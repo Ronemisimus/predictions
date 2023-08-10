@@ -1,4 +1,4 @@
-package predictions.rule;
+package predictions.rule.api;
 
 import predictions.action.api.Action;
 

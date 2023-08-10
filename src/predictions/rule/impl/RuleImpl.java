@@ -1,6 +1,8 @@
-package predictions.rule;
+package predictions.rule.impl;
 
 import predictions.action.api.Action;
+import predictions.rule.api.Activation;
+import predictions.rule.api.Rule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +13,10 @@ public class RuleImpl implements Rule {
     private Activation activation;
     private final List<Action> actions;
 
-    public RuleImpl(String name) {
+    public RuleImpl(String name, Activation activation) {
         this.name = name;
         actions = new ArrayList<>();
+        this.activation = activation;
     }
 
     @Override

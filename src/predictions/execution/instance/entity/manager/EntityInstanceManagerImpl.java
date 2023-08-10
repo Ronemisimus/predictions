@@ -1,9 +1,9 @@
-package predictions.execution.instance.enitty.manager;
+package predictions.execution.instance.entity.manager;
 
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.property.api.PropertyDefinition;
-import predictions.execution.instance.enitty.EntityInstance;
-import predictions.execution.instance.enitty.EntityInstanceImpl;
+import predictions.execution.instance.entity.EntityInstance;
+import predictions.execution.instance.entity.EntityInstanceImpl;
 import predictions.execution.instance.property.PropertyInstance;
 import predictions.execution.instance.property.PropertyInstanceImpl;
 
@@ -43,6 +43,11 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
 
     @Override
     public void killEntity(int id) {
-        // some implementation...
+        for (EntityInstance entityInstance : instances) {
+            if (entityInstance.getId() == id) {
+                instances.remove(entityInstance);
+                return;
+            }
+        }
     }
 }

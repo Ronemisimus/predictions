@@ -1,4 +1,4 @@
-package predictions.rule;
+package predictions.rule.api;
 
 public interface Activation {
     boolean isActive(int tickNumber);

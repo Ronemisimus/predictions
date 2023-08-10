@@ -5,6 +5,7 @@ import predictions.definition.property.api.PropertyDefinition;
 public interface PropertyInstance {
     PropertyDefinition getPropertyDefinition();
     Object getValue();
-    void updateValue(Object val);
+    void updateValue(Object val, int timeModification);
+    int getTimeModification();
 
 }

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/prediction_nuvo.iml" filepath="$PROJECT_DIR$/prediction_nuvo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/prediction_neo.iml" filepath="$PROJECT_DIR$/prediction_neo.iml" />
     </modules>
   </component>
 </project>

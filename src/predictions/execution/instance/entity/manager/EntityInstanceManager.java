@@ -1,7 +1,7 @@
-package predictions.execution.instance.enitty.manager;
+package predictions.execution.instance.entity.manager;
 
 import predictions.definition.entity.EntityDefinition;
-import predictions.execution.instance.enitty.EntityInstance;
+import predictions.execution.instance.entity.EntityInstance;
 
 import java.util.List;
 

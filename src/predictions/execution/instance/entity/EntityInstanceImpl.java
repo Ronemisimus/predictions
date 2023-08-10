@@ -1,4 +1,4 @@
-package predictions.execution.instance.enitty;
+package predictions.execution.instance.entity;
 
 import predictions.definition.entity.EntityDefinition;
 import predictions.execution.instance.property.PropertyInstance;

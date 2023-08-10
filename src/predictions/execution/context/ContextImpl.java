@@ -1,7 +1,7 @@
 package predictions.execution.context;
 
-import predictions.execution.instance.enitty.EntityInstance;
-import predictions.execution.instance.enitty.manager.EntityInstanceManager;
+import predictions.execution.instance.entity.EntityInstance;
+import predictions.execution.instance.entity.manager.EntityInstanceManager;
 import predictions.execution.instance.environment.api.ActiveEnvironment;
 import predictions.execution.instance.property.PropertyInstance;
 

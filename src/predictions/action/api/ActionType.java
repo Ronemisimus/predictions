@@ -1,5 +1,12 @@
 package predictions.action.api;
 
 public enum ActionType {
-    INCREASE, DECREASE, KILL
+    INCREASE,
+    DECREASE,
+    CALCULATION,
+    CONDITION,
+    SET,
+    KILL,
+    REPLACE,
+    PROXIMITY
 }
