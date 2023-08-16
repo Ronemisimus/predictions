@@ -1,7 +1,6 @@
 package predictions.expression.impl;
 
 import predictions.execution.context.Context;
-import predictions.execution.instance.entity.EntityInstance;
 import predictions.expression.api.Expression;
 
 public class PropertyExpression<T> implements Expression<T> {

@@ -1,8 +1,5 @@
 package predictions.expression.api;
 
-import predictions.expression.api.Expression;
-import predictions.expression.api.MathOperation;
-
 public abstract class DualExpression<T> implements Expression<T> {
 
     private Expression<T> expression1;

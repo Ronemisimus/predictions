@@ -34,7 +34,7 @@ public class Main {
         // define rules by creating instances of actions
         Activation a = new ActivationImpl(2, 1);
         Rule rule1 = new RuleImpl("rule 1", a);
-        rule1.addAction(new IncreaseAction(smokerEntityDefinition, "age", "1+environment(tax-amount)-environment(tax-amount)"));
+        rule1.addAction(new IncreaseAction(smokerEntityDefinition, "age", "percent(1,environment(tax-amount))+5"));
         rule1.addAction(new IncreaseAction(smokerEntityDefinition, "smokingInDay", "3"));
         //rule1.addAction(new KillAction(smokerEntityDefinition));
 

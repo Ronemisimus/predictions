@@ -27,23 +27,17 @@ public class IncreaseAction extends AbstractAction {
             throw new IllegalArgumentException("increase action can't operate on a none number property [" + property);
         }
 
-        Integer v = PropertyType.DECIMAL.convert(propertyInstance.getValue());
+        Double expVal = byExpression.evaluate(context);
 
-        // something that evaluates expression to a number, say the result is 5...
-        // now you can also access the environment variables through the active environment...
-        // PropertyInstance blaPropertyInstance = activeEnvironment.getProperty("bla");
-        int x = (int) Math.round(byExpression.evaluate(context));
+        // TODO: get world ticks
+        int world_time = 500;
 
-        // actual calculation
-        int result = x + v;
-
-        // updating result on the property
-        // TODO: pass real world time
-        propertyInstance.updateValue(result, 5);
-    }
-
-    private boolean verifyNumericPropertyType(PropertyInstance propertyValue) {
-        return
-                PropertyType.DECIMAL.equals(propertyValue.getPropertyDefinition().getType()) || PropertyType.FLOAT.equals(propertyValue.getPropertyDefinition().getType());
+        if (propertyInstance.getPropertyDefinition().getType() == PropertyType.DECIMAL) {
+            int propVal = (Integer) propertyInstance.getValue();
+            propertyInstance.updateValue(Math.round(propVal + expVal.doubleValue()), world_time);
+        } else if (propertyInstance.getPropertyDefinition().getType() == PropertyType.FLOAT) {
+            double propVal = (Double) propertyInstance.getValue();
+            propertyInstance.updateValue(propVal + expVal.doubleValue(), world_time);
+        }
     }
 }

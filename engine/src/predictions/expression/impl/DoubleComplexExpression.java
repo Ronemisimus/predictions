@@ -14,13 +14,11 @@ public class DoubleComplexExpression implements Expression<Double> {
 
     private Expression<Double> res;
     private Pattern simple_expression_pattern;
-    private Pattern complex_expression_pattern;
     private String expression;
 
     public DoubleComplexExpression(String expression) {
         this.expression = expression;
         simple_expression_pattern = Pattern.compile(RegexpConstants.SIMPLE_MATH_EXPRESSION_REGEX_STR);
-        complex_expression_pattern = Pattern.compile(RegexpConstants.COMPLEX_MATH_REGEX_STR);
         res = buildExpression(expression);
     }
 
@@ -30,17 +28,28 @@ public class DoubleComplexExpression implements Expression<Double> {
         Expression<Double> e1;
         Expression<Double> e2;
 
+        String before;
+        String match;
+
         if (isExpressionSimple(expression))
         {
             return buildSimpleExpression(expression);
         }
 
         int opIndex = getComplexOpIndex(expression);
-        String before = expression.substring(0, opIndex);
-        String match = expression.substring(opIndex,opIndex+1);
-        // get string after first match
-        expression = expression.substring(opIndex+1);
-
+        if (opIndex!=-1)
+        {
+            before = expression.substring(0, opIndex);
+            match = expression.substring(opIndex,opIndex+1);
+            // get string after first match
+            expression = expression.substring(opIndex+1);
+        }
+        else
+        {
+            before = "";
+            match = expression;
+            expression = "";
+        }
         // analyze operation
         try {
             op = MathOperation.getInstance(match);
@@ -99,18 +108,45 @@ public class DoubleComplexExpression implements Expression<Double> {
     }
 
     private Expression<Double> catchPercent(String match) {
-        Matcher percentMatcher = Pattern.compile(RegexpConstants.PERCENT_REGEX_STR).matcher(match);
-        if (!percentMatcher.matches())
+        boolean matchesPercent = checkPercent(match);
+        if (!matchesPercent)
         {
             throw new RuntimeException("Unknown math operation " + match + " in expression" + this.expression);
         }
         MathOperation op = MathOperation.PERCENT;
         match = match.substring(MathOperation.PERCENT.toString().length());
         String exp1 = match.substring(1, match.indexOf(","));
-        String exp2 = match.substring(match.indexOf(",")+1);
+        String exp2 = match.substring(match.indexOf(",")+1, match.length()-1);
         Expression<Double> e1 = buildExpression(exp1);
         Expression<Double> e2 = buildExpression(exp2);
         return new DualMathExpression(op, e1, e2);
+    }
+
+    private boolean checkPercent(String match) {
+        if(match.startsWith(RegexpConstants.PERCENT_REGEX_STR))
+        {
+            match = match.substring(RegexpConstants.PERCENT_REGEX_STR.length());
+            int level = 0;
+            if (match.charAt(0) == '(')
+            {
+                level = 1;
+            }
+            for (int i=1; i<match.length(); i++)
+            {
+                if (match.charAt(i) == '(')
+                {
+                    level++;
+                }
+                else if (match.charAt(i) == ')')
+                {
+                    level--;
+                    if (level<0) return false;
+                }
+                else if (level==0) return false;
+            }
+            if (level==0) return true;
+        }
+        return false;
     }
 
     private boolean isExpressionSimple(String expression){

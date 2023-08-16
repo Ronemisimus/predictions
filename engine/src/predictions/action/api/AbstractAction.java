@@ -1,6 +1,8 @@
 package predictions.action.api;
 
 import predictions.definition.entity.EntityDefinition;
+import predictions.definition.property.api.PropertyType;
+import predictions.execution.instance.property.PropertyInstance;
 
 public abstract class AbstractAction implements Action {
 
@@ -20,5 +22,10 @@ public abstract class AbstractAction implements Action {
     @Override
     public EntityDefinition getContextEntity() {
         return entityDefinition;
+    }
+
+    protected boolean verifyNumericPropertyType(PropertyInstance propertyValue) {
+        return
+                PropertyType.DECIMAL.equals(propertyValue.getPropertyDefinition().getType()) || PropertyType.FLOAT.equals(propertyValue.getPropertyDefinition().getType());
     }
 }
