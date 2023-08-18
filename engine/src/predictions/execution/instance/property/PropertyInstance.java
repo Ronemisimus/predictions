@@ -2,10 +2,10 @@ package predictions.execution.instance.property;
 
 import predictions.definition.property.api.PropertyDefinition;
 
-public interface PropertyInstance {
-    PropertyDefinition getPropertyDefinition();
-    Object getValue();
-    void updateValue(Object val, int timeModification);
+public interface PropertyInstance<T> {
+    PropertyDefinition<T> getPropertyDefinition();
+    Comparable<T> getValue();
+    void updateValue(Comparable<?> val, int timeModification);
     int getTimeModification();
 
 }

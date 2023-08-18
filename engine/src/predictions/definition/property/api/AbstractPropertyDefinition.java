@@ -2,7 +2,7 @@ package predictions.definition.property.api;
 
 import predictions.definition.value.generator.api.ValueGenerator;
 
-public abstract class AbstractPropertyDefinition<T> implements PropertyDefinition {
+public abstract class AbstractPropertyDefinition<T> implements PropertyDefinition<T> {
 
     private final String name;
     private final PropertyType propertyType;
@@ -25,7 +25,18 @@ public abstract class AbstractPropertyDefinition<T> implements PropertyDefinitio
     }
 
     @Override
-    public T generateValue() {
+    public Comparable<T> generateValue() {
         return valueGenerator.generateValue();
+    }
+
+    @Override
+    public boolean isLegal(Comparable<?> value) {
+        try{
+            propertyType.convert(value);
+            return true;
+        }catch (IllegalArgumentException e)
+        {
+            return false;
+        }
     }
 }

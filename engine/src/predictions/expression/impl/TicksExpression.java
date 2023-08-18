@@ -17,7 +17,7 @@ public class TicksExpression implements Expression<Double> {
     }
 
     @Override
-    public Double evaluate(Context context) {
+    public Comparable<Double> evaluate(Context context) {
         return (double) context.getPrimaryEntityInstance().getPropertyByName(property).getTimeModification();
     }
 }

@@ -11,10 +11,13 @@ public class ContextImpl implements Context {
     private EntityInstanceManager entityInstanceManager;
     private ActiveEnvironment activeEnvironment;
 
-    public ContextImpl(EntityInstance primaryEntityInstance, EntityInstanceManager entityInstanceManager, ActiveEnvironment activeEnvironment) {
+    private int tick;
+
+    public ContextImpl(EntityInstance primaryEntityInstance, EntityInstanceManager entityInstanceManager, ActiveEnvironment activeEnvironment, int tick) {
         this.primaryEntityInstance = primaryEntityInstance;
         this.entityInstanceManager = entityInstanceManager;
         this.activeEnvironment = activeEnvironment;
+        this.tick = tick;
     }
 
     @Override
@@ -28,7 +31,12 @@ public class ContextImpl implements Context {
     }
 
     @Override
-    public PropertyInstance getEnvironmentVariable(String name) {
+    public PropertyInstance<?> getEnvironmentVariable(String name) {
         return activeEnvironment.getProperty(name);
+    }
+
+    @Override
+    public int getTick() {
+        return tick;
     }
 }

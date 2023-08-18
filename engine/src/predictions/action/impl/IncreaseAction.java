@@ -7,6 +7,7 @@ import predictions.definition.property.api.PropertyType;
 import predictions.execution.context.Context;
 import predictions.execution.instance.property.PropertyInstance;
 import predictions.expression.api.Expression;
+import predictions.expression.api.MathOperation;
 import predictions.expression.impl.DoubleComplexExpression;
 
 public class IncreaseAction extends AbstractAction {
@@ -22,22 +23,25 @@ public class IncreaseAction extends AbstractAction {
 
     @Override
     public void invoke(Context context) {
-        PropertyInstance propertyInstance = context.getPrimaryEntityInstance().getPropertyByName(property);
-        if (!verifyNumericPropertyType(propertyInstance)) {
+        PropertyInstance<?> propertyInstance = context.getPrimaryEntityInstance().getPropertyByName(property);
+        if (verifyNonNumericPropertyType(propertyInstance)) {
             throw new IllegalArgumentException("increase action can't operate on a none number property [" + property);
         }
 
-        Double expVal = byExpression.evaluate(context);
+        Comparable<Double> expVal = byExpression.evaluate(context);
 
-        // TODO: get world ticks
-        int world_time = 500;
+        int world_time = context.getTick();
 
         if (propertyInstance.getPropertyDefinition().getType() == PropertyType.DECIMAL) {
-            int propVal = (Integer) propertyInstance.getValue();
-            propertyInstance.updateValue(Math.round(propVal + expVal.doubleValue()), world_time);
+            PropertyInstance<Integer> prop = (PropertyInstance<Integer>) propertyInstance;
+            Comparable<Double> val = (double) (int) prop.getValue();
+            Comparable<Double> res = MathOperation.ADD.evaluate(val, expVal);
+            prop.updateValue((int)(double)res, world_time);
         } else if (propertyInstance.getPropertyDefinition().getType() == PropertyType.FLOAT) {
-            double propVal = (Double) propertyInstance.getValue();
-            propertyInstance.updateValue(propVal + expVal.doubleValue(), world_time);
+            PropertyInstance<Double> prop = (PropertyInstance<Double>) propertyInstance;
+            Comparable<Double> val = prop.getValue();
+            Comparable<Double> res = MathOperation.ADD.evaluate(val, expVal);
+            prop.updateValue(res, world_time);
         }
     }
 }

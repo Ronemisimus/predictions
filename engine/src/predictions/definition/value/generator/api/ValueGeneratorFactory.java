@@ -6,7 +6,7 @@ import predictions.definition.value.generator.random.impl.numeric.RandomIntegerG
 
 public interface ValueGeneratorFactory {
 
-    static <T> ValueGenerator<T> createFixed(T value) {
+    static <T> ValueGenerator<T> createFixed(Comparable<T> value) {
         return new FixedValueGenerator<>(value);
     }
 

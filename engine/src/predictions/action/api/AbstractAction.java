@@ -24,8 +24,8 @@ public abstract class AbstractAction implements Action {
         return entityDefinition;
     }
 
-    protected boolean verifyNumericPropertyType(PropertyInstance propertyValue) {
+    public static boolean verifyNonNumericPropertyType(PropertyInstance<?> propertyValue) {
         return
-                PropertyType.DECIMAL.equals(propertyValue.getPropertyDefinition().getType()) || PropertyType.FLOAT.equals(propertyValue.getPropertyDefinition().getType());
+                !PropertyType.DECIMAL.equals(propertyValue.getPropertyDefinition().getType()) && !PropertyType.FLOAT.equals(propertyValue.getPropertyDefinition().getType());
     }
 }

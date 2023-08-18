@@ -13,7 +13,7 @@ public abstract class DualExpression<T> implements Expression<T> {
         return expression2;
     }
 
-    public DualExpression(Expression a, Expression b) {
+    public DualExpression(Expression<T> a, Expression<T> b) {
         this.expression1 = a;
         this.expression2 = b;
     }

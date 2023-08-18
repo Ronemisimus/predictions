@@ -13,7 +13,7 @@ import java.util.List;
 public class EntityInstanceManagerImpl implements EntityInstanceManager {
 
     private int count;
-    private List<EntityInstance> instances;
+    private final List<EntityInstance> instances;
 
     public EntityInstanceManagerImpl() {
         count = 0;
@@ -27,12 +27,27 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
         EntityInstance newEntityInstance = new EntityInstanceImpl(entityDefinition, count);
         instances.add(newEntityInstance);
 
-        for (PropertyDefinition propertyDefinition : entityDefinition.getProps()) {
-            Object value = propertyDefinition.generateValue();
-            PropertyInstance newPropertyInstance = new PropertyInstanceImpl(propertyDefinition, value);
-            newEntityInstance.addPropertyInstance(newPropertyInstance);
-        }
+        entityDefinition.getProps().forEach(prop -> {
+            PropertyInstance<?> res;
 
+            switch (prop.getType()) {
+                case STRING:
+                    res = new PropertyInstanceImpl<>((PropertyDefinition<String>) prop, (String) prop.generateValue());
+                    break;
+                case DECIMAL:
+                    res = new PropertyInstanceImpl<>((PropertyDefinition<Integer>) prop, (Integer) prop.generateValue());
+                    break;
+                case FLOAT:
+                    res = new PropertyInstanceImpl<>((PropertyDefinition<Double>) prop, (Double) prop.generateValue());
+                    break;
+                case BOOLEAN:
+                    res = new PropertyInstanceImpl<>((PropertyDefinition<Boolean>) prop, (Boolean) prop.generateValue());
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unsupported property type");
+            }
+            newEntityInstance.addPropertyInstance(res);
+        });
         return newEntityInstance;
     }
 

@@ -16,12 +16,12 @@ public class RandomExpression implements Expression<Double> {
     }
 
     public static Expression<Double> BuildInstance(String simpleExpression) {
-        int to = Integer.parseInt(simpleExpression.substring(simpleExpression.indexOf('('), simpleExpression.indexOf(')')));
+        int to = Integer.parseInt(simpleExpression.substring(simpleExpression.indexOf('(')+1, simpleExpression.indexOf(')')));
         return new RandomExpression(to);
     }
 
     @Override
-    public Double evaluate(Context context) {
+    public Comparable<Double> evaluate(Context context) {
         return (double) random.nextInt(to+1);
     }
 }

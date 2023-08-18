@@ -4,14 +4,14 @@ import predictions.definition.value.generator.api.ValueGenerator;
 
 public class FixedValueGenerator<T> implements ValueGenerator<T> {
 
-    private final T fixedValue;
+    private final Comparable<T> fixedValue;
 
-    public FixedValueGenerator(T fixedValue) {
+    public FixedValueGenerator(Comparable<T> fixedValue) {
         this.fixedValue = fixedValue;
     }
 
     @Override
-    public T generateValue() {
+    public Comparable<T> generateValue() {
         return fixedValue;
     }
 }

@@ -1,7 +1,16 @@
 package predictions.definition.property.api;
 
-public interface PropertyDefinition {
+import predictions.execution.instance.property.PropertyInstance;
+import predictions.execution.instance.property.PropertyInstanceImpl;
+
+public interface PropertyDefinition<T> {
     String getName();
     PropertyType getType();
-    Object generateValue();
+    Comparable<T> generateValue();
+
+    boolean isLegal(Comparable<?> value);
+
+    static PropertyInstance<?> instantiate(PropertyDefinition<?> def) {
+        return new PropertyInstanceImpl<Object>((PropertyDefinition<Object>) def, (Comparable<Object>) def.generateValue());
+    }
 }

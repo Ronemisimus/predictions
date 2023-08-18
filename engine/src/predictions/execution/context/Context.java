@@ -6,5 +6,7 @@ import predictions.execution.instance.property.PropertyInstance;
 public interface Context {
     EntityInstance getPrimaryEntityInstance();
     void removeEntity(EntityInstance entityInstance);
-    PropertyInstance getEnvironmentVariable(String name);
+    PropertyInstance<?> getEnvironmentVariable(String name);
+
+    int getTick();
 }

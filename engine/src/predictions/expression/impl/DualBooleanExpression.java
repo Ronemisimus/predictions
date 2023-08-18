@@ -9,16 +9,16 @@ public class DualBooleanExpression extends DualExpression<Boolean> {
 
     private BooleanOperation booleanOperation;
 
-    public DualBooleanExpression(BooleanOperation booleanOperation, Expression a, Expression b) {
+    public DualBooleanExpression(BooleanOperation booleanOperation, Expression<Boolean> a, Expression<Boolean> b) {
         super(a, b);
         this.booleanOperation = booleanOperation;
     }
 
     @Override
-    public Boolean evaluate(Context context) {
+    public Comparable<Boolean> evaluate(Context context) {
         return booleanOperation.evaluate(
-                (Boolean) getExpression1().evaluate(context),
-                (Boolean) getExpression2().evaluate(context)
+                getExpression1().evaluate(context),
+                getExpression2().evaluate(context)
         );
     }
 }

@@ -3,47 +3,47 @@ package predictions.expression.api;
 public enum MathOperation {
     ADD("+") {
         @Override
-        public Double evaluate(Double a, Double b) {
-            return a+b;
+        public Comparable<Double> evaluate(Comparable<Double> a, Comparable<Double> b) {
+            return (Double)a+ (Double)b;
         }
     },
     SUBTRACT("-") {
         @Override
-        public Double evaluate(Double a, Double b) {
-            return a-b;
+        public Comparable<Double> evaluate(Comparable<Double> a, Comparable<Double> b) {
+            return (Double)a- (Double) b;
         }
     },
     MULTIPLY("*") {
         @Override
-        public Double evaluate(Double a, Double b) {
-            return a*b;
+        public Comparable<Double> evaluate(Comparable<Double> a, Comparable<Double> b) {
+            return (Double)a*(Double) b;
         }
     },
     DIVIDE("/") {
         @Override
-        public Double evaluate(Double a, Double b) {
-            if (b == 0) {
+        public Comparable<Double> evaluate(Comparable<Double> a, Comparable<Double> b) {
+            if (b.equals(0.0)) {
                 throw new IllegalArgumentException("division by zero");
             }
-            return a/b;
+            return (Double)a/(Double) b;
         }
     },
     PERCENT("percent") {
         @Override
-        public Double evaluate(Double a, Double b) {
-            if (b<0 || b>100) {
+        public Comparable<Double> evaluate(Comparable<Double> a, Comparable<Double> b) {
+            if (b.compareTo(0.0)<0 || b.compareTo(100.0)>0) {
                 throw new IllegalArgumentException("percent value must be between 0 and 100");
             }
-            return a*b/100;
+            return (Double)a*(Double) b/100;
         }
     };
-    private String sign;
+    private final String sign;
 
-    private MathOperation(String sign) {
+    MathOperation(String sign) {
         this.sign = sign;
     }
 
-    public abstract Double evaluate(Double a, Double b);
+    public abstract Comparable<Double> evaluate(Comparable<Double> a, Comparable<Double> b);
 
     @Override
     public String toString() {

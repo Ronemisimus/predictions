@@ -7,7 +7,7 @@ public class RandomIntegerGenerator extends AbstractNumericRandomGenerator<Integ
     }
 
     @Override
-    public Integer generateValue() {
+    public Comparable<Integer> generateValue() {
         return from + random.nextInt(to-from);
     }
 }

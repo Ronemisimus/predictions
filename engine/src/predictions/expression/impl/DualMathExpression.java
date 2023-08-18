@@ -9,16 +9,16 @@ public class DualMathExpression extends DualExpression<Double> {
 
     private MathOperation mathOperation;
 
-    public DualMathExpression(MathOperation mathOperation, Expression a, Expression b) {
+    public DualMathExpression(MathOperation mathOperation, Expression<Double> a, Expression<Double> b) {
         super(a, b);
         this.mathOperation = mathOperation;
     }
 
     @Override
-    public Double evaluate(Context context) {
+    public Comparable<Double> evaluate(Context context) {
         return mathOperation.evaluate(
-                (Double) getExpression1().evaluate(context),
-                (Double) getExpression2().evaluate(context)
+                getExpression1().evaluate(context),
+                getExpression2().evaluate(context)
         );
     }
 }

@@ -6,7 +6,7 @@ public class RandomDoubleGenerator extends AbstractNumericRandomGenerator<Double
     }
 
     @Override
-    public Double generateValue() {
+    public Comparable<Double> generateValue() {
         return from + random.nextDouble() * (to - from);
     }
 }

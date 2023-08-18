@@ -6,8 +6,8 @@ import java.util.Random;
 
 public class ActivationImpl implements Activation {
 
-    private int cycleSizeInTicks;
-    private double probability;
+    private final int cycleSizeInTicks;
+    private final double probability;
 
     private Random rand;
 

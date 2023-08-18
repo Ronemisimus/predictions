@@ -65,7 +65,7 @@ public class DoubleComplexExpression implements Expression<Double> {
         }
 
         // build sub expressions
-        if (res == null && op != null) {
+        if (res == null) {
             if (isExpressionSimple(before)) e1 = buildSimpleExpression(before);
             else e1 = buildExpression(before);
             if (isExpressionSimple(expression)) e2 = buildSimpleExpression(expression);
@@ -94,7 +94,7 @@ public class DoubleComplexExpression implements Expression<Double> {
                 MathOperation op = null;
                 try {
                     op = MathOperation.getInstance(sign);
-                }catch (RuntimeException e)
+                }catch (RuntimeException ignored)
                 {
 
                 }
@@ -144,7 +144,7 @@ public class DoubleComplexExpression implements Expression<Double> {
                 }
                 else if (level==0) return false;
             }
-            if (level==0) return true;
+            return level == 0;
         }
         return false;
     }
@@ -160,11 +160,11 @@ public class DoubleComplexExpression implements Expression<Double> {
         Pattern evaluatePattern = Pattern.compile(RegexpConstants.EVALUATE_REGEX_STR);
         Pattern environmentPattern = Pattern.compile(RegexpConstants.ENVIRONMENT_REGEX_STR);
 
-        Pattern arr[] = {numberPattern, tickPattern, randomPattern, evaluatePattern, environmentPattern};
+        Pattern[] arr = {numberPattern, tickPattern, randomPattern, evaluatePattern, environmentPattern};
 
         Optional<Matcher> mOpt =  Arrays.stream(arr).map(
                 p -> p.matcher(simpleExpression)
-        ).filter(m -> m.matches()).findFirst();
+        ).filter(Matcher::matches).findFirst();
 
         if (!mOpt.isPresent()) throw new RuntimeException("Unknown basic expression " + simpleExpression + " in expression" + this.expression);
 
@@ -186,7 +186,7 @@ public class DoubleComplexExpression implements Expression<Double> {
 
 
     @Override
-    public Double evaluate(Context context) {
+    public Comparable<Double> evaluate(Context context) {
         return res.evaluate(context);
     }
 }

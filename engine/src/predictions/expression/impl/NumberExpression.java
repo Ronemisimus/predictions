@@ -12,7 +12,7 @@ public class NumberExpression implements Expression<Double> {
     }
 
     @Override
-    public Double evaluate(Context context) {
+    public Comparable<Double> evaluate(Context context) {
         return number;
     }
 }

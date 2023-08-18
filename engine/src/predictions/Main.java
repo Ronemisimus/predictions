@@ -6,27 +6,20 @@ import predictions.action.impl.IncreaseAction;
 import predictions.action.impl.KillAction;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.entity.EntityDefinitionImpl;
-import predictions.definition.value.generator.api.ValueGenerator;
 import predictions.definition.world.api.World;
 import predictions.definition.world.impl.WorldImpl;
-import predictions.execution.context.Context;
-import predictions.execution.context.ContextImpl;
-import predictions.execution.instance.environment.api.ActiveEnvironment;
 import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.definition.environment.impl.EnvVariableManagerImpl;
 import predictions.definition.property.impl.IntegerPropertyDefinition;
 import predictions.definition.value.generator.api.ValueGeneratorFactory;
-import predictions.execution.instance.entity.EntityInstance;
-import predictions.execution.instance.entity.manager.EntityInstanceManager;
-import predictions.execution.instance.entity.manager.EntityInstanceManagerImpl;
-import predictions.execution.instance.property.PropertyInstanceImpl;
+import predictions.execution.instance.world.WorldInstance;
+import predictions.execution.instance.world.WorldInstanceImpl;
 import predictions.expression.api.BooleanOperation;
 import predictions.expression.api.Expression;
 import predictions.expression.api.SingleBooleanOperation;
 import predictions.expression.impl.DoubleComplexExpression;
 import predictions.expression.impl.DualBooleanExpression;
 import predictions.expression.impl.SingleBooleanExpression;
-import predictions.rule.api.Activation;
 import predictions.rule.api.Rule;
 import predictions.rule.impl.ActivationImpl;
 import predictions.rule.impl.RuleImpl;
@@ -35,30 +28,25 @@ import predictions.termination.impl.TicksTermination;
 import predictions.termination.impl.TimeTermination;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        // TODO: add ranges to properties
-        // TODO: change property to comparable?
         EnvVariablesManager env = new EnvVariableManagerImpl();
         env.addEnvironmentVariable(
                 new IntegerPropertyDefinition(
                         "cigarets-critical",
-                        ValueGeneratorFactory.createRandomInteger(10,100)));
+                        ValueGeneratorFactory.createRandomInteger(10,100),10, 100));
         env.addEnvironmentVariable(
                 new IntegerPropertyDefinition(
                         "cigarets-increase-non-smoker",
-                        ValueGeneratorFactory.createRandomInteger(0,10)));
+                        ValueGeneratorFactory.createRandomInteger(0,10), 0, 10));
         env.addEnvironmentVariable(
                 new IntegerPropertyDefinition(
                         "cigarets-increase-already-smoker",
-                        ValueGeneratorFactory.createRandomInteger(10,100)));
+                        ValueGeneratorFactory.createRandomInteger(10,100), 10, 100));
         Set<EntityDefinition> entityDefinitions = new HashSet<>();
 
         EntityDefinition smoker = new EntityDefinitionImpl("Smoker", 100);
@@ -66,18 +54,18 @@ public class Main {
         smoker.getProps().add(
                 new IntegerPropertyDefinition(
                         "lung-cancer-progress",
-                        ValueGeneratorFactory.createFixed(0)));
+                        ValueGeneratorFactory.createFixed(0),0,100));
         smoker.getProps().add(
                 new IntegerPropertyDefinition(
                         "age",
-                        ValueGeneratorFactory.createRandomInteger(15,50)));
+                        ValueGeneratorFactory.createRandomInteger(15,50),15,50));
         smoker.getProps().add(
             new IntegerPropertyDefinition(
                     "cigarets-per-month",
-                    ValueGeneratorFactory.createRandomInteger(0,500)));
+                    ValueGeneratorFactory.createRandomInteger(0,500),0,500));
         entityDefinitions.add(smoker);
 
-        Set<Rule> rules = new HashSet<>();
+        Set<Rule> rules = new LinkedHashSet<>();
 
         Rule r1 = new RuleImpl("aging", new ActivationImpl(12, 1));
         r1.addAction(new IncreaseAction(
@@ -138,9 +126,15 @@ public class Main {
 
         Set<Termination> term = new HashSet<>();
         term.add(new TicksTermination(840));
-        term.add(new TimeTermination(Duration.ofSeconds(10)));
+        term.add(new TimeTermination(Duration.ofSeconds(10000)));
 
         World w = new WorldImpl(env, entityDefinitions, rules, term);
+
+        WorldInstance wi = new WorldInstanceImpl(w);
+
+        Map.Entry<Integer,Termination> res = wi.run();
+
+        System.out.println(wi.getEntityCounts());
 
 
     }

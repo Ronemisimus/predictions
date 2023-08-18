@@ -10,7 +10,7 @@ public class EntityInstanceImpl implements EntityInstance {
 
     private final EntityDefinition entityDefinition;
     private final int id;
-    private Map<String, PropertyInstance> properties;
+    private Map<String, PropertyInstance<?>> properties;
 
     public EntityInstanceImpl(EntityDefinition entityDefinition, int id) {
         this.entityDefinition = entityDefinition;
@@ -24,7 +24,7 @@ public class EntityInstanceImpl implements EntityInstance {
     }
 
     @Override
-    public PropertyInstance getPropertyByName(String name) {
+    public PropertyInstance<?> getPropertyByName(String name) {
         if (!properties.containsKey(name)) {
             throw new IllegalArgumentException("for entity of type " + entityDefinition.getName() + " has no property named " + name);
         }
@@ -33,7 +33,12 @@ public class EntityInstanceImpl implements EntityInstance {
     }
 
     @Override
-    public void addPropertyInstance(PropertyInstance propertyInstance) {
+    public void addPropertyInstance(PropertyInstance<?> propertyInstance) {
         properties.put(propertyInstance.getPropertyDefinition().getName(), propertyInstance);
+    }
+
+    @Override
+    public String getEntityTypeName() {
+        return entityDefinition.getName();
     }
 }

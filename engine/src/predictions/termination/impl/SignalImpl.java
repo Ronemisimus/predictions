@@ -6,8 +6,8 @@ import java.time.Instant;
 
 public class SignalImpl implements Signal {
 
-    private boolean userRequestedTermination;
-    private int world_ticks;
+    private final boolean userRequestedTermination;
+    private final int world_ticks;
 
     public SignalImpl(boolean userRequestedTermination, int world_ticks) {
         this.userRequestedTermination = userRequestedTermination;

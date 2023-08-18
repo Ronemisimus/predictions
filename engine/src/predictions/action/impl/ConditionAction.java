@@ -7,20 +7,20 @@ import predictions.definition.entity.EntityDefinition;
 import predictions.execution.context.Context;
 import predictions.expression.api.Expression;
 
-import java.util.List;
+import java.util.Collection;
 
 public class ConditionAction extends AbstractAction {
 
-    private Expression<Boolean> condition;
+    private final Expression<Boolean> condition;
 
-    private List<Action> then_actions;
+    private final Collection<Action> then_actions;
 
-    private List<Action> else_actions;
+    private final Collection<Action> else_actions;
 
     public ConditionAction(EntityDefinition entityDefinition,
                            Expression<Boolean> condition,
-                           List<Action> then_actions,
-                           List<Action> else_actions) {
+                           Collection<Action> then_actions,
+                           Collection<Action> else_actions) {
         super(ActionType.CONDITION, entityDefinition);
         this.condition = condition;
         this.then_actions = then_actions;
@@ -29,7 +29,7 @@ public class ConditionAction extends AbstractAction {
 
     @Override
     public void invoke(Context context) {
-        if (condition.evaluate(context)) {
+        if (condition.evaluate(context).equals(true)) {
             then_actions.forEach(a -> a.invoke(context));
         } else {
             else_actions.forEach(a -> a.invoke(context));

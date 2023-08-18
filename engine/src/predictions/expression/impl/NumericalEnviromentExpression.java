@@ -17,8 +17,8 @@ public class NumericalEnviromentExpression implements Expression<Double> {
     }
 
     @Override
-    public Double evaluate(Context context) {
-        PropertyInstance p = context.getEnvironmentVariable(property);
+    public Comparable<Double> evaluate(Context context) {
+        PropertyInstance<?> p = context.getEnvironmentVariable(property);
         switch (p.getPropertyDefinition().getType()) {
             case DECIMAL:
                 return ((Integer)p.getValue()).doubleValue();

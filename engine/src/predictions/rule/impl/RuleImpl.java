@@ -10,7 +10,7 @@ import java.util.List;
 public class RuleImpl implements Rule {
 
     private final String name;
-    private Activation activation;
+    private final Activation activation;
     private final List<Action> actions;
 
     public RuleImpl(String name, Activation activation) {

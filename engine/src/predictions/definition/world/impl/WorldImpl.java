@@ -9,7 +9,6 @@ import predictions.termination.api.Termination;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
-import java.util.Set;
 
 public class WorldImpl implements World {
 
@@ -20,9 +19,9 @@ public class WorldImpl implements World {
 
 
     public WorldImpl(EnvVariablesManager envVariablesManager,
-                     Set<EntityDefinition> entityDefinitions,
-                     Set<Rule> rules,
-                     Set<Termination> terminations) {
+                     Collection<EntityDefinition> entityDefinitions,
+                     Collection<Rule> rules,
+                     Collection<Termination> terminations) {
         this.envVariablesManager = envVariablesManager;
         this.entityDefinitions = entityDefinitions;
         this.rules = rules;

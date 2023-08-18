@@ -1,5 +1,7 @@
 package predictions.termination.api;
 
 public interface Termination {
-    public boolean isTermination(Signal signal);
+    boolean isTermination(Signal signal);
+
+    TerminationType getTerminationType();
 }
