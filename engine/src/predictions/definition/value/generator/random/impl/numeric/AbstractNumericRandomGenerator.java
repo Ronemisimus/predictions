@@ -11,5 +11,4 @@ public abstract class AbstractNumericRandomGenerator<T> extends AbstractRandomVa
         this.from = from;
         this.to = to;
     }
-
 }

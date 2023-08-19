@@ -1,5 +1,7 @@
 package predictions.termination.impl;
 
+import dto.subdto.show.world.TerminationDto;
+import predictions.generated.PRDBySecond;
 import predictions.termination.api.Signal;
 import predictions.termination.api.Termination;
 import predictions.termination.api.TerminationType;
@@ -9,21 +11,35 @@ import java.time.Instant;
 
 public class TimeTermination implements Termination {
 
-    private final Instant terminationTime;
+    private final Duration terminationDuration;
 
     private static final TerminationType terminationType = TerminationType.TIME;
 
     public TimeTermination(Duration duration) {
-        this.terminationTime = Instant.now().plus(duration);
+        this.terminationDuration = duration;
+    }
+
+    public TimeTermination(PRDBySecond prdTermination) {
+        this(Duration.ofSeconds(prdTermination.getCount()));
     }
 
     @Override
     public boolean isTermination(Signal signal) {
+        Instant terminationTime = Instant.now().plus(terminationDuration);
         return signal.getClock().compareTo(terminationTime) >= 0;
     }
 
     @Override
     public TerminationType getTerminationType() {
         return terminationType;
+    }
+
+    @Override
+    public TerminationDto getDto() {
+        return new TerminationDto(null, Math.toIntExact(this.terminationDuration.getSeconds()), false);
+    }
+
+    public Duration getTerminationDuration() {
+        return terminationDuration;
     }
 }

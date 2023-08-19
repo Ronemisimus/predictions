@@ -1,5 +1,6 @@
 package predictions.execution.instance.property;
 
+import dto.subdto.show.instance.PropertyInstanceDto;
 import predictions.definition.property.api.PropertyDefinition;
 
 public interface PropertyInstance<T> {
@@ -8,4 +9,5 @@ public interface PropertyInstance<T> {
     void updateValue(Comparable<?> val, int timeModification);
     int getTimeModification();
 
+    PropertyInstanceDto getDto();
 }

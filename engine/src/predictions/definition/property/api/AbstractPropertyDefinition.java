@@ -1,12 +1,18 @@
 package predictions.definition.property.api;
 
+import dto.subdto.show.world.PropertyDto;
+import predictions.definition.property.impl.BooleanPropertyDefinition;
+import predictions.definition.property.impl.DoublePropertyDefinition;
+import predictions.definition.property.impl.IntegerPropertyDefinition;
+import predictions.definition.property.impl.StringPropertyDefinition;
 import predictions.definition.value.generator.api.ValueGenerator;
+import predictions.definition.value.generator.api.ValueGeneratorFactory;
 
 public abstract class AbstractPropertyDefinition<T> implements PropertyDefinition<T> {
 
     private final String name;
     private final PropertyType propertyType;
-    private final ValueGenerator<T> valueGenerator;
+    private ValueGenerator<T> valueGenerator;
 
     public AbstractPropertyDefinition(String name, PropertyType propertyType, ValueGenerator<T> valueGenerator) {
         this.name = name;
@@ -29,6 +35,10 @@ public abstract class AbstractPropertyDefinition<T> implements PropertyDefinitio
         return valueGenerator.generateValue();
     }
 
+    protected ValueGenerator<T> getValueGenerator() {
+        return valueGenerator;
+    }
+
     @Override
     public boolean isLegal(Comparable<?> value) {
         try{
@@ -38,5 +48,13 @@ public abstract class AbstractPropertyDefinition<T> implements PropertyDefinitio
         {
             return false;
         }
+    }
+
+    @Override
+    public abstract PropertyDto getDto();
+
+    @Override
+    public void setInit(Comparable<T> comparable) {
+        valueGenerator = ValueGeneratorFactory.createFixed(comparable);
     }
 }

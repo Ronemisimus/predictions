@@ -1,8 +1,10 @@
 package predictions.expression.impl;
 
+import predictions.definition.entity.EntityDefinition;
 import predictions.execution.context.Context;
 import predictions.expression.api.Expression;
 import predictions.expression.api.MathOperation;
+import predictions.generated.PRDCondition;
 import predictions.string.RegexpConstants;
 
 import java.util.Arrays;

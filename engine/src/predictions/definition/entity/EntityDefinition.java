@@ -1,5 +1,6 @@
 package predictions.definition.entity;
 
+import dto.subdto.show.world.EntityDto;
 import predictions.definition.property.api.PropertyDefinition;
 import predictions.execution.instance.entity.EntityInstance;
 
@@ -10,4 +11,6 @@ public interface EntityDefinition {
     int getPopulation();
     List<PropertyDefinition<?>> getProps();
     boolean isInstance(EntityInstance entityInstance);
+
+    EntityDto getDto();
 }

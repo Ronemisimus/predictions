@@ -1,5 +1,6 @@
 package predictions.execution.instance.environment.api;
 
+import dto.subdto.InitializeDto;
 import predictions.execution.instance.property.PropertyInstance;
 
 import java.util.Map;
@@ -10,4 +11,6 @@ public interface ActiveEnvironment {
     void addPropertyInstance(PropertyInstance<?> propertyInstance);
 
     Set<String> getEnvVariableNames();
+
+    InitializeDto getDto();
 }

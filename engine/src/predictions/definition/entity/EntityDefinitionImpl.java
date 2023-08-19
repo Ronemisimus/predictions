@@ -1,11 +1,16 @@
 package predictions.definition.entity;
 
+import dto.subdto.show.world.EntityDto;
+import dto.subdto.show.world.PropertyDto;
+import predictions.ConverterPRDEngine;
 import predictions.definition.property.api.PropertyDefinition;
 import predictions.execution.instance.entity.EntityInstance;
+import predictions.generated.PRDEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class EntityDefinitionImpl implements EntityDefinition {
 
@@ -17,6 +22,13 @@ public class EntityDefinitionImpl implements EntityDefinition {
         this.name = name;
         this.population = population;
         properties = new ArrayList<>();
+    }
+
+    public EntityDefinitionImpl(PRDEntity prdEntity) {
+        this(prdEntity.getName(), prdEntity.getPRDPopulation());
+        prdEntity.getPRDProperties().getPRDProperty().stream()
+                .map(ConverterPRDEngine::getPropertyDefinitionFromPRD)
+                .forEach(properties::add);
     }
 
     @Override
@@ -37,6 +49,12 @@ public class EntityDefinitionImpl implements EntityDefinition {
     @Override
     public boolean isInstance(EntityInstance entityInstance) {
         return entityInstance.getEntityTypeName().equals(name);
+    }
+
+    @Override
+    public EntityDto getDto() {
+        List<PropertyDto> props = properties.stream().map(PropertyDefinition::getDto).collect(Collectors.toList());
+        return new EntityDto(props, name, population);
     }
 
     @Override

@@ -1,5 +1,8 @@
 package console.menu.option;
 
+import console.EngineApi;
+import console.dto.presenter.DTOPresenter;
+
 public class RunSimulation implements MenuItem{
 
     private boolean atLeastOneRun;
@@ -10,10 +13,10 @@ public class RunSimulation implements MenuItem{
 
     @Override
     public boolean run() {
-        System.out.println("running simulation...");
-        // TODO: run the simulation and get success or fail
+        DTOPresenter simulation = EngineApi.getInstance().runSimulation();
+        System.out.println(simulation);
         this.atLeastOneRun = true;
-        return atLeastOneRun;
+        return true;
     }
 
     @Override

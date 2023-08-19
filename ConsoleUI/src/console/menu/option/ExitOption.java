@@ -1,9 +1,21 @@
 package console.menu.option;
 
 public class ExitOption implements MenuItem{
+
+    private String message;
+    public ExitOption(String message)
+    {
+        this.message = message;
+    }
+
+    public ExitOption()
+    {
+        this.message = "goodbye :)";
+    }
+
     @Override
     public boolean run() {
-        System.out.println("goodbye :)");
+        System.out.println(this.message);
         return true;
     }
 

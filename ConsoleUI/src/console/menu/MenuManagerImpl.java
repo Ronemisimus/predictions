@@ -73,4 +73,8 @@ public abstract class MenuManagerImpl implements MenuManager{
         }
         return prompt;
     }
+
+    public List<MenuItem> getOptions() {
+        return options;
+    }
 }

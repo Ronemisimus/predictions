@@ -67,12 +67,12 @@ public class Main {
 
         Set<Rule> rules = new LinkedHashSet<>();
 
-        Rule r1 = new RuleImpl("aging", new ActivationImpl(12, 1));
+        Rule r1 = new RuleImpl("aging", new ActivationImpl(12, 1.));
         r1.addAction(new IncreaseAction(
             smoker, "age", "1"));
         rules.add(r1);
 
-        Rule r2 = new RuleImpl("got cancer", new ActivationImpl(1, 1));
+        Rule r2 = new RuleImpl("got cancer", new ActivationImpl(1, 1.));
         Expression<Boolean> cond_exp = new DualBooleanExpression(
                 BooleanOperation.AND,
                 new SingleBooleanExpression(
@@ -108,7 +108,7 @@ public class Main {
         r3.addAction(cond2);
         rules.add(r3);
 
-        Rule r4 = new RuleImpl("death", new ActivationImpl(1,1));
+        Rule r4 = new RuleImpl("death", new ActivationImpl(1,1.));
         Expression<Boolean> cond_exp3 = new SingleBooleanExpression(
             "lung-cancer-progress",
                 SingleBooleanOperation.BIGGER,

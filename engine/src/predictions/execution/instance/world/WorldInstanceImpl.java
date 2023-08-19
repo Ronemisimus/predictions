@@ -2,6 +2,7 @@ package predictions.execution.instance.world;
 
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.world.api.World;
+import predictions.execution.EntityCountHistory;
 import predictions.execution.context.Context;
 import predictions.execution.context.ContextImpl;
 import predictions.execution.instance.entity.EntityInstance;
@@ -42,7 +43,7 @@ public class WorldInstanceImpl implements WorldInstance{
     public Map.Entry<Integer, Termination> run() {
         this.startTime = Instant.now();
         Termination resTermination = null;
-        Signal s = new SignalImpl(false, tick);
+        Signal s = new SignalImpl(false, tick, this.startTime);
         while((resTermination = isTerminated(s))==null)
         {
             List<EntityInstance> tempList = new ArrayList<>(entityInstanceManager.getInstances());
@@ -58,7 +59,7 @@ public class WorldInstanceImpl implements WorldInstance{
                 });
             });
             this.tick++;
-            s = new SignalImpl(false,this.tick);
+            s = new SignalImpl(false,this.tick, this.startTime);
             System.out.println("finished tick " + this.tick);
         }
         return new AbstractMap.SimpleEntry<>(this.hashCode(), resTermination);
@@ -102,13 +103,13 @@ public class WorldInstanceImpl implements WorldInstance{
     }
 
     @Override
-    public Map<String, Integer> getEntityCounts() {
-        Map<String, Integer> res = new HashMap<>();
+    public Map<String, EntityCountHistory> getEntityCounts() {
+        Map<String, EntityCountHistory> res = new HashMap<>();
         world.getEntityDefinitions().forEachRemaining(entityDefinition -> {
             res.put(entityDefinition.getName(),
-                    Math.toIntExact(
+                    new EntityCountHistory(entityDefinition.getPopulation(), Math.toIntExact(
                             entityInstanceManager.getInstances()
-                                    .stream().filter(entityDefinition::isInstance).count()));
+                                    .stream().filter(entityDefinition::isInstance).count())));
         });
         return res;
     }
@@ -123,6 +124,13 @@ public class WorldInstanceImpl implements WorldInstance{
             Comparable<?> val = entityInstance.getPropertyByName(property).getValue();
             res.put(val, res.getOrDefault(val, 0) + 1);
         });
+        return res;
+    }
+
+    @Override
+    public List<EntityDefinition> getEntityDefinitions() {
+        List<EntityDefinition> res = new ArrayList<>();
+        world.getEntityDefinitions().forEachRemaining(res::add);
         return res;
     }
 

@@ -1,5 +1,10 @@
 package console.menu.option;
 
+import console.EngineApi;
+import console.dto.presenter.DTOPresenter;
+import console.dto.presenter.ReadFilePresenter;
+import console.menu.ReadInput;
+
 public class OpenFile implements MenuItem{
     private boolean atLeastOneFileLoaded;
 
@@ -9,9 +14,10 @@ public class OpenFile implements MenuItem{
 
     @Override
     public boolean run() {
-        System.out.println("opening file...");
-        // TODO: send file name to engine and get success or fail
-        this.atLeastOneFileLoaded = true;
+        System.out.println("Please enter the path of the file to load");
+        DTOPresenter rfp = EngineApi.getInstance().readFile(ReadInput.getString());
+        System.out.println(rfp);
+        this.atLeastOneFileLoaded = rfp.success();
         return atLeastOneFileLoaded;
     }
 

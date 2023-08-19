@@ -1,5 +1,6 @@
 package predictions.execution.instance.property;
 
+import dto.subdto.show.instance.PropertyInstanceDto;
 import predictions.definition.property.api.PropertyDefinition;
 
 public class PropertyInstanceImpl<T> implements PropertyInstance<T> {
@@ -16,7 +17,7 @@ public class PropertyInstanceImpl<T> implements PropertyInstance<T> {
             this.timeModification = 0;
         }
         else {
-            throw new IllegalArgumentException("Illegal value for property " + propertyDefinition.getName());
+            throw new IllegalArgumentException("Illegal value for property " + propertyDefinition.getName() + ", value: " + value);
         }
     }
 
@@ -41,6 +42,11 @@ public class PropertyInstanceImpl<T> implements PropertyInstance<T> {
     @Override
     public int getTimeModification() {
         return timeModification;
+    }
+
+    @Override
+    public PropertyInstanceDto getDto() {
+        return new PropertyInstanceDto(propertyDefinition.getDto(), value);
     }
 
 }

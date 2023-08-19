@@ -1,5 +1,6 @@
 package predictions.definition.world.api;
 
+import dto.subdto.show.world.WorldDto;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.rule.api.Rule;
@@ -17,4 +18,6 @@ public interface World {
     Iterator<Rule> getRules();
 
     Iterator<Termination> getTerminations();
+
+    WorldDto getDto();
 }
