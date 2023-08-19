@@ -52,6 +52,8 @@ public class RunHistoryPresenter extends DTOPresenter{
                         entityHistogram :
                         "\t" + dto.getPropertyHist().entrySet().stream()
                                 .map(e -> "value " + e.getKey() + " appeared " + e.getValue() + " times")
-                                .collect(Collectors.joining("\n\t"))) + "\n\nvalue distribution at end of simulation\n";
+                                .collect(Collectors.joining("\n\t")) +
+                                "\n\nvalue distribution at end of simulation"+
+                                "\n(if nothing appears above there are no live entities of "+ent.getName()+")\n\n") ;
     }
 }

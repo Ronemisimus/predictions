@@ -100,7 +100,7 @@ public class EngineApi  {
                 return "Run unique id: " + k + " ran at time: " + format.format(v);
             }
         }));
-        List<Boolean> canCloseMEnu = IntStream.range(0, options.size()).mapToObj(i -> i==options.size()-1).collect(Collectors.toList());
+        List<Boolean> canCloseMEnu = IntStream.range(0, options.size()).mapToObj(i -> true).collect(Collectors.toList());
         MenuManager historyMenu = new HistoryMenu(options, canCloseMEnu);
         historyMenu.run(false);
         HistoryDisplayMenu menu = new HistoryDisplayMenu();
