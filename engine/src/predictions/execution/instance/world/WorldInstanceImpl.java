@@ -60,7 +60,6 @@ public class WorldInstanceImpl implements WorldInstance{
             });
             this.tick++;
             s = new SignalImpl(false,this.tick, this.startTime);
-            System.out.println("finished tick " + this.tick);
         }
         return new AbstractMap.SimpleEntry<>(this.hashCode(), resTermination);
     }

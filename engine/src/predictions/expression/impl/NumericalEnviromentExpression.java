@@ -25,7 +25,7 @@ public class NumericalEnviromentExpression implements Expression<Double> {
             case FLOAT:
                 return (Double) p.getValue();
             default:
-                throw new RuntimeException("environment variable must be a Number in expressions");
+                throw new RuntimeException("environment variable must be a Number in expression");
         }
     }
 }

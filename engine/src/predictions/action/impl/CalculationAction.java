@@ -4,9 +4,15 @@ import dto.subdto.show.world.ActionDto;
 import predictions.action.api.AbstractAction;
 import predictions.action.api.ActionType;
 import predictions.definition.entity.EntityDefinition;
+import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.definition.property.api.PropertyType;
+import predictions.exception.BadExpressionException;
+import predictions.exception.BadFunctionExpressionException;
+import predictions.exception.BadPropertyTypeExpressionException;
+import predictions.exception.MissingPropertyExpressionException;
 import predictions.execution.context.Context;
 import predictions.execution.instance.property.PropertyInstance;
+import predictions.expression.ExpressionBuilder;
 import predictions.expression.api.Expression;
 import predictions.expression.api.MathOperation;
 import predictions.expression.impl.DoubleComplexExpression;
@@ -26,27 +32,37 @@ public class CalculationAction extends AbstractAction {
                              String property,
                              MathOperation[] ops,
                              String[] args1,
-                             String[] args2) {
+                             String[] args2,
+                             EnvVariablesManager env) {
         super(ActionType.CALCULATION, entityDefinition);
         this.property = property;
         if (args1.length != ops.length || args2.length != ops.length) {
             throw new RuntimeException("missing arguments for calculation");
         }
-        Expression<Double>[] args1Exp = (Expression<Double>[])
-                Arrays.stream(args1)
-                        .map(DoubleComplexExpression::new)
-                        .toArray();
-        Expression<Double>[] args2Exp = (Expression<Double>[])
-                Arrays.stream(args2)
-                        .map(DoubleComplexExpression::new)
-                        .toArray();
-        exps = Stream.of(ops, args1Exp, args2Exp)
-                .map(t-> (Expression<Double>) new DualMathExpression(
-                        (MathOperation) t[0],
-                        (Expression<Double>) t[1],
-                        (Expression<Double>) t[2]
-                        )
-                ).collect(Collectors.toList());
+        List<Expression<Double>> args1Exp = Arrays.stream(args1)
+                        .map(exp -> {
+                            try {
+                                return ExpressionBuilder.buildDoubleExpression(exp, entityDefinition, env);
+                            } catch (BadFunctionExpressionException | MissingPropertyExpressionException |
+                                     BadPropertyTypeExpressionException | BadExpressionException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                .map(t -> (Expression<Double>) t).collect(Collectors.toList());
+        List<Expression<Double>> args2Exp = Arrays.stream(args2)
+                .map(exp -> {
+                    try {
+                        return ExpressionBuilder.buildDoubleExpression(exp, entityDefinition, env);
+                    } catch (BadFunctionExpressionException | MissingPropertyExpressionException |
+                             BadPropertyTypeExpressionException | BadExpressionException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .map(t -> (Expression<Double>) t).collect(Collectors.toList());
+        exps = new ArrayList<>();
+        for (int i=0;i<ops.length;i++) {
+            exps.add(new DualMathExpression(ops[i], args1Exp.get(i), args2Exp.get(i)));
+        }
     }
 
     @Override
@@ -64,10 +80,8 @@ public class CalculationAction extends AbstractAction {
         }
         else if (propertyInstance.getPropertyDefinition().getType() == PropertyType.DECIMAL) {
             PropertyInstance<Integer> property = (PropertyInstance<Integer>) propertyInstance;
-            exps.forEach(t -> {
-                Comparable<Double> res = t.evaluate(context);
-                Comparable<Integer> res_int = ((Double)res).intValue();
-                property.updateValue(res_int, world_time);
+            exps.stream().map(t -> t.evaluate(context)).forEach(res -> {
+                property.updateValue(res, world_time);
             });
         }
     }

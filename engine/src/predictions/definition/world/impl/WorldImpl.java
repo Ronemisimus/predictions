@@ -11,6 +11,7 @@ import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.definition.environment.impl.EnvVariableManagerImpl;
 import predictions.definition.property.api.PropertyDefinition;
 import predictions.definition.world.api.World;
+import predictions.exception.*;
 import predictions.generated.PRDBySecond;
 import predictions.generated.PRDByTicks;
 import predictions.generated.PRDWorld;
@@ -47,17 +48,30 @@ public class WorldImpl implements World {
         this.terminations = terminations;
     }
 
-    public WorldImpl(PRDWorld res) {
-        this(new EnvVariableManagerImpl(res.getPRDEvironment()),
+    private WorldImpl(PRDWorld res, EnvVariablesManager env) throws RepeatNameException, RuntimeException {
+        this(env,
                 res.getPRDEntities().getPRDEntity().stream()
                         .map(EntityDefinitionImpl::new).collect(Collectors.toList()),
                 res.getPRDRules().getPRDRule().stream().map(prdRule->
-                        ConverterPRDEngine.getRuleFromPRD(prdRule, res.getPRDEntities()))
+                        {
+                            try {
+                                return ConverterPRDEngine.getRuleFromPRD(prdRule, res.getPRDEntities(), env);
+                            } catch (BadExpressionException | BadFunctionExpressionException |
+                                     MissingPropertyExpressionException | BadPropertyTypeExpressionException |
+                                     MissingPropertyActionException | NoSuchEntityActionException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
                         .collect(Collectors.toList()),
                 res.getPRDTermination().getPRDByTicksOrPRDBySecond().stream().map(
                         prdTermination -> (prdTermination instanceof PRDByTicks)?
                                 new TicksTermination((PRDByTicks)prdTermination) :
                                 new TimeTermination((PRDBySecond)prdTermination)).collect(Collectors.toList()));
+    }
+
+    public static World fromPRD(PRDWorld res) throws RepeatNameException, RuntimeException {
+        EnvVariablesManager env = new EnvVariableManagerImpl(res.getPRDEvironment());
+        return new WorldImpl(res, env);
     }
 
     @Override

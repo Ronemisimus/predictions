@@ -1,9 +1,15 @@
 package predictions.expression.impl;
 
 import predictions.definition.entity.EntityDefinition;
+import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.definition.property.api.PropertyDefinition;
 import predictions.definition.property.api.PropertyType;
+import predictions.exception.BadExpressionException;
+import predictions.exception.BadFunctionExpressionException;
+import predictions.exception.BadPropertyTypeExpressionException;
+import predictions.exception.MissingPropertyExpressionException;
 import predictions.execution.context.Context;
+import predictions.expression.ExpressionBuilder;
 import predictions.expression.api.Expression;
 import predictions.expression.api.SingleBooleanOperation;
 import predictions.generated.PRDCondition;
@@ -20,22 +26,22 @@ public class SingleBooleanExpression implements Expression<Boolean> {
         this.valueExpression = valueExpression;
     }
 
-    public SingleBooleanExpression(PRDCondition prdCondition, EntityDefinition ent) {
+    public SingleBooleanExpression(PRDCondition prdCondition, EntityDefinition ent, EnvVariablesManager env) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
         this.property = prdCondition.getProperty();
         this.operation = SingleBooleanOperation.getInstance(prdCondition.getOperator().toLowerCase());
         PropertyDefinition<?> prop = ent.getProps().stream().filter(p -> p.getName().equals(this.property)).findAny().get();
         switch (prop.getType())
         {
             case BOOLEAN:
-                this.valueExpression = new BooleanComplexExpression(prdCondition.getValue(), ent);
+                this.valueExpression = ExpressionBuilder.buildBooleanExpression(prdCondition.getValue(), ent, env);
                 break;
             case DECIMAL:
-                this.valueExpression = new DoubleComplexExpression(prdCondition.getValue());
+            case FLOAT:
+                this.valueExpression = ExpressionBuilder.buildDoubleExpression(prdCondition.getValue(), ent, env);
                 break;
             case STRING:
-                this.valueExpression = new StringComplexExpression(prdCondition.getValue(), ent);
-            case FLOAT:
-                this.valueExpression = new DoubleComplexExpression(prdCondition.getValue());
+                this.valueExpression = ExpressionBuilder.buildStringExpression(prdCondition.getValue(), ent, env);
+                break;
             default:
                 throw new RuntimeException("bad Single Expression. cannot compare property " + property + " to expression " + prdCondition.getValue());
         }

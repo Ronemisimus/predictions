@@ -1,6 +1,11 @@
 package predictions.expression.impl;
 
 import predictions.definition.entity.EntityDefinition;
+import predictions.definition.environment.api.EnvVariablesManager;
+import predictions.exception.BadExpressionException;
+import predictions.exception.BadFunctionExpressionException;
+import predictions.exception.BadPropertyTypeExpressionException;
+import predictions.exception.MissingPropertyExpressionException;
 import predictions.execution.context.Context;
 import predictions.expression.api.BooleanOperation;
 import predictions.expression.api.DualExpression;
@@ -11,15 +16,10 @@ public class DualBooleanExpression extends DualExpression<Boolean> {
 
     private BooleanOperation booleanOperation;
 
-    public DualBooleanExpression(BooleanOperation booleanOperation, Expression<Boolean> a, Expression<Boolean> b) {
-        super(a, b);
-        this.booleanOperation = booleanOperation;
-    }
-
-    public DualBooleanExpression(PRDCondition prdCondition, EntityDefinition ent) {
+    public DualBooleanExpression(PRDCondition prdCondition, EntityDefinition ent, EnvVariablesManager env) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
         super(
-                new BooleanComplexExpression(prdCondition.getPRDCondition().get(0), ent),
-                new BooleanComplexExpression(subCondition(prdCondition), ent));
+                new BooleanComplexExpression(prdCondition.getPRDCondition().get(0), ent, env),
+                new BooleanComplexExpression(subCondition(prdCondition), ent, env));
         this.booleanOperation = BooleanOperation.valueOf(prdCondition.getLogical().toUpperCase());
     }
 
@@ -31,6 +31,7 @@ public class DualBooleanExpression extends DualExpression<Boolean> {
         {
             res.getPRDCondition().addAll(prdCondition.getPRDCondition());
             res.setLogical(prdCondition.getLogical());
+            res.setSingularity(prdCondition.getSingularity());
             return res;
         }
         else if (len==1)

@@ -8,6 +8,8 @@ import dto.subdto.show.world.WorldDto;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.world.api.World;
 import predictions.definition.world.impl.WorldImpl;
+import predictions.exception.BadExpressionException;
+import predictions.exception.RepeatNameException;
 import predictions.execution.EntityCountHistory;
 import predictions.execution.instance.world.WorldInstance;
 import predictions.execution.instance.world.WorldInstanceImpl;
@@ -50,12 +52,7 @@ public class MainApiImpl implements MainApi {
                 isNotFile||
                 isNotXML)
         {
-            return new ReadFileDto(fileDoesNotExist,
-                    absolutePathError,
-                    isNotFile,
-                    isNotXML,
-                    false,
-                    false);
+            return GeneralDtoBuilder.getReadFileDtoBasic(absolutePathError, fileDoesNotExist, isNotFile, isNotXML);
         }
 
         PRDWorld res = null;
@@ -65,35 +62,23 @@ public class MainApiImpl implements MainApi {
             Unmarshaller unmarshaller = context.createUnmarshaller();
             res = (PRDWorld) unmarshaller.unmarshal(f);
         } catch (JAXBException e) {
-            return new ReadFileDto(false,
-                    false,
-                    false,
-                    false,
-                    true,
-                    false);
+            return GeneralDtoBuilder.getReadFileDtoJAXB();
         }
 
-        // TODO: move to normal objects while catching errors
         try {
-            activeDefinition = new WorldImpl(res);
-        }catch (Exception e)
+            activeDefinition = WorldImpl.fromPRD(res);
+        } catch (RepeatNameException e) {
+            return GeneralDtoBuilder.getReadFileDtoRepeatName(e.isEnvironmentVariable(), e.getVariableName(), e.getEntityName());
+        }catch (RuntimeException e)
         {
-            return new ReadFileDto(
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    false);
+            return GeneralDtoBuilder.getReadFileDtoException(e.getCause());
+        }
+        catch (Exception e)
+        {
+            return GeneralDtoBuilder.getReadFileDtoUnknown();
         }
 
-        return new ReadFileDto(
-                false,
-                false,
-                false,
-                false,
-                false,
-                true);
+        return GeneralDtoBuilder.getReadFileDtoSuccess();
     }
 
     @Override

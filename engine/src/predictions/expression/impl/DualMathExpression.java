@@ -16,9 +16,27 @@ public class DualMathExpression extends DualExpression<Double> {
 
     @Override
     public Comparable<Double> evaluate(Context context) {
-        return mathOperation.evaluate(
-                getExpression1().evaluate(context),
-                getExpression2().evaluate(context)
-        );
+        Comparable<?> exp1_res = getExpression1().evaluate(context);
+        Comparable<?> exp2_res = getExpression2().evaluate(context);
+        Comparable<Double> exp1_double = null;
+        Comparable<Double> exp2_double = null;
+        if(exp1_res instanceof Integer)
+        {
+            exp1_double = Double.valueOf((Integer) exp1_res);
+        }
+        else
+        {
+            exp1_double = (Comparable<Double>) exp1_res;
+        }
+
+        if (exp2_res instanceof Integer)
+        {
+            exp2_double = Double.valueOf((Integer) exp2_res);
+        }
+        else
+        {
+            exp2_double = (Comparable<Double>) exp2_res;
+        }
+        return mathOperation.evaluate(exp1_double,exp2_double);
     }
 }

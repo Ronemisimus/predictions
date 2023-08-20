@@ -47,7 +47,7 @@ public abstract class MenuManagerImpl implements MenuManager{
             try {
                 res = scanner.nextInt();
             } catch (Exception e) {
-                scanner.nextLine();;
+                scanner.nextLine();
             }
         }
         return res;

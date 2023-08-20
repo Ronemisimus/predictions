@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="prediction">
+    <output-path>$PROJECT_DIR$/out/artifacts/prediction</output-path>
+    <root id="archive" name="prediction.jar">
+      <element id="module-output" name="ConsoleUI" />
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/ConsoleUI/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="DTO" />
+    </root>
+  </artifact>
+</component>

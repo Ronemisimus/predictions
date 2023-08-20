@@ -5,6 +5,7 @@ import predictions.definition.property.impl.DoublePropertyDefinition;
 import predictions.definition.property.impl.IntegerPropertyDefinition;
 import predictions.definition.property.impl.StringPropertyDefinition;
 import predictions.definition.value.generator.api.ValueGeneratorFactory;
+import predictions.exception.RepeatNameException;
 import predictions.execution.instance.environment.api.ActiveEnvironment;
 import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.definition.property.api.PropertyDefinition;
@@ -25,9 +26,22 @@ public class EnvVariableManagerImpl implements EnvVariablesManager {
         propNameToPropDefinition = new HashMap<>();
     }
 
-    public EnvVariableManagerImpl(PRDEvironment prdEvironment) {
+    public EnvVariableManagerImpl(PRDEvironment prdEvironment) throws RepeatNameException {
         propNameToPropDefinition = new HashMap<>();
-        prdEvironment.getPRDEnvProperty().forEach(def -> propNameToPropDefinition.put(def.getPRDName(), getPropertyDefinitionFromPRD(def)));
+        final boolean[] keyRepeat = {false};
+        final String[] repeatedKey = {null};
+        prdEvironment.getPRDEnvProperty().forEach(def -> {
+            if (propNameToPropDefinition.getOrDefault(def.getPRDName(), null) != null)
+            {
+                keyRepeat[0] = true;
+                repeatedKey[0] = def.getPRDName();
+            }
+            propNameToPropDefinition.put(def.getPRDName(), getPropertyDefinitionFromPRD(def));
+        });
+        if (keyRepeat[0])
+        {
+            throw new RepeatNameException(null,repeatedKey[0], true);
+        }
     }
 
     @Override

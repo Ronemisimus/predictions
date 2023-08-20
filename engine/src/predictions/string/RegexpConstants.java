@@ -15,5 +15,4 @@ public class RegexpConstants {
              "|"+NUMBER_REGEX_STR+")$";
     public static final String PERCENT_REGEX_STR = "percent";
 
-
 }
