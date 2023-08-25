@@ -16,14 +16,12 @@ import predictions.generated.PRDBySecond;
 import predictions.generated.PRDByTicks;
 import predictions.generated.PRDWorld;
 import predictions.rule.api.Rule;
-import predictions.rule.impl.RuleImpl;
 import predictions.termination.api.Termination;
 import predictions.termination.impl.TicksTermination;
 import predictions.termination.impl.TimeTermination;
 import predictions.termination.impl.UserTermination;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -32,13 +30,13 @@ import java.util.stream.Collectors;
 
 public class WorldImpl implements World {
 
-    private EnvVariablesManager envVariablesManager;
-    private Collection<EntityDefinition> entityDefinitions;
-    private Collection<Rule> rules;
-    private Collection<Termination> terminations;
+    private final EnvVariablesManager envVariablesManager;
+    private final Collection<EntityDefinition> entityDefinitions;
+    private final Collection<Rule> rules;
+    private final Collection<Termination> terminations;
 
 
-    public WorldImpl(EnvVariablesManager envVariablesManager,
+    private WorldImpl(EnvVariablesManager envVariablesManager,
                      Collection<EntityDefinition> entityDefinitions,
                      Collection<Rule> rules,
                      Collection<Termination> terminations) {
@@ -48,7 +46,7 @@ public class WorldImpl implements World {
         this.terminations = terminations;
     }
 
-    private WorldImpl(PRDWorld res, EnvVariablesManager env) throws RepeatNameException, RuntimeException {
+    private WorldImpl(PRDWorld res, EnvVariablesManager env) throws RuntimeException {
         this(env,
                 res.getPRDEntities().getPRDEntity().stream()
                         .map(EntityDefinitionImpl::new).collect(Collectors.toList()),
@@ -110,8 +108,8 @@ public class WorldImpl implements World {
         Duration timeTermination = terminations.stream()
                 .filter(termination -> termination instanceof TimeTermination)
                 .findFirst().map(t -> ((TimeTermination)t).getTerminationDuration()).orElse(null);
-        Integer timeTerminationInteger = Math.toIntExact(timeTermination == null ? null : timeTermination.getSeconds());
-        boolean userTermination = terminations.stream().filter(termination -> termination instanceof UserTermination).count()> 0;
+        Integer timeTerminationInteger = timeTermination == null ? null : Math.toIntExact(timeTermination.getSeconds());
+        boolean userTermination = terminations.stream().anyMatch(termination -> termination instanceof UserTermination);
         return new WorldDto(env,entities, res, tickTermination, timeTerminationInteger, userTermination);
     }
 }

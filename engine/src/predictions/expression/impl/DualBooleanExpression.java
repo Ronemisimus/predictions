@@ -9,17 +9,18 @@ import predictions.exception.MissingPropertyExpressionException;
 import predictions.execution.context.Context;
 import predictions.expression.api.BooleanOperation;
 import predictions.expression.api.DualExpression;
-import predictions.expression.api.Expression;
 import predictions.generated.PRDCondition;
+
+import java.util.Objects;
 
 public class DualBooleanExpression extends DualExpression<Boolean> {
 
-    private BooleanOperation booleanOperation;
+    private final BooleanOperation booleanOperation;
 
     public DualBooleanExpression(PRDCondition prdCondition, EntityDefinition ent, EnvVariablesManager env) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
         super(
                 new BooleanComplexExpression(prdCondition.getPRDCondition().get(0), ent, env),
-                new BooleanComplexExpression(subCondition(prdCondition), ent, env));
+                new BooleanComplexExpression(Objects.requireNonNull(subCondition(prdCondition)), ent, env));
         this.booleanOperation = BooleanOperation.valueOf(prdCondition.getLogical().toUpperCase());
     }
 

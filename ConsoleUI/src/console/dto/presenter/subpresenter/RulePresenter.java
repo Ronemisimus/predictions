@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 public class RulePresenter extends DTOPresenter {
 
-    private RuleDto rule;
+    private final RuleDto rule;
     public RulePresenter(RuleDto rule)
     {
         this.rule = rule;

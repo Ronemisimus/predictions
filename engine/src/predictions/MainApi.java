@@ -12,7 +12,7 @@ public interface MainApi {
     ShowWorldDto showLoadedWorld();
 
     EnvDto getEnv();
-    public InitializeDto initialize();
+    InitializeDto initialize();
     RunSimulationDto runSimulation();
 
     RunHistoryDto getRunHistory();
@@ -22,8 +22,6 @@ public interface MainApi {
     EntityListDto getEntityList(int runId);
     
     SingleRunHistoryDto getRunPropertyHistogram(int runId, String entityName, String propertyName);
-
-    DTO exit();
 
     void setEnv(String name, Optional<Comparable<?>> value);
 }

@@ -10,6 +10,7 @@ import predictions.definition.property.impl.BooleanPropertyDefinition;
 import predictions.definition.property.impl.DoublePropertyDefinition;
 import predictions.definition.property.impl.IntegerPropertyDefinition;
 import predictions.definition.property.impl.StringPropertyDefinition;
+import predictions.definition.value.generator.api.ValueGenerator;
 import predictions.definition.value.generator.api.ValueGeneratorFactory;
 import predictions.exception.*;
 import predictions.expression.api.MathOperation;
@@ -21,64 +22,64 @@ import predictions.rule.impl.RuleImpl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 
 public class ConverterPRDEngine {
     private ConverterPRDEngine() {}
 
-    public static PropertyDefinition<?> getPropertyDefinitionFromPRD(PRDEnvProperty def) {
+    public static PropertyDefinition<?> getPropertyDefinitionFromPRD(PRDEnvProperty def, Comparable<?> val) {
+        return getPropertyDefinitionFromPRDinner(def.getType(), def.getPRDRange(), def.getPRDName(), val);
+    }
+
+    protected static PropertyDefinition<?> getPropertyDefinitionFromPRDinner(String propertyType, PRDRange range, String propertyName, Comparable<?> value) {
         PropertyDefinition<?> res = null;
-        switch (def.getType().toLowerCase())
+        switch (propertyType.toLowerCase())
         {
             case "decimal":
-                Double from = def.getPRDRange().getFrom();
-                Double to = def.getPRDRange().getTo();
-                Comparable<Integer> value = (from != null) ? (int) from.doubleValue() : ((to != null) ? (int) to.doubleValue() : 0);
-                res = new IntegerPropertyDefinition(def.getPRDName(), ValueGeneratorFactory.createFixed(value), (int) def.getPRDRange().getFrom(), (int) def.getPRDRange().getTo());
+                Integer from = null, to = null;
+                if (range!=null) {
+                    from = (int) range.getFrom();
+                    to = (int) range.getTo();
+                }
+                ValueGenerator<Integer> vg = value==null? ValueGeneratorFactory.createRandomInteger(from,to):
+                        ValueGeneratorFactory.createFixed((Integer)value);
+                res = new IntegerPropertyDefinition(propertyName,
+                        vg,
+                        from,
+                        to);
                 break;
             case "float":
-                from = def.getPRDRange().getFrom();
-                to = def.getPRDRange().getTo();
-                Comparable<Double> doubleValue = (from != null) ? from : ((to != null) ?  to : 0.);
-                res = new DoublePropertyDefinition(def.getPRDName(), ValueGeneratorFactory.createFixed(doubleValue), def.getPRDRange().getFrom(), def.getPRDRange().getTo());
+                Double fromD = null, toD = null;
+                if(range!=null) {
+                    fromD = range.getFrom();
+                    toD = range.getTo();
+                }
+                ValueGenerator<Double> vgd = value==null? ValueGeneratorFactory.createRandomDouble(fromD,toD):
+                        ValueGeneratorFactory.createFixed((Double)value);
+                res = new DoublePropertyDefinition(propertyName,
+                        vgd,
+                        fromD,
+                        toD);
                 break;
             case "string":
-                res = new StringPropertyDefinition(def.getPRDName(), ValueGeneratorFactory.createFixed(""));
+                res = new StringPropertyDefinition(propertyName,
+                        ValueGeneratorFactory.createFixed(value==null?"":value.toString()));
                 break;
             case "boolean":
-                res = new BooleanPropertyDefinition(def.getPRDName(), ValueGeneratorFactory.createFixed(false));
+                ValueGenerator<Boolean> vgb = value==null? ValueGeneratorFactory.createRandomBoolean():
+                        ValueGeneratorFactory.createFixed((Boolean)value);
+                res = new BooleanPropertyDefinition(propertyName,
+                        vgb);
                 break;
         }
         return res;
     }
 
-    public static PropertyDefinition<?> getPropertyDefinitionFromPRD(PRDProperty def) {
-        PropertyDefinition<?> res = null;
-        switch (def.getType().toLowerCase())
-        {
-            case "decimal":
-                Double from = def.getPRDRange().getFrom();
-                Double to = def.getPRDRange().getTo();
-                Comparable<Integer> value = (from != null) ? (int) from.doubleValue() : ((to != null) ? (int) to.doubleValue() : 0);
-                res = new IntegerPropertyDefinition(def.getPRDName(), ValueGeneratorFactory.createFixed(value), (int) def.getPRDRange().getFrom(), (int) def.getPRDRange().getTo());
-                break;
-            case "float":
-                from = def.getPRDRange().getFrom();
-                to = def.getPRDRange().getTo();
-                Comparable<Double> doubleValue = (from != null) ? from : ((to != null) ?  to : 0.);
-                res = new DoublePropertyDefinition(def.getPRDName(), ValueGeneratorFactory.createFixed(doubleValue), def.getPRDRange().getFrom(), def.getPRDRange().getTo());
-                break;
-            case "string":
-                res = new StringPropertyDefinition(def.getPRDName(), ValueGeneratorFactory.createFixed(""));
-                break;
-            case "boolean":
-                res = new BooleanPropertyDefinition(def.getPRDName(), ValueGeneratorFactory.createFixed(false));
-                break;
-        }
-        return res;
+    public static PropertyDefinition<?> getPropertyDefinitionFromPRDEntity(PRDProperty def) {
+        return getPropertyDefinitionFromPRDinner(def.getType(), def.getPRDRange(), def.getPRDName(), null);
     }
 
-    public static Action getActionFromPRD(PRDAction def, EntityDefinition ent, EnvVariablesManager env) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException, MissingPropertyActionException {
+        public static Action getActionFromPRD(PRDAction def, EntityDefinition ent, EnvVariablesManager env) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException, MissingPropertyActionException {
         Action res = null;
         switch (def.getType().toLowerCase())
         {
@@ -98,9 +99,9 @@ public class ConverterPRDEngine {
                 res = new ConditionAction(ent, def.getPRDCondition(), def.getPRDThen(), def.getPRDElse(), env);
                 break;
             case "calculation":
-                MathOperation ops[] = ConverterPRDEngine.getCalculationOps(def.getPRDMultiply(), def.getPRDDivide());
-                String args1[] = ConverterPRDEngine.getArgs1(def.getPRDMultiply(), def.getPRDDivide());
-                String args2[] = ConverterPRDEngine.getArgs2(def.getPRDMultiply(), def.getPRDDivide());
+                MathOperation[] ops = ConverterPRDEngine.getCalculationOps(def.getPRDMultiply(), def.getPRDDivide());
+                String[] args1 = ConverterPRDEngine.getArgs1(def.getPRDMultiply(), def.getPRDDivide());
+                String[] args2 = ConverterPRDEngine.getArgs2(def.getPRDMultiply(), def.getPRDDivide());
                 res = new CalculationAction(ent, def.getResultProp(), ops, args1, args2, env);
                 break;
         }
@@ -117,7 +118,7 @@ public class ConverterPRDEngine {
         }
         if (prdDivide != null)
         {
-            res[clear++] = prdDivide.getArg2();
+            res[clear] = prdDivide.getArg2();
         }
         return res;
     }
@@ -132,7 +133,7 @@ public class ConverterPRDEngine {
         }
         if (prdDivide != null)
         {
-            res[clear++] = prdDivide.getArg1();
+            res[clear] = prdDivide.getArg1();
         }
         return res;
     }
@@ -148,7 +149,7 @@ public class ConverterPRDEngine {
         }
         if (prdDivide != null)
         {
-            res[clear++] = MathOperation.DIVIDE;
+            res[clear] = MathOperation.DIVIDE;
         }
         return res;
     }
@@ -157,10 +158,13 @@ public class ConverterPRDEngine {
         Activation act = new ActivationImpl(def.getPRDActivation());
         List<Action> res = new ArrayList<>();
         for (PRDAction prdAction: def.getPRDActions().getPRDAction()) {
-            try {
-                PRDEntity mainEntity = entities.getPRDEntity().stream().filter(prdEntity -> prdAction.getEntity().equals(prdEntity.getName())).findFirst().get();
+            Optional<PRDEntity> mainEntityOpt = entities.getPRDEntity().stream()
+                    .filter(prdEntity -> prdAction.getEntity().equals(prdEntity.getName())).findFirst();
+            if (mainEntityOpt.isPresent())
+            {
+                PRDEntity mainEntity = mainEntityOpt.get();
                 res.add(getActionFromPRD(prdAction, new EntityDefinitionImpl(mainEntity), env));
-            } catch (NoSuchElementException e){
+            } else {
                 throw new NoSuchEntityActionException(prdAction.getEntity());
             }
         }

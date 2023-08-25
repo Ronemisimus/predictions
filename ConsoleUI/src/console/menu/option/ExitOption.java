@@ -2,7 +2,7 @@ package console.menu.option;
 
 public class ExitOption implements MenuItem{
 
-    private String message;
+    private final String message;
     public ExitOption(String message)
     {
         this.message = message;

@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ConsoleUI/ConsoleUI.iml" filepath="$PROJECT_DIR$/ConsoleUI/ConsoleUI.iml" />
       <module fileurl="file://$PROJECT_DIR$/DTO/DTO.iml" filepath="$PROJECT_DIR$/DTO/DTO.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GraphicalUI/GraphicalUI.iml" filepath="$PROJECT_DIR$/GraphicalUI/GraphicalUI.iml" />
       <module fileurl="file://$PROJECT_DIR$/engine/engine.iml" filepath="$PROJECT_DIR$/engine/engine.iml" />
       <module fileurl="file://$PROJECT_DIR$/prediction_neo.iml" filepath="$PROJECT_DIR$/prediction_neo.iml" />
     </modules>

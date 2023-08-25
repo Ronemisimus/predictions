@@ -40,7 +40,7 @@ public class PRDRange {
     protected double from;
 
     /**
-     * Gets the value of the to property.
+     * Gets the value of the "to" property.
      * 
      */
     public double getTo() {
@@ -48,7 +48,7 @@ public class PRDRange {
     }
 
     /**
-     * Sets the value of the to property.
+     * Sets the value of the "to" property.
      * 
      */
     public void setTo(double value) {

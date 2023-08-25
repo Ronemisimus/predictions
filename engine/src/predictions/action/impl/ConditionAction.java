@@ -1,6 +1,5 @@
 package predictions.action.impl;
 
-import dto.subdto.show.world.ActionDto;
 import predictions.ConverterPRDEngine;
 import predictions.action.api.AbstractAction;
 import predictions.action.api.Action;
@@ -11,8 +10,6 @@ import predictions.exception.*;
 import predictions.execution.context.Context;
 import predictions.expression.api.Expression;
 import predictions.expression.impl.BooleanComplexExpression;
-import predictions.expression.impl.DualBooleanExpression;
-import predictions.generated.PRDAction;
 import predictions.generated.PRDCondition;
 import predictions.generated.PRDElse;
 import predictions.generated.PRDThen;

@@ -5,7 +5,7 @@ import dto.subdto.show.world.PropertyDto;
 public class PropertyOption implements MenuItem {
 
     private boolean chosen;
-    private PropertyDto dto;
+    private final PropertyDto dto;
 
     public PropertyOption(PropertyDto dto) {
         this.dto = dto;

@@ -5,7 +5,7 @@ import predictions.expression.api.Expression;
 
 public class NumberExpression implements Expression<Double> {
 
-    private Double number;
+    private final Double number;
 
     public NumberExpression(Double number) {
         this.number = number;

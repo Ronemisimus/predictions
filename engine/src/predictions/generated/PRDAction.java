@@ -280,7 +280,7 @@ public class PRDAction {
     }
 
     /**
-     * Gets the value of the property property.
+     * Gets the value of the property.
      * 
      * @return
      *     possible object is
@@ -292,7 +292,7 @@ public class PRDAction {
     }
 
     /**
-     * Sets the value of the property property.
+     * Sets the value of the property.
      * 
      * @param value
      *     allowed object is

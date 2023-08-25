@@ -10,11 +10,6 @@ public class PropertyExpression<T> implements Expression<T> {
         this.property = property;
     }
 
-    public static Expression<Double> BuildDoubleInstance(String simpleExpression) {
-        String property = simpleExpression.substring(simpleExpression.indexOf('.')+1, simpleExpression.indexOf(')'));
-        return new PropertyExpression<>(property);
-    }
-
     @Override
     public Comparable<T> evaluate(Context context) {
         return (Comparable<T>) context.getPrimaryEntityInstance().getPropertyByName(property).getValue();

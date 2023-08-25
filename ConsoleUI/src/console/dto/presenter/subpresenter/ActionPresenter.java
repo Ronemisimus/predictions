@@ -5,7 +5,7 @@ import dto.subdto.show.world.ActionDto;
 
 public class ActionPresenter extends DTOPresenter {
 
-    private ActionDto action;
+    private final ActionDto action;
     public ActionPresenter(ActionDto action)
     {
         this.action = action;

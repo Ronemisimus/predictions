@@ -1,7 +1,6 @@
 package console.menu.menu;
 
 import console.menu.MenuManagerImpl;
-import console.menu.option.ExitOption;
 import console.menu.option.MenuItem;
 
 import java.util.ArrayList;

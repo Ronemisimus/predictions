@@ -2,7 +2,6 @@ package console.menu.option;
 
 import console.EngineApi;
 import console.dto.presenter.DTOPresenter;
-import console.dto.presenter.ReadFilePresenter;
 import console.menu.ReadInput;
 
 public class OpenFile implements MenuItem{

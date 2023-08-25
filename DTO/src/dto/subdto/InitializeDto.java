@@ -2,7 +2,6 @@ package dto.subdto;
 
 import dto.DTO;
 import dto.subdto.show.instance.PropertyInstanceDto;
-import dto.subdto.show.world.PropertyDto;
 
 import java.util.List;
 

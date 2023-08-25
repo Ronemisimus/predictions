@@ -5,8 +5,8 @@ import dto.subdto.show.world.PropertyDto;
 
 public class PropertyPresenter extends DTOPresenter {
 
-    private PropertyDto prop;
-    private boolean environment;
+    private final PropertyDto prop;
+    private final boolean environment;
     public PropertyPresenter(PropertyDto prop, boolean environment) {
         this.prop = prop;
         this.environment = environment;

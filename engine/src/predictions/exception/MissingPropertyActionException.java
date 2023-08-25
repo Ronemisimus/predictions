@@ -4,8 +4,8 @@ import predictions.action.api.ActionType;
 
 public class MissingPropertyActionException extends Throwable {
 
-    private String property;
-    private ActionType actionType;
+    private final String property;
+    private final ActionType actionType;
     public MissingPropertyActionException(String property, ActionType actionType) {
         this.property = property;
         this.actionType = actionType;

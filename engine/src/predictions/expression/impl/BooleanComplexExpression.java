@@ -26,16 +26,6 @@ public class BooleanComplexExpression implements Expression<Boolean> {
         }
     }
 
-    public BooleanComplexExpression(String value, EntityDefinition ent) {
-        Boolean res;
-        try {
-            res = Boolean.getBoolean(value);
-        }catch (Exception e){
-            throw new RuntimeException("bad Boolean Expression. cannot compare boolean property to expression " + value);
-        }
-        this.res = context -> res;
-    }
-
     @Override
     public Comparable<Boolean> evaluate(Context context) {
         return res.evaluate(context);

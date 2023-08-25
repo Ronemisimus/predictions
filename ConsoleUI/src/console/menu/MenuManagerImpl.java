@@ -9,12 +9,12 @@ import java.util.stream.IntStream;
 
 public abstract class MenuManagerImpl implements MenuManager{
 
-    private List<MenuItem> options;
-    private List<Boolean> canCloseMEnu;
+    private final List<MenuItem> options;
+    private final List<Boolean> canCloseMEnu;
 
     private boolean exited;
     private boolean menuOpen;
-    private Scanner scanner;
+    private final Scanner scanner;
 
     protected MenuManagerImpl(List<MenuItem> options, List<Boolean> canCloseMEnu){
         this.options = options;
@@ -66,12 +66,12 @@ public abstract class MenuManagerImpl implements MenuManager{
 
     @Override
     public String toString() {
-        String prompt = "Please enter a number to the left of the option you want:\n";
-        prompt+= "(a number from this list: [" + IntStream.range(1, options.size() + 1).mapToObj(String::valueOf).collect(Collectors.joining(", ")) + "])\n";
+        StringBuilder prompt = new StringBuilder("Please enter a number to the left of the option you want:\n");
+        prompt.append("(a number from this list: [").append(IntStream.range(1, options.size() + 1).mapToObj(String::valueOf).collect(Collectors.joining(", "))).append("])\n");
         for (int i = 0; i < options.size(); i++) {
-            prompt += (i + 1) + "\t: " + options.get(i).toString() + "\n";
+            prompt.append((i + 1)).append("\t: ").append(options.get(i).toString()).append("\n");
         }
-        return prompt;
+        return prompt.toString();
     }
 
     public List<MenuItem> getOptions() {

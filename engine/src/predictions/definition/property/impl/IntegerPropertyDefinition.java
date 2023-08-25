@@ -16,10 +16,6 @@ public class IntegerPropertyDefinition extends AbstractPropertyDefinition<Intege
         this.to = to;
     }
 
-    public IntegerPropertyDefinition(String name, ValueGenerator<Integer> valueGenerator) {
-        this(name, valueGenerator, null, null);
-    }
-
     @Override
     public boolean isLegal(Comparable<?> value) {
         if(super.isLegal(value))

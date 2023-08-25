@@ -2,8 +2,8 @@ package predictions.expression.api;
 
 public abstract class DualExpression<T> implements Expression<T> {
 
-    private Expression<T> expression1;
-    private Expression<T> expression2;
+    private final Expression<T> expression1;
+    private final Expression<T> expression2;
 
     public Expression<T> getExpression1() {
         return expression1;

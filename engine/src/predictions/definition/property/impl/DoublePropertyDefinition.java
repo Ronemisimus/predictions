@@ -15,10 +15,6 @@ public class DoublePropertyDefinition extends AbstractPropertyDefinition<Double>
         this.to = to;
     }
 
-    public DoublePropertyDefinition(String name, ValueGenerator<Double> valueGenerator) {
-        this(name, valueGenerator, null, null);
-    }
-
     @Override
     public boolean isLegal(Comparable<?> value) {
         if(super.isLegal(value))

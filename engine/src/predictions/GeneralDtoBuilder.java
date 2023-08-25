@@ -13,10 +13,12 @@ import java.util.stream.Collectors;
 public class GeneralDtoBuilder {
     public static SingleRunHistoryDto buildSingleRunDtoEntity(Map<String, EntityCountHistory> res) {
         List<String> entities = new ArrayList<>(res.keySet());
-        List<Integer> startCount = entities.stream().map(name->(EntityCountHistory)res.get(name))
-                .map(EntityCountHistory::getInitialCount).collect(Collectors.toList());
-        List<Integer> finalCount = entities.stream().map(name->(EntityCountHistory)res.get(name))
-                .map(EntityCountHistory::getEndCount).collect(Collectors.toList());
+        List<Integer> startCount = entities.stream().map(res::get)
+                .map(EntityCountHistory::getInitialCount)
+                .collect(Collectors.toList());
+        List<Integer> finalCount = entities.stream().map(res::get)
+                .map(EntityCountHistory::getEndCount)
+                .collect(Collectors.toList());
         return new SingleRunHistoryDto(entities, startCount,finalCount, null);
     }
 

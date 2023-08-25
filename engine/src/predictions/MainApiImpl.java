@@ -8,7 +8,6 @@ import dto.subdto.show.world.WorldDto;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.world.api.World;
 import predictions.definition.world.impl.WorldImpl;
-import predictions.exception.BadExpressionException;
 import predictions.exception.RepeatNameException;
 import predictions.execution.EntityCountHistory;
 import predictions.execution.instance.world.WorldInstance;
@@ -30,7 +29,7 @@ public class MainApiImpl implements MainApi {
 
     private WorldInstance activeWorld;
 
-    private Map<Integer, WorldInstance> history;
+    private final Map<Integer, WorldInstance> history;
     private World activeDefinition;
 
     public MainApiImpl()
@@ -55,7 +54,7 @@ public class MainApiImpl implements MainApi {
             return GeneralDtoBuilder.getReadFileDtoBasic(absolutePathError, fileDoesNotExist, isNotFile, isNotXML);
         }
 
-        PRDWorld res = null;
+        PRDWorld res;
 
         try {
             JAXBContext context = JAXBContext.newInstance(PRDWorld.class);
@@ -128,11 +127,6 @@ public class MainApiImpl implements MainApi {
     public SingleRunHistoryDto getRunPropertyHistogram(int runId, String entityName, String propertyName) {
         Map<Comparable<?>, Integer> propertyHist = history.get(runId).getEntityPropertyHistogram(entityName,propertyName);
         return GeneralDtoBuilder.buildSingleRunDtoProperty(propertyHist);
-    }
-
-    @Override
-    public DTO exit() {
-        return null;
     }
 
     @Override

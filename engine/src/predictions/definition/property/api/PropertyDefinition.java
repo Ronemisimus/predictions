@@ -12,7 +12,7 @@ public interface PropertyDefinition<T> {
     boolean isLegal(Comparable<?> value);
 
     static PropertyInstance<?> instantiate(PropertyDefinition<?> def) {
-        return new PropertyInstanceImpl<Object>((PropertyDefinition<Object>) def, (Comparable<Object>) def.generateValue());
+        return new PropertyInstanceImpl<>((PropertyDefinition<Object>) def, (Comparable<Object>) def.generateValue());
     }
 
     PropertyDto getDto();

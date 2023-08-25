@@ -14,7 +14,6 @@ import predictions.execution.instance.property.PropertyInstance;
 import predictions.expression.ExpressionBuilder;
 import predictions.expression.api.Expression;
 import predictions.expression.api.MathOperation;
-import predictions.expression.impl.DoubleComplexExpression;
 
 public class IncreaseAction extends AbstractAction {
 
@@ -43,7 +42,7 @@ public class IncreaseAction extends AbstractAction {
             PropertyInstance<Integer> prop = (PropertyInstance<Integer>) propertyInstance;
             Comparable<Double> val = Double.valueOf((Integer) prop.getValue());
             Comparable<Double> res = MathOperation.ADD.evaluate(val, expVal);
-            prop.updateValue(Integer.valueOf(((Double)res).intValue()), world_time);
+            prop.updateValue(((Double) res).intValue(), world_time);
         } else if (propertyInstance.getPropertyDefinition().getType() == PropertyType.FLOAT) {
             PropertyInstance<Double> prop = (PropertyInstance<Double>) propertyInstance;
             Comparable<Double> val = prop.getValue();

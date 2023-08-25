@@ -11,7 +11,6 @@ import predictions.execution.context.Context;
 import predictions.execution.instance.property.PropertyInstance;
 import predictions.expression.ExpressionBuilder;
 import predictions.expression.api.Expression;
-import predictions.expression.impl.DoubleComplexExpression;
 
 import java.util.Optional;
 

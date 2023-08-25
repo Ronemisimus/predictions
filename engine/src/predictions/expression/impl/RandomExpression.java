@@ -7,17 +7,12 @@ import java.util.Random;
 
 public class RandomExpression implements Expression<Double> {
 
-    private Integer to;
-    private Random random;
+    private final Integer to;
+    private final Random random;
 
     public RandomExpression(Integer to) {
         this.to = to;
         this.random = new Random();
-    }
-
-    public static Expression<Double> BuildInstance(String simpleExpression) {
-        int to = Integer.parseInt(simpleExpression.substring(simpleExpression.indexOf('(')+1, simpleExpression.indexOf(')')));
-        return new RandomExpression(to);
     }
 
     @Override

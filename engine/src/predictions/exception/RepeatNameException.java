@@ -2,10 +2,9 @@ package predictions.exception;
 
 public class RepeatNameException extends Throwable {
 
-    private boolean environmentVariable;
-    private String variableName;
-
-    private String entityName;
+    private final boolean environmentVariable;
+    private final String variableName;
+    private final String entityName;
     public RepeatNameException(String entityName, String prdName, boolean b) {
         this.variableName = prdName;
         this.environmentVariable = b;

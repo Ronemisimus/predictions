@@ -27,7 +27,7 @@ public class EntityDefinitionImpl implements EntityDefinition {
     public EntityDefinitionImpl(PRDEntity prdEntity) {
         this(prdEntity.getName(), prdEntity.getPRDPopulation());
         prdEntity.getPRDProperties().getPRDProperty().stream()
-                .map(ConverterPRDEngine::getPropertyDefinitionFromPRD)
+                .map(ConverterPRDEngine::getPropertyDefinitionFromPRDEntity)
                 .forEach(properties::add);
     }
 

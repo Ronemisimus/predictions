@@ -9,7 +9,6 @@ import predictions.execution.instance.entity.EntityInstance;
 import predictions.execution.instance.entity.manager.EntityInstanceManager;
 import predictions.execution.instance.entity.manager.EntityInstanceManagerImpl;
 import predictions.execution.instance.environment.api.ActiveEnvironment;
-import predictions.execution.instance.property.PropertyInstance;
 import predictions.termination.api.Signal;
 import predictions.termination.api.Termination;
 import predictions.termination.impl.SignalImpl;
@@ -20,9 +19,9 @@ import java.util.*;
 
 public class WorldInstanceImpl implements WorldInstance{
 
-    private ActiveEnvironment activeEnvironment;
-    private EntityInstanceManager entityInstanceManager;
-    private World world;
+    private final ActiveEnvironment activeEnvironment;
+    private final EntityInstanceManager entityInstanceManager;
+    private final World world;
 
     private int tick;
     private Instant startTime;
@@ -35,29 +34,24 @@ public class WorldInstanceImpl implements WorldInstance{
 
         world.getEntityDefinitions()
                 .forEachRemaining(
-                        entityDefinition ->
-                                this.entityInstanceManager.create(entityDefinition));
+                        this.entityInstanceManager::create);
     }
 
     @Override
     public Map.Entry<Integer, Termination> run() {
         this.startTime = Instant.now();
-        Termination resTermination = null;
+        Termination resTermination;
         Signal s = new SignalImpl(false, tick, this.startTime);
         while((resTermination = isTerminated(s))==null)
         {
             List<EntityInstance> tempList = new ArrayList<>(entityInstanceManager.getInstances());
-            tempList.forEach(entityInstance -> {
-                world.getRules().forEachRemaining(rule -> {
-                    if(rule.getActivation().isActive(tick))
-                    {
-                        Context context = new ContextImpl(entityInstance, entityInstanceManager, activeEnvironment, tick);
-                        rule.getActionsToPerform().forEach(action -> {
-                            action.invoke(context);
-                        });
-                    }
-                });
-            });
+            tempList.forEach(entityInstance -> world.getRules().forEachRemaining(rule -> {
+                if(rule.getActivation().isActive(tick))
+                {
+                    Context context = new ContextImpl(entityInstance, entityInstanceManager, activeEnvironment, tick);
+                    rule.getActionsToPerform().forEach(action -> action.invoke(context));
+                }
+            }));
             this.tick++;
             s = new SignalImpl(false,this.tick, this.startTime);
         }
@@ -66,7 +60,7 @@ public class WorldInstanceImpl implements WorldInstance{
 
     private Termination isTerminated(Signal signal)
     {
-        Termination res = null;
+        Termination res;
         Iterator<Termination> it = world.getTerminations();
         while (it.hasNext())
         {
@@ -104,12 +98,10 @@ public class WorldInstanceImpl implements WorldInstance{
     @Override
     public Map<String, EntityCountHistory> getEntityCounts() {
         Map<String, EntityCountHistory> res = new HashMap<>();
-        world.getEntityDefinitions().forEachRemaining(entityDefinition -> {
-            res.put(entityDefinition.getName(),
-                    new EntityCountHistory(entityDefinition.getPopulation(), Math.toIntExact(
-                            entityInstanceManager.getInstances()
-                                    .stream().filter(entityDefinition::isInstance).count())));
-        });
+        world.getEntityDefinitions().forEachRemaining(entityDefinition -> res.put(entityDefinition.getName(),
+                new EntityCountHistory(entityDefinition.getPopulation(), Math.toIntExact(
+                        entityInstanceManager.getInstances()
+                                .stream().filter(entityDefinition::isInstance).count()))));
         return res;
     }
 

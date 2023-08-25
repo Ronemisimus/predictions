@@ -7,11 +7,11 @@ import predictions.execution.instance.property.PropertyInstance;
 
 public class ContextImpl implements Context {
 
-    private EntityInstance primaryEntityInstance;
-    private EntityInstanceManager entityInstanceManager;
-    private ActiveEnvironment activeEnvironment;
+    private final EntityInstance primaryEntityInstance;
+    private final EntityInstanceManager entityInstanceManager;
+    private final ActiveEnvironment activeEnvironment;
 
-    private int tick;
+    private final int tick;
 
     public ContextImpl(EntityInstance primaryEntityInstance, EntityInstanceManager entityInstanceManager, ActiveEnvironment activeEnvironment, int tick) {
         this.primaryEntityInstance = primaryEntityInstance;

@@ -5,15 +5,10 @@ import predictions.execution.instance.property.PropertyInstance;
 import predictions.expression.api.Expression;
 
 public class NumericalEnviromentExpression implements Expression<Double> {
-    private String property;
+    private final String property;
 
     public NumericalEnviromentExpression(String property) {
         this.property = property;
-    }
-
-    public static Expression<Double> BuildDoubleInstance(String simpleExpression) {
-        String name = simpleExpression.substring(simpleExpression.indexOf("(")+1,simpleExpression.indexOf(")"));
-        return new NumericalEnviromentExpression(name);
     }
 
     @Override

@@ -10,7 +10,7 @@ public class EntityInstanceImpl implements EntityInstance {
 
     private final EntityDefinition entityDefinition;
     private final int id;
-    private Map<String, PropertyInstance<?>> properties;
+    private final Map<String, PropertyInstance<?>> properties;
 
     public EntityInstanceImpl(EntityDefinition entityDefinition, int id) {
         this.entityDefinition = entityDefinition;

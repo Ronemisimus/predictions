@@ -1,6 +1,5 @@
 package console.menu.menu;
 
-import console.menu.MenuManager;
 import console.menu.MenuManagerImpl;
 import console.menu.option.EntityOption;
 import console.menu.option.MenuItem;

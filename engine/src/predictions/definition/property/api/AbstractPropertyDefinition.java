@@ -1,10 +1,6 @@
 package predictions.definition.property.api;
 
 import dto.subdto.show.world.PropertyDto;
-import predictions.definition.property.impl.BooleanPropertyDefinition;
-import predictions.definition.property.impl.DoublePropertyDefinition;
-import predictions.definition.property.impl.IntegerPropertyDefinition;
-import predictions.definition.property.impl.StringPropertyDefinition;
 import predictions.definition.value.generator.api.ValueGenerator;
 import predictions.definition.value.generator.api.ValueGeneratorFactory;
 

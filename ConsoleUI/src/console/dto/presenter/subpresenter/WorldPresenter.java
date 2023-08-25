@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class WorldPresenter extends DTOPresenter {
-    private WorldDto world;
+    private final WorldDto world;
     public WorldPresenter(WorldDto world) {
         this.world = world;
     }
@@ -41,10 +41,10 @@ public class WorldPresenter extends DTOPresenter {
         res += "\n\n\ttermination options: \n";
         Integer ticksTermination = world.getTicksTermination();
         Integer timeTermination = world.getTimeTermination();
-        Boolean userTermination = world.isUserTermination();
+        boolean userTermination = world.isUserTermination();
         res += ticksTermination == null ? "" : "\t\tin " + ticksTermination + " ticks\n";
         res += timeTermination == null ? "" : "\t\tfor " + timeTermination + " seconds\n";
-        res += userTermination == false? "" : "\t\twith user termination\n";
+        res += !userTermination ? "" : "\t\twith user termination\n";
         res += "\n" + sep + "\n";
         return res;
     }

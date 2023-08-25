@@ -3,7 +3,6 @@ package predictions.expression.impl;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.definition.property.api.PropertyDefinition;
-import predictions.definition.property.api.PropertyType;
 import predictions.exception.BadExpressionException;
 import predictions.exception.BadFunctionExpressionException;
 import predictions.exception.BadPropertyTypeExpressionException;
@@ -16,15 +15,9 @@ import predictions.generated.PRDCondition;
 
 public class SingleBooleanExpression implements Expression<Boolean> {
 
-    private String property;
-    private SingleBooleanOperation operation;
-    private Expression<?> valueExpression;
-
-    public SingleBooleanExpression(String property, SingleBooleanOperation operation, Expression<?> valueExpression) {
-        this.property = property;
-        this.operation = operation;
-        this.valueExpression = valueExpression;
-    }
+    private final String property;
+    private final SingleBooleanOperation operation;
+    private final Expression<?> valueExpression;
 
     public SingleBooleanExpression(PRDCondition prdCondition, EntityDefinition ent, EnvVariablesManager env) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
         this.property = prdCondition.getProperty();
@@ -52,6 +45,8 @@ public class SingleBooleanExpression implements Expression<Boolean> {
         Comparable<?> propVal = context.getPrimaryEntityInstance().getPropertyByName(property).getValue();
         Comparable<?> expVal = valueExpression.evaluate(context);
 
+        Double b = null, a = null;
+
         if (!legalCombination(propVal,expVal))
         {
             throw new RuntimeException("bad Single Expression. cannot compare property " + property + " to expression " + valueExpression);
@@ -59,15 +54,15 @@ public class SingleBooleanExpression implements Expression<Boolean> {
 
         if (propVal instanceof Integer)
         {
-             propVal = (double)(int)(Comparable<Integer>)propVal;
+             a = (double)(int)(Integer)propVal;
         }
 
         if (expVal instanceof Integer)
         {
-            expVal = (double)(int)(Comparable<Integer>)expVal;
+            b = (double)(int)(Integer)expVal;
         }
 
-        return operation.evaluate(propVal,expVal);
+        return operation.evaluate(a==null?propVal:a,b==null?expVal:b);
     }
 
     private static boolean legalCombination(Comparable<?> a, Comparable<?> b)

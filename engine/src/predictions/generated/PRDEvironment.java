@@ -66,7 +66,7 @@ public class PRDEvironment {
      */
     public List<PRDEnvProperty> getPRDEnvProperty() {
         if (prdEnvProperty == null) {
-            prdEnvProperty = new ArrayList<PRDEnvProperty>();
+            prdEnvProperty = new ArrayList<>();
         }
         return this.prdEnvProperty;
     }

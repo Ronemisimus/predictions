@@ -2,7 +2,7 @@ package predictions.exception;
 
 public class BadFunctionExpressionException extends Throwable {
 
-    private String expression;
+    private final String expression;
     public BadFunctionExpressionException(String expression) {
         this.expression = expression;
     }

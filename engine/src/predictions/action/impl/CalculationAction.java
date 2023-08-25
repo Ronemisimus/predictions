@@ -1,6 +1,5 @@
 package predictions.action.impl;
 
-import dto.subdto.show.world.ActionDto;
 import predictions.action.api.AbstractAction;
 import predictions.action.api.ActionType;
 import predictions.definition.entity.EntityDefinition;
@@ -15,14 +14,12 @@ import predictions.execution.instance.property.PropertyInstance;
 import predictions.expression.ExpressionBuilder;
 import predictions.expression.api.Expression;
 import predictions.expression.api.MathOperation;
-import predictions.expression.impl.DoubleComplexExpression;
 import predictions.expression.impl.DualMathExpression;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class CalculationAction extends AbstractAction {
 
@@ -48,7 +45,7 @@ public class CalculationAction extends AbstractAction {
                                 throw new RuntimeException(e);
                             }
                         })
-                .map(t -> (Expression<Double>) t).collect(Collectors.toList());
+                .map(t -> t).collect(Collectors.toList());
         List<Expression<Double>> args2Exp = Arrays.stream(args2)
                 .map(exp -> {
                     try {
@@ -58,7 +55,7 @@ public class CalculationAction extends AbstractAction {
                         throw new RuntimeException(e);
                     }
                 })
-                .map(t -> (Expression<Double>) t).collect(Collectors.toList());
+                .map(t -> t).collect(Collectors.toList());
         exps = new ArrayList<>();
         for (int i=0;i<ops.length;i++) {
             exps.add(new DualMathExpression(ops[i], args1Exp.get(i), args2Exp.get(i)));
@@ -80,9 +77,7 @@ public class CalculationAction extends AbstractAction {
         }
         else if (propertyInstance.getPropertyDefinition().getType() == PropertyType.DECIMAL) {
             PropertyInstance<Integer> property = (PropertyInstance<Integer>) propertyInstance;
-            exps.stream().map(t -> t.evaluate(context)).forEach(res -> {
-                property.updateValue(res, world_time);
-            });
+            exps.stream().map(t -> t.evaluate(context)).forEach(res -> property.updateValue(res, world_time));
         }
     }
 }

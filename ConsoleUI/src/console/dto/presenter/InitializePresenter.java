@@ -5,7 +5,7 @@ import dto.subdto.InitializeDto;
 import java.util.stream.Collectors;
 
 public class InitializePresenter extends DTOPresenter {
-    private InitializeDto initDto;
+    private final InitializeDto initDto;
     public InitializePresenter(InitializeDto initDto) {
         this.initDto = initDto;
     }

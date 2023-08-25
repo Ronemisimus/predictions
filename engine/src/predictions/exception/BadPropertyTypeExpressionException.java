@@ -4,8 +4,8 @@ import predictions.definition.property.api.PropertyType;
 
 public class BadPropertyTypeExpressionException extends Throwable {
 
-    private String expression;
-    private PropertyType type;
+    private final String expression;
+    private final PropertyType type;
     public BadPropertyTypeExpressionException(String expression, PropertyType type) {
         this.expression = expression;
         this.type = type;

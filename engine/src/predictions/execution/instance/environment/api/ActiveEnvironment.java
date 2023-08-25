@@ -3,7 +3,6 @@ package predictions.execution.instance.environment.api;
 import dto.subdto.InitializeDto;
 import predictions.execution.instance.property.PropertyInstance;
 
-import java.util.Map;
 import java.util.Set;
 
 public interface ActiveEnvironment {

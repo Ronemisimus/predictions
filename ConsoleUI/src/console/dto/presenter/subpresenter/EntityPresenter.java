@@ -2,13 +2,12 @@ package console.dto.presenter.subpresenter;
 
 import console.dto.presenter.DTOPresenter;
 import dto.subdto.show.world.EntityDto;
-import dto.subdto.show.world.PropertyDto;
 
 import java.util.stream.Collectors;
 
 public class EntityPresenter extends DTOPresenter {
 
-    private EntityDto entity;
+    private final EntityDto entity;
     public EntityPresenter(EntityDto ent)
     {
         this.entity = ent;

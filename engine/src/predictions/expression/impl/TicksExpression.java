@@ -5,7 +5,7 @@ import predictions.expression.api.Expression;
 
 public class TicksExpression implements Expression<Double> {
 
-    private String property;
+    private final String property;
 
     public TicksExpression(String property) {
         this.property = property;

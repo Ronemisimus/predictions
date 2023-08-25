@@ -11,7 +11,7 @@ public class ActivationImpl implements Activation {
     private final int cycleSizeInTicks;
     private final double probability;
 
-    private Random rand;
+    private final Random rand;
 
     public ActivationImpl(Integer cycleSizeInTicks, Double probability)
     {

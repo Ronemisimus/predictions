@@ -8,7 +8,6 @@ import predictions.exception.BadExpressionException;
 import predictions.exception.BadFunctionExpressionException;
 import predictions.exception.BadPropertyTypeExpressionException;
 import predictions.exception.MissingPropertyExpressionException;
-import predictions.execution.context.Context;
 import predictions.expression.api.Expression;
 import predictions.expression.api.MathOperation;
 import predictions.expression.impl.*;
@@ -19,7 +18,7 @@ import java.util.Optional;
 
 public class ExpressionBuilder {
 
-    private static List<String> functions;
+    private static final List<String> functions;
 
     static {
         functions = new ArrayList<>();
@@ -34,9 +33,7 @@ public class ExpressionBuilder {
         if (funcExpression != null) return funcExpression;
         Expression<Double> entPropertyExpression = buildEntityDoublePropertyExpression(expression, entityDefinition);
         if (entPropertyExpression != null) return entPropertyExpression;
-        Expression<Double> simpleExpression = buildSimpleDoubleExpression(expression);
-        if (simpleExpression != null) return simpleExpression;
-        throw new BadExpressionException(expression);
+        return buildSimpleDoubleExpression(expression);
     }
 
     private static Expression<Double> buildSimpleDoubleExpression(String expression) throws BadPropertyTypeExpressionException {
@@ -55,10 +52,12 @@ public class ExpressionBuilder {
                 .filter(name -> name.equals(expression)).findFirst();
         if (propDef.isPresent()) {
             Optional<PropertyDefinition<?>> prop = entityDefinition.getProps().stream().filter(p -> p.getName().equals(expression)).findFirst();
-            if (prop.isPresent() && prop.get().getType() == PropertyType.DECIMAL || prop.get().getType() == PropertyType.FLOAT)
+            if (prop.isPresent() &&
+                    (prop.get().getType() == PropertyType.DECIMAL ||
+                            prop.get().getType() == PropertyType.FLOAT))
                 return new PropertyExpression<>(expression);
             else
-                throw new BadPropertyTypeExpressionException(expression, prop.get().getType());
+                throw new BadPropertyTypeExpressionException(expression, prop.map(PropertyDefinition::getType).orElse(null));
         }
         return null;
     }
@@ -71,6 +70,9 @@ public class ExpressionBuilder {
         expression = expression.substring(funcName.length());
         if (!expression.startsWith("(") || !expression.endsWith(")")) throw new BadFunctionExpressionException(finalExpression);
         expression = expression.substring(1, expression.length()-1);
+
+        String prop;
+        Optional<String> propDef;
         switch (funcName)
         {
             case "environment":
@@ -87,8 +89,8 @@ public class ExpressionBuilder {
                     throw new BadFunctionExpressionException(finalExpression);
                 }
             case "evaluate":
-                String prop = expression.substring(expression.indexOf(".")+1);
-                Optional<String> propDef = entityDefinition.getProps().stream()
+                prop = expression.substring(expression.indexOf(".")+1);
+                propDef = entityDefinition.getProps().stream()
                         .map(PropertyDefinition::getName)
                         .filter(name -> name.equals(prop)).findFirst();
                 if (propDef.isPresent()) {
@@ -118,7 +120,7 @@ public class ExpressionBuilder {
         throw new BadFunctionExpressionException(finalExpression);
     }
 
-    public static Expression<String> buildStringExpression(String valueExpression, EntityDefinition entityDefinition, EnvVariablesManager env) throws MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException, BadExpressionException {
+    public static Expression<String> buildStringExpression(String valueExpression, EntityDefinition entityDefinition, EnvVariablesManager env) throws MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
         Expression<String> funcExpression = buildFunctionStringExpression(valueExpression, entityDefinition, env);
         if (funcExpression != null) return funcExpression;
         Expression<String> entPropertyExpression = buildEntityStringPropertyExpression(valueExpression, entityDefinition);
@@ -127,12 +129,7 @@ public class ExpressionBuilder {
     }
 
     private static Expression<String> buildSimpleStringExpression(String valueExpression) {
-        return new Expression<String>() {
-            @Override
-            public Comparable<String> evaluate(Context context) {
-                return valueExpression;
-            }
-        };
+        return context -> valueExpression;
     }
 
     private static Expression<String> buildEntityStringPropertyExpression(String valueExpression, EntityDefinition entityDefinition) throws BadPropertyTypeExpressionException {
@@ -144,33 +141,33 @@ public class ExpressionBuilder {
             if (prop.isPresent() && prop.get().getType() == PropertyType.STRING)
                 return new PropertyExpression<>(valueExpression);
             else
-                throw new BadPropertyTypeExpressionException(valueExpression, prop.get().getType());
+                throw new BadPropertyTypeExpressionException(valueExpression, prop.map(PropertyDefinition::getType).orElse(null));
         }
         return null;
     }
 
-    private static Expression<String> buildFunctionStringExpression(String valueExpression, EntityDefinition entityDefinition, EnvVariablesManager env) throws MissingPropertyExpressionException, BadFunctionExpressionException {
-        String finalExpression = valueExpression;
+    private static Expression<String> buildFunctionStringExpression(String expression, EntityDefinition entityDefinition, EnvVariablesManager env) throws MissingPropertyExpressionException, BadFunctionExpressionException {
+        String finalExpression = expression;
         Optional<String> func = functions.stream().filter(f -> finalExpression.toLowerCase().startsWith(f)).findFirst();
         if(!func.isPresent()) return null;
         String funcName = func.get();
-        valueExpression = valueExpression.substring(funcName.length());
-        if (!valueExpression.startsWith("(") || !valueExpression.endsWith(")")) throw new BadFunctionExpressionException(finalExpression);
-        valueExpression = valueExpression.substring(1, valueExpression.length()-1);
+        expression = expression.substring(funcName.length());
+        if (!expression.startsWith("(") || !expression.endsWith(")")) throw new BadFunctionExpressionException(finalExpression);
+        expression = expression.substring(1, expression.length()-1);
         switch (funcName)
         {
             case "environment":
-                String finalExpression1 = valueExpression;
+                String finalExpression1 = expression;
                 env.getEnvVariables().stream().map(PropertyDefinition::getName)
                         .filter(name -> name.equals(finalExpression1)).findFirst()
                         .orElseThrow(() -> new MissingPropertyExpressionException(finalExpression, entityDefinition, true));
-                return new StringEnviromentExpression(valueExpression);
+                return new StringEnviromentExpression(expression);
             case "random":
             case "percent":
             case "ticks":
                 throw new BadFunctionExpressionException(finalExpression);
             case "evaluate":
-                String prop = valueExpression.substring(valueExpression.indexOf(".")+1);
+                String prop = expression.substring(expression.indexOf(".")+1);
                 Optional<String> propDef = entityDefinition.getProps().stream()
                         .map(PropertyDefinition::getName)
                         .filter(name -> name.equals(prop)).findFirst();
@@ -213,7 +210,7 @@ public class ExpressionBuilder {
             if (prop.isPresent() && prop.get().getType() == PropertyType.BOOLEAN)
                 return new PropertyExpression<>(valueExpression);
             else
-                throw new BadPropertyTypeExpressionException(valueExpression, prop.get().getType());
+                throw new BadPropertyTypeExpressionException(valueExpression, prop.map(PropertyDefinition::getType).orElse(null));
         }
         return null;
     }

@@ -1,7 +1,7 @@
 package predictions.definition.value.generator.random.impl.numeric;
 
 public class RandomDoubleGenerator extends AbstractNumericRandomGenerator<Double> {
-    protected RandomDoubleGenerator(Double from, Double to) {
+    public RandomDoubleGenerator(Double from, Double to) {
         super(from, to);
     }
 

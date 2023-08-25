@@ -4,7 +4,7 @@ import console.dto.presenter.subpresenter.WorldPresenter;
 import dto.ShowWorldDto;
 
 public class ShowWorldPresenter extends DTOPresenter {
-    private ShowWorldDto dto;
+    private final ShowWorldDto dto;
 
     public ShowWorldPresenter(ShowWorldDto dto) {
         this.dto = dto;

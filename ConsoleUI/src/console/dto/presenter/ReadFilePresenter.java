@@ -4,7 +4,7 @@ import dto.ReadFileDto;
 
 public class ReadFilePresenter extends DTOPresenter {
 
-    private ReadFileDto dto;
+    private final ReadFileDto dto;
     public ReadFilePresenter(ReadFileDto dto) {
         this.dto = dto;
     }
@@ -38,7 +38,7 @@ public class ReadFilePresenter extends DTOPresenter {
         }
         if(dto.isBadFunctionExpression())
         {
-            return "Bad function expression in " + dto.getProperyName() + " fix to continue";
+            return "Bad function expression in " + dto.getPropertyName() + " fix to continue";
         }
         if(dto.isMatchesSchema())
         {
@@ -46,19 +46,19 @@ public class ReadFilePresenter extends DTOPresenter {
         }
         if (dto.isEnvironmentVariableRepeatedKey())
         {
-            return "Environment variable repeated " + dto.getProperyName();
+            return "Environment variable repeated " + dto.getPropertyName();
         }
-        else if(dto.getEntityName()!=null && dto.getProperyName()!=null)
+        else if(dto.getEntityName()!=null && dto.getPropertyName()!=null)
         {
-            return dto.getEntityName() + " has repeated property: " + dto.getProperyName();
+            return dto.getEntityName() + " has repeated property: " + dto.getPropertyName();
         }
         if(dto.isPropertyDoesNotExistInEntity())
         {
-            return dto.getEntityName() + " has repeated property: " + dto.getProperyName();
+            return dto.getEntityName() + " has repeated property: " + dto.getPropertyName();
         }
         if(dto.isIncreaseDecreaseCalculationParametersNumerical())
         {
-            return dto.getProperyName() + " has invalid parameter types: " + dto.getProperyType();
+            return dto.getPropertyName() + " has invalid parameter types: " + dto.getPropertyType();
         }
         if(dto.isMissingEntity())
         {

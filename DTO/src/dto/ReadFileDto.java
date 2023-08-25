@@ -13,12 +13,12 @@ public class ReadFileDto implements DTO{
     private final boolean propertyDoesNotExistInEntity;
     private final boolean increaseDecreaseCalculationParametersNumerical;
 
-    private final String properyName;
+    private final String propertyName;
     private final String entityName;
     private final String ruleName;
     private final String actionType;
 
-    private final String properyType;
+    private final String propertyType;
     private final boolean missingPropertyEnvironmentVariable;
 
     private final boolean badFunctionExpression;
@@ -38,11 +38,11 @@ public class ReadFileDto implements DTO{
                        boolean missingPropertyEnvironmentVariable,
                        boolean badFunctionExpression,
                        boolean missingEntity,
-                       String properyName,
+                       String propertyName,
                        String entityName,
                        String ruleName,
                        String actionType,
-                       String properyType) {
+                       String propertyType) {
         this.fullPathError = fullPathError;
         this.fileExists = fileExists;
         this.isFile = isFile;
@@ -54,12 +54,12 @@ public class ReadFileDto implements DTO{
         this.ruleExceedsContext = ruleExceedsContext;
         this.propertyDoesNotExistInEntity = propertyDoesNotExistInEntity;
         this.increaseDecreaseCalculationParametersNumerical = increaseDecreaseCalculationParametersNumerical;
-        this.properyName = properyName;
+        this.propertyName = propertyName;
         this.entityName = entityName;
         this.ruleName = ruleName;
         this.actionType = actionType;
         this.missingPropertyEnvironmentVariable = missingPropertyEnvironmentVariable;
-        this.properyType = properyType;
+        this.propertyType = propertyType;
         this.badFunctionExpression = badFunctionExpression;
         this.missingEntity = missingEntity;
     }
@@ -108,8 +108,8 @@ public class ReadFileDto implements DTO{
         return increaseDecreaseCalculationParametersNumerical;
     }
 
-    public String getProperyName() {
-        return properyName;
+    public String getPropertyName() {
+        return propertyName;
     }
 
     public String getEntityName() {
@@ -128,8 +128,8 @@ public class ReadFileDto implements DTO{
         return missingPropertyEnvironmentVariable;
     }
 
-    public String getProperyType() {
-        return properyType;
+    public String getPropertyType() {
+        return propertyType;
     }
 
     public boolean isBadFunctionExpression() {

@@ -1,15 +1,12 @@
 package console.dto.collector;
 
-import console.dto.presenter.subpresenter.PropertyPresenter;
 import console.menu.MenuManager;
-import console.menu.MenuManagerImpl;
 import console.menu.menu.EnvMenu;
 import console.menu.option.ExitOption;
 import console.menu.option.MenuItem;
 import dto.EnvDto;
 import dto.subdto.show.world.PropertyDto;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -18,8 +15,8 @@ import java.util.stream.IntStream;
 
 public class EnvCollector implements Runnable{
 
-    private  EnvDto env;
-    private List<Comparable<?>> userValue;
+    private final EnvDto env;
+    private final List<Comparable<?>> userValue;
 
     private static final Scanner scanner = new Scanner(System.in);
     public EnvCollector(EnvDto env){
@@ -91,8 +88,8 @@ public class EnvCollector implements Runnable{
             System.out.println("(enter a number" + rangeStr + ")");
             try {
                 res = scanner.nextDouble();
-                if (res>to || res<from)
-                {
+                if (from != null && to != null &&
+                        (res.compareTo(to) > 0 || res.compareTo(from) < 0)) {
                     res = null;
                 }
             }catch (Exception e){
@@ -113,8 +110,8 @@ public class EnvCollector implements Runnable{
             System.out.println("(enter a whole number" + rangeStr + ")");
             try {
                 res = scanner.nextInt();
-                if (res>to || res<from)
-                {
+                if (from != null && to != null &&
+                        (res.compareTo(to) > 0 || res.compareTo(from) < 0)) {
                     res = null;
                 }
             }catch (Exception e){

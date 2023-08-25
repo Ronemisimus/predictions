@@ -1,8 +1,6 @@
 package predictions.rule.impl;
 
-import predictions.ConverterPRDEngine;
 import predictions.action.api.Action;
-import predictions.generated.PRDRule;
 import predictions.rule.api.Activation;
 import predictions.rule.api.Rule;
 

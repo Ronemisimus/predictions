@@ -3,7 +3,6 @@ package console;
 import console.dto.collector.EnvCollector;
 import console.dto.presenter.*;
 import console.menu.MenuManager;
-import console.menu.MenuManagerImpl;
 import console.menu.menu.EntityMenu;
 import console.menu.menu.HistoryDisplayMenu;
 import console.menu.menu.HistoryMenu;
@@ -19,9 +18,7 @@ import predictions.MainApi;
 import predictions.MainApiImpl;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +28,7 @@ import java.util.stream.IntStream;
 
 public class EngineApi  {
 
-    private MainApi api;
+    private final MainApi api;
     private static EngineApi instance;
 
     private EngineApi()
@@ -70,11 +67,6 @@ public class EngineApi  {
                 .forEach(name -> api.setEnv(name,collector.getValue(name)));
     }
 
-    private void showEnv()
-    {
-
-    }
-
     public static EngineApi getInstance()
     {
         if(instance == null)
@@ -106,7 +98,7 @@ public class EngineApi  {
         HistoryDisplayMenu menu = new HistoryDisplayMenu();
         ((MenuManager)menu).run(false);
         Integer displayOption = menu.getChoice();
-        SingleRunHistoryDto res = null;
+        SingleRunHistoryDto res;
         if (displayOption ==1)
         {
             res = api.getRunEntityCounts(chosenRun[0].getKey());
