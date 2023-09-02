@@ -1,6 +1,6 @@
 package gui.details.tree.action;
 
-import dto.subdto.show.world.ActionDto;
+import dto.subdto.show.world.action.*;
 import gui.details.tree.OpenableItem;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
@@ -8,23 +8,165 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.layout.VBox;
 
 public class ActionItem extends TreeItem<String> implements OpenableItem {
-    private ActionDto action;
+    private final ActionDto action;
     public ActionItem(ActionDto action) {
-        super(action.getName(), null);
+        super(action.getType(), null);
         this.action = action;
+        addChildren();
+    }
+
+    private void addChildren() {
+        switch (action.getType()) {
+            case "Condition":
+                if (action instanceof ConditionActionDto)
+                    addChildren((ConditionActionDto) action);
+            case "Proximity":
+                if (action instanceof ProximityActionDto)
+                    addChildren((ProximityActionDto) action);
+        }
+    }
+
+    private void addChildren(ProximityActionDto action) {
+        action.getActions().forEach(this::accept);
+    }
+
+    private void addChildren(ConditionActionDto action) {
+        TreeItem<String> thenItem = new TreeItem<>("then");
+        TreeItem<String> elseItem = new TreeItem<>("else");
+        action.getThenActions().forEach(act -> thenItem.getChildren().add(new ActionItem(act)));
+        action.getElseActions().forEach(act -> elseItem.getChildren().add(new ActionItem(act)));
+        getChildren().add(thenItem);
+        getChildren().add(elseItem);
     }
 
     @Override
     public Parent getDetailsView() {
+        switch (action.getType()) {
+            case "Increase":
+                if (action instanceof IncreaseActionDto) return getDetailsView((IncreaseActionDto) action);
+                else return null;
+            case "Decrease":
+                if (action instanceof decreaseActionDto) return getDetailsView((decreaseActionDto) action);
+                else return null;
+            case "Calculation":
+                if (action instanceof CalculationActionDto) return getDetailsView((CalculationActionDto) action);
+                else return null;
+            case "Kill":
+                if (action instanceof KillActionDto) return getDetailsView((KillActionDto) action);
+                else return null;
+            case "Set":
+                if (action instanceof SetActionDto) return getDetailsView((SetActionDto) action);
+                else return null;
+            case "Replace":
+                if (action instanceof ReplaceActionDto) return getDetailsView((ReplaceActionDto) action);
+                else return null;
+            case "Condition":
+                if (action instanceof ConditionActionDto) return getDetailsView((ConditionActionDto) action);
+                else return null;
+            case "Proximity":
+                if (action instanceof ProximityActionDto) return getDetailsView((ProximityActionDto) action);
+                else return null;
+            default:
+                return null;
+        }
+    }
+
+    private Parent getDetailsView(ProximityActionDto action) {
         VBox detailsBox = new VBox();
 
-        Label nameLabel = new Label("Action Name: " + action.getName());
-        detailsBox.getChildren().addAll(nameLabel);
-
-        // Customize the VBox's appearance or layout if needed
-        detailsBox.setSpacing(10); // Set spacing between items
-        detailsBox.setStyle("-fx-padding: 10px;"); // Add padding to the VBox
+        Label nameLabel = new Label("Type: Proximity - sub actions performed if:");
+        Label sourceEntityLabel = new Label("Source Entity: " + action.getSourceEntity().getName());
+        Label targetEntityLabel = new Label("Target Entity: " + action.getTargetEntity().getName());
+        Label distanceLabel = new Label("Distance is " + (action.getOfValue()==1? "1 block" : "2 blocks"));
+        detailsBox.getChildren().addAll(nameLabel, sourceEntityLabel, targetEntityLabel, distanceLabel);
 
         return detailsBox;
+    }
+
+    private Parent getDetailsView(ConditionActionDto action) {
+        Label nameLabel = new Label("Type: Condition" + action.getType());
+        Label conditionLabel = new Label("then sub actions performed if:" + action.getConditionExpression());
+        Label elseLabel = new Label("otherwise else sub actions performed");
+        Label primaryEntityLabel = new Label("Primary Entity: " + action.getPrimaryEntity().getName());
+        Label secondaryEntityLabel = new Label("Secondary Entity: " + action.getSecondaryEntity().getName());
+
+        VBox detailsBox = new VBox();
+        detailsBox.getChildren().addAll(nameLabel, primaryEntityLabel, secondaryEntityLabel, conditionLabel, elseLabel);
+
+        return detailsBox;
+    }
+
+    private Parent getDetailsView(ReplaceActionDto action) {
+        Label typeLabel = new Label("Type: Replace");
+        Label bornEntity = new Label("Born Entity: " + action.getBornEntity().getName());
+        Label deadEntity = new Label("Killed Entity: " + action.getKilledEntity().getName());
+        Label modeLabel = new Label("Mode: " + action.getMode());
+
+        VBox detailsBox = new VBox();
+        detailsBox.getChildren().addAll(typeLabel, bornEntity, deadEntity, modeLabel);
+
+        return detailsBox;
+    }
+
+    private Parent getDetailsView(SetActionDto action) {
+        Label typeLabel = new Label("Type: Set");
+        Label entityLabel = new Label("Primary Entity: " + action.getPrimaryEntity().getName());
+        Label secondaryEntityLabel = new Label("Secondary Entity: " + action.getSecondaryEntity().getName());
+        Label propertyLabel = new Label("Property: " + action.getPropertyName() + " = " + action.getValueExpression());
+
+        VBox detailsBox = new VBox();
+        detailsBox.getChildren().addAll(typeLabel, entityLabel, secondaryEntityLabel, propertyLabel);
+
+        return detailsBox;
+    }
+
+    private Parent getDetailsView(KillActionDto action) {
+        Label typeLabel = new Label("Type: Kill");
+        Label primaryEntityLabel = new Label("Killed Entity: " + action.getPrimaryEntity().getName());
+
+        VBox detailsBox = new VBox();
+        detailsBox.getChildren().addAll(typeLabel, primaryEntityLabel);
+
+        return detailsBox;
+    }
+
+    private Parent getDetailsView(CalculationActionDto action) {
+        Label typeLabel = new Label("Type: Calculation");
+        Label primaryEntityLabel = new Label("Primary Entity: " + action.getPrimaryEntity().getName());
+        Label secondaryEntityLabel = new Label("Secondary Entity: " + action.getSecondaryEntity().getName());
+        Label propertyLabel = new Label("Property: " + action.getResultPropName() + " = " + action.getCalculationExpression());
+
+        VBox detailsBox = new VBox();
+        detailsBox.getChildren().addAll(typeLabel, primaryEntityLabel, secondaryEntityLabel, propertyLabel);
+
+        return detailsBox;
+    }
+
+    private Parent getDetailsView(decreaseActionDto action) {
+        Label typeLabel = new Label("Type: Decrease");
+        Label primaryEntityLabel = new Label("Primary Entity: " + action.getPrimaryEntity().getName());
+        Label secondaryEntityLabel = new Label("Secondary Entity: " + action.getSecondaryEntity().getName());
+        Label propertyLabel = new Label("Property: " + action.getPropertyName() + " = " + action.getPropertyName() + " - 1");
+
+        VBox detailsBox = new VBox();
+        detailsBox.getChildren().addAll(typeLabel, primaryEntityLabel, secondaryEntityLabel, propertyLabel);
+
+        return detailsBox;
+    }
+
+    private Parent getDetailsView(IncreaseActionDto action) {
+        Label typeLabel = new Label("Type: Increase");
+        Label primaryEntityLabel = new Label("Primary Entity: " + action.getPrimaryEntity().getName());
+        Label secondaryEntityLabel = new Label("Secondary Entity: " + action.getSecondaryEntity().getName());
+        Label propertyLabel = new Label("Property: " + action.getPropertyName() + " = " + action.getPropertyName() + " + 1");
+
+        VBox detailsBox = new VBox();
+        detailsBox.getChildren().addAll(typeLabel, primaryEntityLabel, secondaryEntityLabel, propertyLabel);
+
+        return detailsBox;
+    }
+
+    private void accept(ActionDto child) {
+        getChildren().add(new ActionItem(child));
     }
 }

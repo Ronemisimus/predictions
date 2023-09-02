@@ -27,10 +27,6 @@ public class RulesItem extends TreeItem<String> implements OpenableItem{
         // Add Labels to the VBox
         detailsBox.getChildren().addAll(ruleNumberLabel);
 
-        // Customize the VBox's appearance or layout if needed
-        detailsBox.setSpacing(10); // Set spacing between items
-        detailsBox.setStyle("-fx-padding: 10px;"); // Add padding to the VBox
-
         // Return the VBox as a Parent
         return detailsBox;
     }

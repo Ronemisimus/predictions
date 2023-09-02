@@ -10,15 +10,16 @@ import javafx.scene.layout.VBox;
 public class EntityItem extends TreeItem<String> implements OpenableItem {
 
     private EntityDto entity;
+    private Integer entityAmount;
     public EntityItem(EntityDto entity) {
         super(entity.getName(), null);
         this.entity = entity;
+        entityAmount = 0;
         entity.getProps().forEach(this::accept);
     }
 
     @Override
     public Parent getDetailsView() {
-        Integer entityAmount = entity.getAmount();
         String entityName = entity.getName();
         Integer PropertyAmount = entity.getProps().size();
 
@@ -33,12 +34,16 @@ public class EntityItem extends TreeItem<String> implements OpenableItem {
         // Add Labels to the VBox
         detailsBox.getChildren().addAll(nameLabel, amountLabel, propertyAmountLabel);
 
-        // Customize the VBox's appearance or layout if needed
-        detailsBox.setSpacing(10); // Set spacing between items
-        detailsBox.setStyle("-fx-padding: 10px;"); // Add padding to the VBox
-
         // Return the VBox as a Parent
         return detailsBox;
+    }
+
+    public Integer getEntityAmount() {
+        return entityAmount;
+    }
+
+    public void setEntityAmount(Integer entityAmount) {
+        this.entityAmount = entityAmount;
     }
 
     private void accept(PropertyDto e) {

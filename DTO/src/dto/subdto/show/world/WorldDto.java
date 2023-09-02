@@ -13,18 +13,30 @@ public class WorldDto {
 
     private final boolean userTermination;
 
+    private final Integer gridWidth;
+
+    private final Integer gridHeight;
+
+    private final Integer threadCount;
+
     public WorldDto(List<PropertyDto> environment,
                     List<EntityDto> entities,
                     List<RuleDto> rules,
                     Integer tickTermination,
                     Integer timeTermination,
-                    Boolean userTermination) {
+                    Boolean userTermination,
+                    Integer gridWidth,
+                    Integer gridHeight,
+                    Integer threadCount) {
         this.environment = environment;
         this.entities = entities;
         this.rules = rules;
         this.userTermination = userTermination!=null && userTermination;
         this.timeTermination = timeTermination;
         this.ticksTermination = tickTermination;
+        this.gridWidth = gridWidth;
+        this.gridHeight = gridHeight;
+        this.threadCount = threadCount;
     }
 
     public List<PropertyDto> getEnvironment() {
@@ -49,5 +61,17 @@ public class WorldDto {
 
     public boolean isUserTermination() {
         return userTermination;
+    }
+
+    public Integer getGridWidth() {
+        return gridWidth;
+    }
+
+    public Integer getGridHeight() {
+        return gridHeight;
+    }
+
+    public Integer getThreadCount() {
+        return threadCount;
     }
 }

@@ -1,5 +1,7 @@
 package dto.subdto.show.world;
 
+import dto.subdto.show.world.action.ActionDto;
+
 import java.util.List;
 
 public class RuleDto {
@@ -8,7 +10,10 @@ public class RuleDto {
     private final Double probability;
     private final List<ActionDto> actions;
 
-    public RuleDto(String name, Integer ticks, Double probability, List<ActionDto> actions) {
+    public RuleDto(String name,
+                   Integer ticks,
+                   Double probability,
+                   List<ActionDto> actions) {
         this.name = name;
         this.ticks = ticks;
         this.probability = probability;

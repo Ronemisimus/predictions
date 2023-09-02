@@ -5,8 +5,10 @@ import gui.details.tree.OpenableItem;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.VBox;
 
 import java.awt.event.MouseEvent;
 import java.beans.EventHandler;
@@ -34,7 +36,12 @@ public class DetailsSceneController {
                         if(getTreeItem() instanceof OpenableItem)
                         {
                             OpenableItem openableItem = (OpenableItem) getTreeItem();
-                            detailView.setContent(openableItem.getDetailsView());
+                            Parent root = openableItem.getDetailsView();
+                            if (root instanceof VBox) {
+                                ((VBox) root).setSpacing(10);
+                                root.setStyle("-fx-padding: 10px;");
+                            }
+                            detailView.setContent(root);
                         }
                         else
                         {

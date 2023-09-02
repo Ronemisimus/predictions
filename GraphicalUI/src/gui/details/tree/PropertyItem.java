@@ -28,10 +28,6 @@ public class PropertyItem extends TreeItem<String> implements OpenableItem {
             detailsBox.getChildren().add(range);
         }
 
-        // Customize the VBox's appearance or layout if needed
-        detailsBox.setSpacing(10); // Set spacing between items
-        detailsBox.setStyle("-fx-padding: 10px;"); // Add padding to the VBox
-
         return detailsBox;
     }
 }

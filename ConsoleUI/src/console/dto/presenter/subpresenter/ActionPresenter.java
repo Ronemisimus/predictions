@@ -1,7 +1,7 @@
 package console.dto.presenter.subpresenter;
 
 import console.dto.presenter.DTOPresenter;
-import dto.subdto.show.world.ActionDto;
+import dto.subdto.show.world.action.ActionDto;
 
 public class ActionPresenter extends DTOPresenter {
 
@@ -17,6 +17,6 @@ public class ActionPresenter extends DTOPresenter {
 
     @Override
     public String toString() {
-        return "\t" + action.getName();
+        return "\t" + action.getType();
     }
 }

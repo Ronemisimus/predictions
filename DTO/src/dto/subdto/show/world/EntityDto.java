@@ -5,12 +5,10 @@ import java.util.List;
 public class EntityDto {
     private final List<PropertyDto> props;
     private final String name;
-    private final Integer amount;
 
-    public EntityDto(List<PropertyDto> props, String name, Integer amount) {
+    public EntityDto(List<PropertyDto> props, String name) {
         this.props = props;
         this.name = name;
-        this.amount = amount;
     }
 
     public List<PropertyDto> getProps() {
@@ -19,9 +17,5 @@ public class EntityDto {
 
     public String getName() {
         return name;
-    }
-
-    public Integer getAmount() {
-        return amount;
     }
 }
