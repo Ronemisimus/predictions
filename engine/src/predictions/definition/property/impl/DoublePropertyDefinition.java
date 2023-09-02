@@ -30,6 +30,6 @@ public class DoublePropertyDefinition extends AbstractPropertyDefinition<Double>
 
     @Override
     public PropertyDto getDto() {
-        return new PropertyDto(getType().name(),getName(),from,to, getValueGenerator().isRandomInit());
+        return new PropertyDto(getType().name(),getName(),from,to, getValueGenerator().isRandomInit(), getValueGenerator().getInitValue());
     }
 }

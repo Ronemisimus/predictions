@@ -1,5 +1,6 @@
 package predictions.expression.impl;
 
+import predictions.action.api.ContextDefinition;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.exception.BadExpressionException;
@@ -17,10 +18,11 @@ public class DualBooleanExpression extends DualExpression<Boolean> {
 
     private final BooleanOperation booleanOperation;
 
-    public DualBooleanExpression(PRDCondition prdCondition, EntityDefinition ent, EnvVariablesManager env) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
+    public DualBooleanExpression(PRDCondition prdCondition,
+                                 ContextDefinition contextDefinition) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
         super(
-                new BooleanComplexExpression(prdCondition.getPRDCondition().get(0), ent, env),
-                new BooleanComplexExpression(Objects.requireNonNull(subCondition(prdCondition)), ent, env));
+                new BooleanComplexExpression(prdCondition.getPRDCondition().get(0), contextDefinition),
+                new BooleanComplexExpression(Objects.requireNonNull(subCondition(prdCondition)), contextDefinition));
         this.booleanOperation = BooleanOperation.valueOf(prdCondition.getLogical().toUpperCase());
     }
 

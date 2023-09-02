@@ -34,19 +34,28 @@ public class WorldImpl implements World {
     private final Collection<EntityDefinition> entityDefinitions;
     private final Collection<Rule> rules;
     private final Collection<Termination> terminations;
+    private final Integer gridWidth;
+    private final Integer gridHeight;
+    private final Integer threadCount;
 
 
     private WorldImpl(EnvVariablesManager envVariablesManager,
-                     Collection<EntityDefinition> entityDefinitions,
-                     Collection<Rule> rules,
-                     Collection<Termination> terminations) {
+                      Collection<EntityDefinition> entityDefinitions,
+                      Collection<Rule> rules,
+                      Collection<Termination> terminations,
+                      Integer gridWidth,
+                      Integer gridHeight,
+                      Integer threadCount) {
         this.envVariablesManager = envVariablesManager;
         this.entityDefinitions = entityDefinitions;
         this.rules = rules;
         this.terminations = terminations;
+        this.gridWidth = gridWidth;
+        this.gridHeight = gridHeight;
+        this.threadCount = threadCount;
     }
 
-    private WorldImpl(PRDWorld res, EnvVariablesManager env) throws RuntimeException {
+    private WorldImpl(final PRDWorld res, final EnvVariablesManager env) throws RuntimeException {
         this(env,
                 res.getPRDEntities().getPRDEntity().stream()
                         .map(EntityDefinitionImpl::new).collect(Collectors.toList()),
@@ -54,62 +63,86 @@ public class WorldImpl implements World {
                         {
                             try {
                                 return ConverterPRDEngine.getRuleFromPRD(prdRule, res.getPRDEntities(), env);
-                            } catch (BadExpressionException | BadFunctionExpressionException |
-                                     MissingPropertyExpressionException | BadPropertyTypeExpressionException |
-                                     MissingPropertyActionException | NoSuchEntityActionException e) {
+                            } catch (final BadExpressionException | BadFunctionExpressionException |
+                                           MissingPropertyExpressionException | BadPropertyTypeExpressionException |
+                                           MissingPropertyActionException | NoSuchEntityActionException e) {
                                 throw new RuntimeException(e);
                             }
                         })
                         .collect(Collectors.toList()),
-                res.getPRDTermination().getPRDByTicksOrPRDBySecond().stream().map(
+                res.getPRDTermination().getPRDBySecondOrPRDByTicks().stream().map(
                         prdTermination -> (prdTermination instanceof PRDByTicks)?
                                 new TicksTermination((PRDByTicks)prdTermination) :
-                                new TimeTermination((PRDBySecond)prdTermination)).collect(Collectors.toList()));
+                                new TimeTermination((PRDBySecond)prdTermination)).collect(Collectors.toList()),
+                res.getPRDGrid().getColumns(),
+                res.getPRDGrid().getRows(),
+                res.getPRDThreadCount());
     }
 
-    public static World fromPRD(PRDWorld res) throws RepeatNameException, RuntimeException {
-        EnvVariablesManager env = new EnvVariableManagerImpl(res.getPRDEvironment());
+    public static World fromPRD(final PRDWorld res) throws RepeatNameException, RuntimeException {
+        final EnvVariablesManager env = new EnvVariableManagerImpl(res.getPRDEnvironment());
         return new WorldImpl(res, env);
     }
 
     @Override
     public EnvVariablesManager getEnvVariablesManager() {
-        return envVariablesManager;
+        return this.envVariablesManager;
     }
 
     @Override
-    public Optional<EntityDefinition> getEntityDefinitionByName(String name) {
-        return entityDefinitions.stream().filter(e -> e.getName().equals(name)).findFirst();
+    public Optional<EntityDefinition> getEntityDefinitionByName(final String name) {
+        return this.entityDefinitions.stream().filter(e -> e.getName().equals(name)).findFirst();
     }
 
     @Override
     public Iterator<EntityDefinition> getEntityDefinitions() {
-        return entityDefinitions.iterator();
+        return this.entityDefinitions.iterator();
     }
 
     @Override
     public Iterator<Rule> getRules() {
-        return rules.iterator();
+        return this.rules.iterator();
     }
 
     @Override
     public Iterator<Termination> getTerminations() {
-        return terminations.iterator();
+        return this.terminations.iterator();
+    }
+
+    public Integer getGridWidth() {
+        return this.gridWidth;
+    }
+
+    public Integer getGridHeight() {
+        return this.gridHeight;
+    }
+
+    public Integer getThreadCount() {
+        return this.threadCount;
     }
 
     @Override
     public WorldDto getDto() {
-        List<PropertyDto> env = envVariablesManager.getEnvVariables().stream().map(PropertyDefinition::getDto).collect(Collectors.toList());
-        List<EntityDto> entities = entityDefinitions.stream().map(EntityDefinition::getDto).collect(Collectors.toList());
-        List<RuleDto> res = rules.stream().map(Rule::getDto).collect(Collectors.toList());
-        Integer tickTermination = terminations.stream()
+        final List<PropertyDto> env = this.envVariablesManager.getEnvVariables().stream().map(PropertyDefinition::getDto).collect(Collectors.toList());
+        final List<EntityDto> entities = this.entityDefinitions.stream().map(EntityDefinition::getDto).collect(Collectors.toList());
+        final List<RuleDto> res = this.rules.stream().map(Rule::getDto).collect(Collectors.toList());
+        final Integer tickTermination = this.terminations.stream()
                 .filter(termination -> termination instanceof TicksTermination)
                 .findFirst().map(t -> ((TicksTermination)t).getTicks()).orElse(null);
-        Duration timeTermination = terminations.stream()
+        final Duration timeTermination = this.terminations.stream()
                 .filter(termination -> termination instanceof TimeTermination)
                 .findFirst().map(t -> ((TimeTermination)t).getTerminationDuration()).orElse(null);
-        Integer timeTerminationInteger = timeTermination == null ? null : Math.toIntExact(timeTermination.getSeconds());
-        boolean userTermination = terminations.stream().anyMatch(termination -> termination instanceof UserTermination);
-        return new WorldDto(env,entities, res, tickTermination, timeTerminationInteger, userTermination);
+        final Integer timeTerminationInteger = null == timeTermination ? null : Math.toIntExact(timeTermination.getSeconds());
+        final boolean userTermination = this.terminations.stream().anyMatch(termination -> termination instanceof UserTermination);
+        return new WorldDto(
+                env,
+                entities,
+                res,
+                tickTermination,
+                timeTerminationInteger,
+                userTermination,
+                this.gridWidth,
+                this.gridHeight,
+                this.threadCount);
     }
 }

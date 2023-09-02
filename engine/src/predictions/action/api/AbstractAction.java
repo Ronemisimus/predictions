@@ -10,11 +10,11 @@ import java.util.ArrayList;
 public abstract class AbstractAction implements Action {
 
     private final ActionType actionType;
-    private final EntityDefinition entityDefinition;
+    private final ContextDefinition contextDefinition;
 
-    protected AbstractAction(ActionType actionType, EntityDefinition entityDefinition) {
+    protected AbstractAction(ActionType actionType, ContextDefinition contextDefinition) {
         this.actionType = actionType;
-        this.entityDefinition = entityDefinition;
+        this.contextDefinition = contextDefinition;
     }
 
     @Override
@@ -23,8 +23,8 @@ public abstract class AbstractAction implements Action {
     }
 
     @Override
-    public EntityDefinition getContextEntity() {
-        return entityDefinition;
+    public ContextDefinition getContextDefinition() {
+        return contextDefinition;
     }
 
     public static boolean verifyNonNumericPropertyType(PropertyInstance<?> propertyValue) {
@@ -33,8 +33,5 @@ public abstract class AbstractAction implements Action {
     }
 
     @Override
-    public ActionDto getDto() {
-        return new ActionDto(new ArrayList<>(),
-                getActionType().name() + " on " + getContextEntity().getName());
-    }
+    public abstract ActionDto getDto();
 }

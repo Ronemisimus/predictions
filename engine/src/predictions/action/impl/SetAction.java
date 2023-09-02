@@ -1,9 +1,10 @@
 package predictions.action.impl;
 
+import dto.subdto.show.world.action.ActionDto;
+import dto.subdto.show.world.action.SetActionDto;
 import predictions.action.api.AbstractAction;
 import predictions.action.api.ActionType;
-import predictions.definition.entity.EntityDefinition;
-import predictions.definition.environment.api.EnvVariablesManager;
+import predictions.action.api.ContextDefinition;
 import predictions.definition.property.api.PropertyDefinition;
 import predictions.definition.property.api.PropertyType;
 import predictions.exception.*;
@@ -19,26 +20,25 @@ public class SetAction extends AbstractAction {
     private final String property;
     private Expression<?> valueExpression;
 
-    public SetAction(EntityDefinition entityDefinition,
+    public SetAction(ContextDefinition contextDefinition,
                      String property,
-                     String valueExpression,
-                     EnvVariablesManager env) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException, MissingPropertyActionException {
-        super(ActionType.SET, entityDefinition);
+                     String valueExpression) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException, MissingPropertyActionException {
+        super(ActionType.SET, contextDefinition);
         this.property = property;
-        Optional<PropertyDefinition<?>> prop = entityDefinition.getProps().stream()
+        Optional<PropertyDefinition<?>> prop = contextDefinition.getPrimaryEntityDefinition().getProps().stream()
                 .filter(p -> p.getName().equals(property)).findFirst();
         if (!prop.isPresent()) throw new MissingPropertyActionException(property, ActionType.SET);
         switch (prop.get().getType())
         {
             case DECIMAL:
             case FLOAT:
-                this.valueExpression = ExpressionBuilder.buildDoubleExpression(valueExpression, entityDefinition, env);
+                this.valueExpression = ExpressionBuilder.buildDoubleExpression(valueExpression, contextDefinition);
                 break;
             case STRING:
-                this.valueExpression = ExpressionBuilder.buildStringExpression(valueExpression, entityDefinition, env);
+                this.valueExpression = ExpressionBuilder.buildStringExpression(valueExpression, contextDefinition);
                 break;
             case BOOLEAN:
-                this.valueExpression = ExpressionBuilder.buildBooleanExpression(valueExpression, entityDefinition, env);
+                this.valueExpression = ExpressionBuilder.buildBooleanExpression(valueExpression, contextDefinition);
                 break;
         }
     }
@@ -68,5 +68,16 @@ public class SetAction extends AbstractAction {
             PropertyInstance<Boolean> prop = (PropertyInstance<Boolean>) propertyInstance;
             prop.updateValue(expVal, world_time);
         }
+    }
+
+    @Override
+    public ActionDto getDto() {
+        return new SetActionDto(
+                getContextDefinition().getPrimaryEntityDefinition().getDto(),
+                getContextDefinition().getSecondaryEntityDefinition() == null ? null :
+                        getContextDefinition().getSecondaryEntityDefinition().getDto(),
+                property,
+                valueExpression.toString()
+        );
     }
 }

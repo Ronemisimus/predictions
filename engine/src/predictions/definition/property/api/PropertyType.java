@@ -1,7 +1,7 @@
 package predictions.definition.property.api;
 
 public enum PropertyType {
-    DECIMAL {
+    DECIMAL(Double.class) {
 
         @Override
         public Comparable<?> convert(Comparable<?> value) {
@@ -10,7 +10,7 @@ public enum PropertyType {
             }
             return value;
         }
-    }, BOOLEAN {
+    }, BOOLEAN(Boolean.class) {
 
         @Override
         public Comparable<?> convert(Comparable<?> value) {
@@ -19,7 +19,7 @@ public enum PropertyType {
             }
             return value;
         }
-    }, FLOAT {
+    }, FLOAT(Double.class) {
 
         @Override
         public Comparable<?> convert(Comparable<?> value) {
@@ -28,7 +28,7 @@ public enum PropertyType {
             }
             return value;
         }
-    }, STRING {
+    }, STRING(String.class) {
 
         @Override
         public Comparable<?> convert(Comparable<?> value) {
@@ -38,6 +38,12 @@ public enum PropertyType {
             return value;
         }
     };
+
+    public final Class type;
+
+    PropertyType(Class type) {
+        this.type = type;
+    }
 
     public abstract Comparable<?> convert(Comparable<?> value);
 }

@@ -1,7 +1,10 @@
 package predictions.action.impl;
 
+import dto.subdto.show.world.action.ActionDto;
+import dto.subdto.show.world.action.CalculationActionDto;
 import predictions.action.api.AbstractAction;
 import predictions.action.api.ActionType;
+import predictions.action.api.ContextDefinition;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.definition.property.api.PropertyType;
@@ -25,13 +28,12 @@ public class CalculationAction extends AbstractAction {
 
     private final String property;
     private final List<Expression<Double>> exps;
-    public CalculationAction(EntityDefinition entityDefinition,
+    public CalculationAction(ContextDefinition contextDefinition,
                              String property,
                              MathOperation[] ops,
                              String[] args1,
-                             String[] args2,
-                             EnvVariablesManager env) {
-        super(ActionType.CALCULATION, entityDefinition);
+                             String[] args2) {
+        super(ActionType.CALCULATION, contextDefinition);
         this.property = property;
         if (args1.length != ops.length || args2.length != ops.length) {
             throw new RuntimeException("missing arguments for calculation");
@@ -39,7 +41,7 @@ public class CalculationAction extends AbstractAction {
         List<Expression<Double>> args1Exp = Arrays.stream(args1)
                         .map(exp -> {
                             try {
-                                return ExpressionBuilder.buildDoubleExpression(exp, entityDefinition, env);
+                                return ExpressionBuilder.buildDoubleExpression(exp, contextDefinition);
                             } catch (BadFunctionExpressionException | MissingPropertyExpressionException |
                                      BadPropertyTypeExpressionException | BadExpressionException e) {
                                 throw new RuntimeException(e);
@@ -49,7 +51,7 @@ public class CalculationAction extends AbstractAction {
         List<Expression<Double>> args2Exp = Arrays.stream(args2)
                 .map(exp -> {
                     try {
-                        return ExpressionBuilder.buildDoubleExpression(exp, entityDefinition, env);
+                        return ExpressionBuilder.buildDoubleExpression(exp, contextDefinition);
                     } catch (BadFunctionExpressionException | MissingPropertyExpressionException |
                              BadPropertyTypeExpressionException | BadExpressionException e) {
                         throw new RuntimeException(e);
@@ -79,5 +81,16 @@ public class CalculationAction extends AbstractAction {
             PropertyInstance<Integer> property = (PropertyInstance<Integer>) propertyInstance;
             exps.stream().map(t -> t.evaluate(context)).forEach(res -> property.updateValue(res, world_time));
         }
+    }
+
+    @Override
+    public ActionDto getDto() {
+        return new CalculationActionDto(
+                getContextDefinition().getPrimaryEntityDefinition().getDto(),
+                getContextDefinition().getSecondaryEntityDefinition() == null?null:
+                        getContextDefinition().getSecondaryEntityDefinition().getDto(),
+                property,
+                exps.toString()
+        );
     }
 }

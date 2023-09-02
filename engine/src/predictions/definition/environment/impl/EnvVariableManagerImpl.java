@@ -5,7 +5,7 @@ import predictions.execution.instance.environment.api.ActiveEnvironment;
 import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.definition.property.api.PropertyDefinition;
 import predictions.execution.instance.environment.impl.ActiveEnvironmentImpl;
-import predictions.generated.PRDEvironment;
+import predictions.generated.PRDEnvironment;
 
 import java.util.*;
 
@@ -15,11 +15,11 @@ public class EnvVariableManagerImpl implements EnvVariablesManager {
 
     private final Map<String, PropertyDefinition<?>> propNameToPropDefinition;
 
-    public EnvVariableManagerImpl(PRDEvironment prdEvironment) throws RepeatNameException {
+    public EnvVariableManagerImpl(PRDEnvironment prdEnvironment) throws RepeatNameException {
         propNameToPropDefinition = new HashMap<>();
         final boolean[] keyRepeat = {false};
         final String[] repeatedKey = {null};
-        prdEvironment.getPRDEnvProperty().forEach(def -> {
+        prdEnvironment.getPRDEnvProperty().forEach(def -> {
             if (propNameToPropDefinition.getOrDefault(def.getPRDName(), null) != null)
             {
                 keyRepeat[0] = true;

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class EntityDefinitionImpl implements EntityDefinition {
 
     private final String name;
-    private final int population;
+    private int population;
     private final List<PropertyDefinition<?>> properties;
 
     public EntityDefinitionImpl(String name, int population) {
@@ -25,7 +25,7 @@ public class EntityDefinitionImpl implements EntityDefinition {
     }
 
     public EntityDefinitionImpl(PRDEntity prdEntity) {
-        this(prdEntity.getName(), prdEntity.getPRDPopulation());
+        this(prdEntity.getName(), 0);
         prdEntity.getPRDProperties().getPRDProperty().stream()
                 .map(ConverterPRDEngine::getPropertyDefinitionFromPRDEntity)
                 .forEach(properties::add);
@@ -41,6 +41,10 @@ public class EntityDefinitionImpl implements EntityDefinition {
         return population;
     }
 
+    public void setPopulation(int population) {
+        this.population = population;
+    }
+
     @Override
     public List<PropertyDefinition<?>> getProps() {
         return properties;
@@ -54,7 +58,7 @@ public class EntityDefinitionImpl implements EntityDefinition {
     @Override
     public EntityDto getDto() {
         List<PropertyDto> props = properties.stream().map(PropertyDefinition::getDto).collect(Collectors.toList());
-        return new EntityDto(props, name, population);
+        return new EntityDto(props, name);
     }
 
     @Override

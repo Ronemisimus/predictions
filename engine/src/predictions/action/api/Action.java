@@ -7,7 +7,6 @@ import predictions.execution.context.Context;
 public interface Action {
     void invoke(Context context);
     ActionType getActionType();
-    EntityDefinition getContextEntity();
-
+    ContextDefinition getContextDefinition();
     ActionDto getDto();
 }

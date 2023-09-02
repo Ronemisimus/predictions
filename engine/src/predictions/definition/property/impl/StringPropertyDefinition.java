@@ -13,6 +13,6 @@ public class StringPropertyDefinition extends AbstractPropertyDefinition<String>
 
     @Override
     public PropertyDto getDto() {
-        return new PropertyDto(getType().name(), getName(), null, null, getValueGenerator().isRandomInit());
+        return new PropertyDto(getType().name(), getName(), null, null, getValueGenerator().isRandomInit(), getValueGenerator().getInitValue());
     }
 }

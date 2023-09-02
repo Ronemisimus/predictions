@@ -1,24 +1,32 @@
 package predictions.exception;
 
+import predictions.action.api.ContextDefinition;
 import predictions.definition.entity.EntityDefinition;
+import predictions.definition.property.api.PropertyType;
 
 public class MissingPropertyExpressionException extends Throwable {
 
     private final String finalExpression;
-    private final EntityDefinition entityDefinition;
+    private final ContextDefinition contextDefinition;
     private final boolean environment;
-    public MissingPropertyExpressionException(String finalExpression, EntityDefinition entityDefinition, boolean environment) {
-        this.entityDefinition = entityDefinition;
+    private final PropertyType expectedType;
+    public MissingPropertyExpressionException(String finalExpression, ContextDefinition contextDefinition, boolean environment, PropertyType expectedType) {
         this.finalExpression = finalExpression;
         this.environment = environment;
+        this.contextDefinition = contextDefinition;
+        this.expectedType = expectedType;
     }
 
     public String getFinalExpression() {
         return finalExpression;
     }
 
-    public EntityDefinition getEntityDefinition() {
-        return entityDefinition;
+    public ContextDefinition getContextDefinition() {
+        return contextDefinition;
+    }
+
+    public PropertyType getExpectedType() {
+        return expectedType;
     }
 
     public boolean isEnvironment() {

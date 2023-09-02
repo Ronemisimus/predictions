@@ -1,6 +1,7 @@
 package predictions;
 
 import predictions.action.api.Action;
+import predictions.action.api.ContextDefinition;
 import predictions.action.impl.*;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.entity.EntityDefinitionImpl;
@@ -14,6 +15,7 @@ import predictions.definition.value.generator.api.ValueGenerator;
 import predictions.definition.value.generator.api.ValueGeneratorFactory;
 import predictions.exception.*;
 import predictions.expression.api.MathOperation;
+import predictions.expression.impl.BooleanComplexExpression;
 import predictions.generated.*;
 import predictions.rule.api.Activation;
 import predictions.rule.api.Rule;
@@ -76,33 +78,63 @@ public class ConverterPRDEngine {
     }
 
     public static PropertyDefinition<?> getPropertyDefinitionFromPRDEntity(PRDProperty def) {
-        return getPropertyDefinitionFromPRDinner(def.getType(), def.getPRDRange(), def.getPRDName(), null);
+        Comparable<?> res = null;
+        if (def.getPRDValue()!=null && def.getPRDValue().getInit()!=null) {
+            try {
+                switch (def.getType().toLowerCase()) {
+                    case "decimal":
+                        res = Integer.parseInt(def.getPRDValue().getInit());
+                        break;
+                    case "float":
+                        res = Double.parseDouble(def.getPRDValue().getInit());
+                        break;
+                    case "string":
+                        res = def.getPRDValue().getInit();
+                        break;
+                    case "boolean":
+                        res = Boolean.getBoolean(def.getPRDValue().getInit());
+                        break;
+                }
+            }catch (Exception e) {
+                throw new RuntimeException("Invalid init value" + def.getPRDValue().getInit() + " for property " + def.getPRDName());
+            }
+        }
+        return getPropertyDefinitionFromPRDinner(def.getType(), def.getPRDRange(), def.getPRDName(), res);
     }
 
-        public static Action getActionFromPRD(PRDAction def, EntityDefinition ent, EnvVariablesManager env) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException, MissingPropertyActionException {
+        public static Action getActionFromPRD(PRDAction def,
+                                              ContextDefinition contextDefinition) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException, MissingPropertyActionException {
         Action res = null;
         switch (def.getType().toLowerCase())
         {
             case "increase":
-                res = new IncreaseAction(ent, def.getProperty(), def.getBy(), env);
+                res = new IncreaseAction(contextDefinition,
+                        def.getProperty(),
+                        def.getBy());
                 break;
             case "decrease":
-                res = new DecreaseAction(ent, def.getProperty(), def.getBy(), env);
+                res = new DecreaseAction(contextDefinition, def.getProperty(), def.getBy());
                 break;
             case "kill":
-                res = new KillAction(ent);
+                res = new KillAction(contextDefinition);
                 break;
             case "set":
-                res = new SetAction(ent, def.getProperty(), def.getValue(), env);
+                res = new SetAction(contextDefinition, def.getProperty(), def.getValue());
                 break;
             case "condition":
-                res = new ConditionAction(ent, def.getPRDCondition(), def.getPRDThen(), def.getPRDElse(), env);
+                res = new ConditionAction(contextDefinition, def.getPRDCondition(), def.getPRDThen(), def.getPRDElse());
                 break;
             case "calculation":
                 MathOperation[] ops = ConverterPRDEngine.getCalculationOps(def.getPRDMultiply(), def.getPRDDivide());
                 String[] args1 = ConverterPRDEngine.getArgs1(def.getPRDMultiply(), def.getPRDDivide());
                 String[] args2 = ConverterPRDEngine.getArgs2(def.getPRDMultiply(), def.getPRDDivide());
-                res = new CalculationAction(ent, def.getResultProp(), ops, args1, args2, env);
+                res = new CalculationAction(contextDefinition, def.getResultProp(), ops, args1, args2);
+                break;
+            case "proximity":
+                res = new ProximityAction(contextDefinition, def.getPRDEnvDepth().getOf(), def.getPRDActions());
+                break;
+            case "replace":
+                res = new ReplaceAction(contextDefinition, def.getKill(), def.getCreate(), def.getMode());
                 break;
         }
         return res;
@@ -158,18 +190,54 @@ public class ConverterPRDEngine {
         Activation act = new ActivationImpl(def.getPRDActivation());
         List<Action> res = new ArrayList<>();
         for (PRDAction prdAction: def.getPRDActions().getPRDAction()) {
+            String primaryEntityName = getPrimaryFromPRD(prdAction);
+            String secondaryEntityName = getSecondaryFromPRD(prdAction);
             Optional<PRDEntity> mainEntityOpt = entities.getPRDEntity().stream()
-                    .filter(prdEntity -> prdAction.getEntity().equals(prdEntity.getName())).findFirst();
-            if (mainEntityOpt.isPresent())
+                    .filter(prdEntity -> prdEntity.getName().equals(primaryEntityName)).findFirst();
+            Optional<PRDEntity> secondaryEntityOpt = entities.getPRDEntity().stream()
+                    .filter(prdEntity -> prdEntity.getName().equals(secondaryEntityName)).findFirst();
+            Optional<String> secondaryEntity = prdAction.getPRDSecondaryEntity() == null?
+                    Optional.empty() :
+                    prdAction.getPRDSecondaryEntity().getPRDSelection() == null?
+                    Optional.empty() :
+                    Optional.of(prdAction.getPRDSecondaryEntity().getPRDSelection().getCount());
+            Optional<PRDCondition> prdCondition = prdAction.getPRDSecondaryEntity()== null?
+                    Optional.empty() :
+                    prdAction.getPRDSecondaryEntity().getPRDSelection()== null?
+                    Optional.empty() :
+                    Optional.of(prdAction.getPRDSecondaryEntity().getPRDSelection().getPRDCondition());
+            try {
+                ContextDefinition context = ContextDefinitionImpl.getInstance(
+                        mainEntityOpt.orElse(null),
+                        secondaryEntityOpt.orElse(null),
+                        secondaryEntity.isPresent()? Integer.parseInt(secondaryEntity.get()): null,
+                        prdCondition.orElse(null),
+                        env,
+                        primaryEntityName
+                );
+
+                res.add(getActionFromPRD(prdAction, context));
+            }catch (NumberFormatException e)
             {
-                PRDEntity mainEntity = mainEntityOpt.get();
-                res.add(getActionFromPRD(prdAction, new EntityDefinitionImpl(mainEntity), env));
-            } else {
-                throw new NoSuchEntityActionException(prdAction.getEntity());
+                throw new NumberFormatException("Invalid secondary entity count " + secondaryEntity.get() + " in action " + prdAction.getType());
             }
         }
         Rule r = new RuleImpl(def.getName(), act);
         res.forEach(r::addAction);
         return r;
+    }
+
+    private static String getSecondaryFromPRD(PRDAction prdAction) {
+        return prdAction.getPRDSecondaryEntity() == null?
+                (prdAction.getPRDBetween() == null?
+                null: prdAction.getPRDBetween().getTargetEntity()):
+                prdAction.getPRDSecondaryEntity().getEntity();
+    }
+
+    private static String getPrimaryFromPRD(PRDAction prdAction) {
+        return prdAction.getEntity() == null?
+                (prdAction.getPRDBetween() == null?
+                null: prdAction.getPRDBetween().getSourceEntity()):
+                prdAction.getEntity();
     }
 }

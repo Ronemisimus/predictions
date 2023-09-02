@@ -15,4 +15,9 @@ public abstract class AbstractRandomValueGenerator<T> implements ValueGenerator<
     public boolean isRandomInit() {
         return true;
     }
+
+    @Override
+    public Comparable<T> getInitValue() {
+        return null;
+    }
 }

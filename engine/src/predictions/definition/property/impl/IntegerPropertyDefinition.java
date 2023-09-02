@@ -31,6 +31,6 @@ public class IntegerPropertyDefinition extends AbstractPropertyDefinition<Intege
 
     @Override
     public PropertyDto getDto() {
-        return new PropertyDto(getType().name(),getName(),from,to, getValueGenerator().isRandomInit());
+        return new PropertyDto(getType().name(),getName(),from,to, getValueGenerator().isRandomInit(), getValueGenerator().getInitValue());
     }
 }

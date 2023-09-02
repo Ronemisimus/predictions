@@ -1,7 +1,10 @@
 package predictions.action.impl;
 
+import dto.subdto.show.world.action.ActionDto;
+import dto.subdto.show.world.action.decreaseActionDto;
 import predictions.action.api.AbstractAction;
 import predictions.action.api.ActionType;
+import predictions.action.api.ContextDefinition;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.definition.property.api.PropertyType;
@@ -20,10 +23,12 @@ public class DecreaseAction extends AbstractAction {
     private final String property;
     private final Expression<Double> byExpression;
 
-    public DecreaseAction(EntityDefinition entityDefinition, String property, String byExpression, EnvVariablesManager env) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
-        super(ActionType.DECREASE, entityDefinition);
+    public DecreaseAction(ContextDefinition contextDefinition,
+                          String property,
+                          String byExpression) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
+        super(ActionType.DECREASE, contextDefinition);
         this.property = property;
-        this.byExpression = ExpressionBuilder.buildDoubleExpression(byExpression, entityDefinition, env);
+        this.byExpression = ExpressionBuilder.buildDoubleExpression(byExpression, contextDefinition);
     }
 
     @Override
@@ -48,5 +53,16 @@ public class DecreaseAction extends AbstractAction {
             Comparable<Double> res = MathOperation.SUBTRACT.evaluate(val, expVal);
             prop.updateValue(res, world_time);
         }
+    }
+
+    @Override
+    public ActionDto getDto() {
+        return new decreaseActionDto(
+                property,
+                byExpression.toString(),
+                getContextDefinition().getPrimaryEntityDefinition().getDto(),
+                getContextDefinition().getSecondaryEntityDefinition()==null?null:
+                        getContextDefinition().getSecondaryEntityDefinition().getDto()
+        );
     }
 }

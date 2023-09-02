@@ -4,4 +4,6 @@ public interface ValueGenerator<T> {
     Comparable<T> generateValue();
 
     boolean isRandomInit();
+
+    Comparable<T> getInitValue();
 }

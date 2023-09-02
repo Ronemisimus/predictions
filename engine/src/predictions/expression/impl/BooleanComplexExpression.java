@@ -1,5 +1,7 @@
 package predictions.expression.impl;
 
+import predictions.action.api.ContextDefinition;
+import predictions.action.impl.ContextDefinitionImpl;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.exception.BadExpressionException;
@@ -14,14 +16,15 @@ public class BooleanComplexExpression implements Expression<Boolean> {
 
     private Expression<Boolean> res;
 
-    public BooleanComplexExpression(PRDCondition prdCondition, EntityDefinition ent, EnvVariablesManager env) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
+    public BooleanComplexExpression(PRDCondition prdCondition,
+                                    ContextDefinition contextDefinition) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
         switch(prdCondition.getSingularity().toLowerCase())
         {
             case "multiple":
-                res = new DualBooleanExpression(prdCondition, ent, env);
+                res = new DualBooleanExpression(prdCondition, contextDefinition);
                 break;
             case "single":
-                res = new SingleBooleanExpression(prdCondition, ent, env);
+                res = new SingleBooleanExpression(prdCondition, contextDefinition);
                 break;
         }
     }

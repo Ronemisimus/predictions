@@ -1,5 +1,7 @@
 package predictions.expression.impl;
 
+import predictions.action.api.ContextDefinition;
+import predictions.action.impl.ContextDefinitionImpl;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.definition.property.api.PropertyDefinition;
@@ -12,37 +14,30 @@ import predictions.expression.ExpressionBuilder;
 import predictions.expression.api.Expression;
 import predictions.expression.api.SingleBooleanOperation;
 import predictions.generated.PRDCondition;
+import predictions.generated.PRDEntity;
+
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class SingleBooleanExpression implements Expression<Boolean> {
 
-    private final String property;
+    private final Expression<?> property;
     private final SingleBooleanOperation operation;
     private final Expression<?> valueExpression;
 
-    public SingleBooleanExpression(PRDCondition prdCondition, EntityDefinition ent, EnvVariablesManager env) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
-        this.property = prdCondition.getProperty();
-        this.operation = SingleBooleanOperation.getInstance(prdCondition.getOperator().toLowerCase());
-        PropertyDefinition<?> prop = ent.getProps().stream().filter(p -> p.getName().equals(this.property)).findAny().get();
-        switch (prop.getType())
-        {
-            case BOOLEAN:
-                this.valueExpression = ExpressionBuilder.buildBooleanExpression(prdCondition.getValue(), ent, env);
-                break;
-            case DECIMAL:
-            case FLOAT:
-                this.valueExpression = ExpressionBuilder.buildDoubleExpression(prdCondition.getValue(), ent, env);
-                break;
-            case STRING:
-                this.valueExpression = ExpressionBuilder.buildStringExpression(prdCondition.getValue(), ent, env);
-                break;
-            default:
-                throw new RuntimeException("bad Single Expression. cannot compare property " + property + " to expression " + prdCondition.getValue());
-        }
+    public SingleBooleanExpression(PRDCondition prdCondition,
+                                   ContextDefinition contextDefinition) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
+        operation = Arrays.stream(SingleBooleanOperation.values())
+                .filter(op -> op.getVal().equals(prdCondition.getOperator().toLowerCase()))
+                .findFirst().orElseThrow(() -> new RuntimeException("bad Single Expression. unknown operator " + prdCondition.getOperator()));
+        property = ExpressionBuilder.buildGenericExpression(prdCondition.getProperty(), contextDefinition);
+        valueExpression = ExpressionBuilder.buildGenericExpression(prdCondition.getValue(), contextDefinition);
     }
 
     @Override
     public Comparable<Boolean> evaluate(Context context) {
-        Comparable<?> propVal = context.getPrimaryEntityInstance().getPropertyByName(property).getValue();
+        Comparable<?> propVal = property.evaluate(context);
         Comparable<?> expVal = valueExpression.evaluate(context);
 
         Double b = null, a = null;

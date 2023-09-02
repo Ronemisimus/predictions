@@ -12,6 +12,6 @@ public class BooleanPropertyDefinition extends AbstractPropertyDefinition<Boolea
 
     @Override
     public PropertyDto getDto() {
-        return new PropertyDto(getType().name(),getName(),null,null, getValueGenerator().isRandomInit());
+        return new PropertyDto(getType().name(),getName(),null,null, getValueGenerator().isRandomInit(), getValueGenerator().getInitValue());
     }
 }

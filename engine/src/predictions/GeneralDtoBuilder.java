@@ -155,7 +155,7 @@ public class GeneralDtoBuilder {
                     false,
                     false,
                     exp.getFinalExpression(),
-                    exp.getEntityDefinition().getName(),
+                    exp.getContextDefinition().getPrimaryEntityDefinition().getName(),
                     null,
                     null,
                     null);

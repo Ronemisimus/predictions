@@ -1,9 +1,12 @@
 package predictions.action.impl;
 
+import dto.subdto.show.world.action.ActionDto;
+import dto.subdto.show.world.action.ConditionActionDto;
 import predictions.ConverterPRDEngine;
 import predictions.action.api.AbstractAction;
 import predictions.action.api.Action;
 import predictions.action.api.ActionType;
+import predictions.action.api.ContextDefinition;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.exception.*;
@@ -26,13 +29,16 @@ public class ConditionAction extends AbstractAction {
 
     private final Collection<Action> else_actions;
 
-    public ConditionAction(EntityDefinition ent, PRDCondition prdCondition, PRDThen prdThen, PRDElse prdElse, EnvVariablesManager env) throws RuntimeException, BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
-        super(ActionType.CONDITION, ent);
-        this.condition = new BooleanComplexExpression(prdCondition, ent, env);
+    public ConditionAction(ContextDefinition contextDefinition,
+                           PRDCondition prdCondition,
+                           PRDThen prdThen,
+                           PRDElse prdElse) throws RuntimeException, BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
+        super(ActionType.CONDITION, contextDefinition);
+        this.condition = new BooleanComplexExpression(prdCondition, contextDefinition);
         this.then_actions = prdThen==null? new ArrayList<>(): prdThen.getPRDAction().stream()
                 .map(def -> {
                     try {
-                        return ConverterPRDEngine.getActionFromPRD(def, ent, env);
+                        return ConverterPRDEngine.getActionFromPRD(def, contextDefinition);
                     } catch (BadExpressionException | MissingPropertyActionException |
                              MissingPropertyExpressionException | BadFunctionExpressionException |
                              BadPropertyTypeExpressionException e) {
@@ -43,7 +49,7 @@ public class ConditionAction extends AbstractAction {
         this.else_actions = prdElse==null? new ArrayList<>(): prdElse.getPRDAction().stream()
                 .map(def -> {
                     try {
-                        return ConverterPRDEngine.getActionFromPRD(def, ent, env);
+                        return ConverterPRDEngine.getActionFromPRD(def, contextDefinition);
                     } catch (BadExpressionException | MissingPropertyExpressionException |
                              BadFunctionExpressionException | BadPropertyTypeExpressionException |
                              MissingPropertyActionException e) {
@@ -60,5 +66,17 @@ public class ConditionAction extends AbstractAction {
         } else {
             else_actions.forEach(a -> a.invoke(context));
         }
+    }
+
+    @Override
+    public ActionDto getDto() {
+        return new ConditionActionDto(
+                getContextDefinition().getPrimaryEntityDefinition().getDto(),
+                getContextDefinition().getSecondaryEntityDefinition() == null ? null :
+                        getContextDefinition().getSecondaryEntityDefinition().getDto(),
+                condition.toString(),
+                then_actions.stream().map(Action::getDto).collect(Collectors.toList()),
+                else_actions.stream().map(Action::getDto).collect(Collectors.toList())
+        );
     }
 }

@@ -19,4 +19,9 @@ public class FixedValueGenerator<T> implements ValueGenerator<T> {
     public boolean isRandomInit() {
         return false;
     }
+
+    @Override
+    public Comparable<T> getInitValue() {
+        return generateValue();
+    }
 }

@@ -17,6 +17,7 @@ public interface Rule {
         return new RuleDto(getName(),
                 getActivation().getCycleSizeInTicks(),
                 getActivation().getProbability(),
+                getActionsToPerform() == null ? null :
                 getActionsToPerform().stream().map(Action::getDto).collect(Collectors.toList()));
     }
 }
