@@ -9,6 +9,7 @@ import predictions.exception.BadExpressionException;
 import predictions.exception.BadFunctionExpressionException;
 import predictions.exception.BadPropertyTypeExpressionException;
 import predictions.exception.MissingPropertyExpressionException;
+import predictions.execution.context.Context;
 import predictions.expression.api.Expression;
 import predictions.expression.api.MathOperation;
 import predictions.expression.impl.*;
@@ -76,8 +77,10 @@ public class ExpressionBuilder {
         String entity;
         Optional<String> propDef;
         List<EntityDefinition> entities = new ArrayList<>();
-        entities.add(contextDefinition.getSecondaryEntityDefinition());
-        entities.add(contextDefinition.getPrimaryEntityDefinition());
+        if (contextDefinition.getSecondaryEntityDefinition()!=null)
+            entities.add(contextDefinition.getSecondaryEntityDefinition());
+        if (contextDefinition.getPrimaryEntityDefinition()!=null)
+            entities.add(contextDefinition.getPrimaryEntityDefinition());
         switch (funcName)
         {
             case "environment":
@@ -139,7 +142,7 @@ public class ExpressionBuilder {
                         .map(PropertyDefinition::getName)
                         .filter(name -> name.equals(prop)).findFirst();
                 if (propDef.isPresent()) {
-                    return new TicksExpression(prop);
+                    return new TicksExpression(prop, selectedEntity);
                 }
                 else {
                     throw new MissingPropertyExpressionException(finalExpression, contextDefinition, false, type);
@@ -157,7 +160,16 @@ public class ExpressionBuilder {
     }
 
     private static Expression<String> buildSimpleStringExpression(String valueExpression) {
-        return context -> valueExpression;
+        return new Expression<String>() {
+            @Override
+            public Comparable<String> evaluate(Context context) {
+                return valueExpression;
+            }
+            @Override
+            public String toString() {
+                return valueExpression;
+            }
+        };
     }
 
     public static Expression<Boolean> buildBooleanExpression(String valueExpression,
@@ -192,13 +204,7 @@ public class ExpressionBuilder {
         Boolean val = valueExpression.equalsIgnoreCase("true");
         if (!val && !valueExpression.equalsIgnoreCase("false"))
             throw new BadPropertyTypeExpressionException(valueExpression, PropertyType.BOOLEAN);
-        return context -> {
-            try {
-                return val;
-            } catch (NumberFormatException e) {
-                throw new RuntimeException();
-            }
-        };
+        return new BasicBooleanExpression(val);
     }
 
 }

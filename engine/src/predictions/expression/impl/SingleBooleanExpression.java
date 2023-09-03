@@ -69,4 +69,9 @@ public class SingleBooleanExpression implements Expression<Boolean> {
         if (a instanceof Integer && b instanceof Double) return true;
         return a instanceof Double && b instanceof Integer;
     }
+
+    @Override
+    public String toString() {
+        return "( " + property.toString() + " ) " + operation + " ( " + valueExpression + " )";
+    }
 }

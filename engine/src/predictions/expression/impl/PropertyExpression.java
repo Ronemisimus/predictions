@@ -19,4 +19,12 @@ public class PropertyExpression<T> implements Expression<T> {
     public Comparable<T> evaluate(Context context) {
         return (Comparable<T>) context.getPrimaryEntityInstance().getPropertyByName(property).getValue();
     }
+
+    @Override
+    public String toString() {
+        if (containingEntity == null) {
+            throw new RuntimeException("bad property expression");
+        }
+        return "evaluate("+ containingEntity.getName() + "." + property + ")";
+    }
 }

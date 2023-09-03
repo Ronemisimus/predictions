@@ -58,6 +58,7 @@ public class MainController {
 
     @FXML
     private void handleLoadFileButtonClick(ActionEvent event) {
+        isLoaded.set(false);
         isLoaded.set(EngineApi.getInstance().LoadFile(FileLabel.textProperty()));
     }
 
@@ -71,6 +72,10 @@ public class MainController {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        }
+        else
+        {
+            centerStage.setCenter(null);
         }
     }
 }

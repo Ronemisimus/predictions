@@ -8,12 +8,12 @@ import predictions.termination.api.TerminationType;
 public class UserTermination implements Termination {
     @Override
     public boolean isTermination(Signal signal) {
-        return false;
+        return signal.userRequestedTermination();
     }
 
     @Override
     public TerminationType getTerminationType() {
-        return null;
+        return TerminationType.USER;
     }
 
     @Override

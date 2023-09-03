@@ -9,6 +9,8 @@ import predictions.action.api.ActionType;
 import predictions.action.api.ContextDefinition;
 import predictions.exception.*;
 import predictions.execution.context.Context;
+import predictions.expression.ExpressionBuilder;
+import predictions.expression.api.Expression;
 import predictions.generated.PRDActions;
 
 import java.util.List;
@@ -17,9 +19,9 @@ import java.util.stream.Collectors;
 public class ProximityAction extends AbstractAction {
 
     private final List<Action> actions;
-    private final Boolean distanceOf1;
+    private final Expression<Double> distanceOf1;
 
-    public ProximityAction(ContextDefinition contextDefinition, String s, PRDActions prdActions) {
+    public ProximityAction(ContextDefinition contextDefinition, String s, PRDActions prdActions) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
         super(ActionType.PROXIMITY, contextDefinition);
         actions = prdActions==null? null:
                 prdActions.getPRDAction().stream()
@@ -39,7 +41,7 @@ public class ProximityAction extends AbstractAction {
                             }
                         })
                         .collect(Collectors.toList());
-        distanceOf1 = s.equals("1");
+        distanceOf1 = ExpressionBuilder.buildDoubleExpression(s, contextDefinition);
     }
 
     @Override
@@ -51,7 +53,7 @@ public class ProximityAction extends AbstractAction {
         return actions;
     }
 
-    public Boolean getDistanceOf1() {
+    public Expression<Double> getDistanceOf1() {
         return distanceOf1;
     }
 
@@ -61,7 +63,7 @@ public class ProximityAction extends AbstractAction {
                 getContextDefinition().getPrimaryEntityDefinition().getDto(),
                 getContextDefinition().getSecondaryEntityDefinition() == null? null:
                         getContextDefinition().getSecondaryEntityDefinition().getDto(),
-                distanceOf1?1:2,
+                distanceOf1.toString(),
                 actions.stream().map(Action::getDto).collect(Collectors.toList())
         );
     }

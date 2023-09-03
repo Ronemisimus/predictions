@@ -15,4 +15,9 @@ public class BasicBooleanExpression implements Expression<Boolean> {
     public Comparable<Boolean> evaluate(Context context) {
         return res;
     }
+
+    @Override
+    public String toString() {
+        return res.toString();
+    }
 }

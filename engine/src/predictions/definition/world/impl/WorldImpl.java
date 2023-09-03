@@ -14,6 +14,7 @@ import predictions.definition.world.api.World;
 import predictions.exception.*;
 import predictions.generated.PRDBySecond;
 import predictions.generated.PRDByTicks;
+import predictions.generated.PRDTermination;
 import predictions.generated.PRDWorld;
 import predictions.rule.api.Rule;
 import predictions.termination.api.Termination;
@@ -22,10 +23,7 @@ import predictions.termination.impl.TimeTermination;
 import predictions.termination.impl.UserTermination;
 
 import java.time.Duration;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class WorldImpl implements World {
@@ -70,13 +68,28 @@ public class WorldImpl implements World {
                             }
                         })
                         .collect(Collectors.toList()),
-                res.getPRDTermination().getPRDBySecondOrPRDByTicks().stream().map(
-                        prdTermination -> (prdTermination instanceof PRDByTicks)?
-                                new TicksTermination((PRDByTicks)prdTermination) :
-                                new TimeTermination((PRDBySecond)prdTermination)).collect(Collectors.toList()),
+                createTerminations(res.getPRDTermination()),
                 res.getPRDGrid().getColumns(),
                 res.getPRDGrid().getRows(),
                 res.getPRDThreadCount());
+    }
+
+    private static Collection<Termination> createTerminations(PRDTermination prdTermination) {
+        List<Termination> res = new ArrayList<>();
+        if (prdTermination.getPRDByUser()!=null)
+        {
+            res.add(new UserTermination());
+        }
+        if (prdTermination.getPRDBySecondOrPRDByTicks()!=null)
+        {
+            prdTermination.getPRDBySecondOrPRDByTicks().stream()
+                    .forEach(prdBySecondOrPRDByTicks ->
+                            res.add(prdBySecondOrPRDByTicks instanceof PRDByTicks?
+                                            new TicksTermination((PRDByTicks)prdBySecondOrPRDByTicks):
+                                            new TimeTermination((PRDBySecond)prdBySecondOrPRDByTicks))
+                                    );
+        }
+        return res;
     }
 
     public static World fromPRD(final PRDWorld res) throws RepeatNameException, RuntimeException {

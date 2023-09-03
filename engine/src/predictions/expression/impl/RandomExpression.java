@@ -19,4 +19,9 @@ public class RandomExpression implements Expression<Double> {
     public Comparable<Double> evaluate(Context context) {
         return (double) random.nextInt(to+1);
     }
+
+    @Override
+    public String toString() {
+        return "random( between 0 and " + to + ")";
+    }
 }

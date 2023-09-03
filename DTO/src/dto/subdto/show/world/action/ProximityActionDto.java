@@ -5,12 +5,12 @@ import dto.subdto.show.world.EntityDto;
 import java.util.List;
 
 public class ProximityActionDto extends ActionDto {
-    private final Integer ofValue;
+    private final String ofValue;
     private final List<ActionDto> actions;
 
     public ProximityActionDto(EntityDto sourceEntity,
                               EntityDto targetEntity,
-                              Integer ofValue,
+                              String ofValue,
                               List<ActionDto> actions) {
         super("Proximity", sourceEntity, targetEntity);
         this.ofValue = ofValue;
@@ -25,7 +25,7 @@ public class ProximityActionDto extends ActionDto {
         return getSecondaryEntity();
     }
 
-    public Integer getOfValue() {
+    public String getOfValue() {
         return ofValue;
     }
 

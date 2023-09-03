@@ -33,4 +33,9 @@ public class BooleanComplexExpression implements Expression<Boolean> {
     public Comparable<Boolean> evaluate(Context context) {
         return res.evaluate(context);
     }
+
+    @Override
+    public String toString() {
+        return res.toString();
+    }
 }

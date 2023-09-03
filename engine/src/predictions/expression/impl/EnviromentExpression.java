@@ -15,4 +15,9 @@ public class EnviromentExpression<T> implements Expression<T> {
     public Comparable<T> evaluate(Context context) {
         return (Comparable<T>) context.getEnvironmentVariable(property);
     }
+
+    @Override
+    public String toString() {
+        return "environment(" + property + ")";
+    }
 }

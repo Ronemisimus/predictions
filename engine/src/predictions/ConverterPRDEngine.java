@@ -25,6 +25,7 @@ import predictions.rule.impl.RuleImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ConverterPRDEngine {
     private ConverterPRDEngine() {}
@@ -213,6 +214,8 @@ public class ConverterPRDEngine {
                         secondaryEntity.isPresent()? Integer.parseInt(secondaryEntity.get()): null,
                         prdCondition.orElse(null),
                         env,
+                        entities.getPRDEntity() == null? new ArrayList<EntityDefinition>():
+                                entities.getPRDEntity().stream().map(EntityDefinitionImpl::new).collect(Collectors.toList()), 
                         primaryEntityName
                 );
 

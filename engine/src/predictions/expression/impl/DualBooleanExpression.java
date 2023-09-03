@@ -54,4 +54,9 @@ public class DualBooleanExpression extends DualExpression<Boolean> {
                 getExpression2().evaluate(context)
         );
     }
+
+    @Override
+    public String toString() {
+        return "( " + getExpression1().toString() + " )" + booleanOperation + " ( " + getExpression2().toString() + " )";
+    }
 }

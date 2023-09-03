@@ -15,4 +15,9 @@ public class NumberExpression implements Expression<Double> {
     public Comparable<Double> evaluate(Context context) {
         return number;
     }
+
+    @Override
+    public String toString() {
+        return number.toString();
+    }
 }

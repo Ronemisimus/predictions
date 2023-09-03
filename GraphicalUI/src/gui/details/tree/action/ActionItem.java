@@ -74,12 +74,12 @@ public class ActionItem extends TreeItem<String> implements OpenableItem {
     private Parent getDetailsView(ProximityActionDto action) {
         VBox detailsBox = new VBox();
 
-        Label nameLabel = new Label("Type: Proximity - sub actions performed if:");
+        Label nameLabel = new Label("Type: Proximity:");
         Label sourceEntityLabel = new Label("Source Entity: " + (action.getSourceEntity()==null? "" :
                 action.getSourceEntity().getName()));
         Label targetEntityLabel = new Label("Target Entity: " + (action.getTargetEntity()==null? "" :
                 action.getTargetEntity().getName()));
-        Label distanceLabel = new Label("Distance is " + (action.getOfValue()==1? "1 block" : "2 blocks"));
+        Label distanceLabel = new Label("sub actions activated if source and target\n entities are within a distance of " + action.getOfValue());
         detailsBox.getChildren().addAll(nameLabel, sourceEntityLabel, targetEntityLabel, distanceLabel);
 
         return detailsBox;

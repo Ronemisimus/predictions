@@ -37,4 +37,9 @@ public class DualMathExpression extends DualExpression<Double> {
             exp2_double = (Double) exp2_res;
         return mathOperation.evaluate(exp1_double,exp2_double);
     }
+
+    @Override
+    public String toString() {
+        return "( " + getExpression1().toString() + " ) " + mathOperation.toString() + " ( " + getExpression2().toString() + " )";
+    }
 }

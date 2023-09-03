@@ -11,6 +11,8 @@ import predictions.expression.impl.BooleanComplexExpression;
 import predictions.generated.PRDCondition;
 import predictions.generated.PRDEntity;
 
+import java.util.Collection;
+
 public class ContextDefinitionImpl implements ContextDefinition {
 
     private final EntityDefinition primaryEntityDefinition;
@@ -19,16 +21,20 @@ public class ContextDefinitionImpl implements ContextDefinition {
     private final Expression<Boolean> secondaryExpression;
     private final EnvVariablesManager envVariables;
 
+    private final Collection<EntityDefinition> systemEntityDefinitions;
+
     private ContextDefinitionImpl(EntityDefinition primaryEntityDefinition,
                                  EntityDefinition secondaryEntityDefinition,
                                  Integer secondaryEntityAmount,
                                  Expression<Boolean> secondaryExpression,
-                                 EnvVariablesManager envVariables) {
+                                 EnvVariablesManager envVariables,
+                                 Collection<EntityDefinition> systemEntityDefinitions) {
         this.primaryEntityDefinition = primaryEntityDefinition;
         this.secondaryEntityDefinition = secondaryEntityDefinition;
         this.secondaryEntityAmount = secondaryEntityAmount;
         this.secondaryExpression = secondaryExpression;
         this.envVariables = envVariables;
+        this.systemEntityDefinitions = systemEntityDefinitions;
     }
 
     public static ContextDefinitionImpl getInstance(PRDEntity primaryEntity,
@@ -36,6 +42,7 @@ public class ContextDefinitionImpl implements ContextDefinition {
                                  Integer secondaryEntityAmount,
                                  PRDCondition prdCondition,
                                  EnvVariablesManager envVariables,
+                                 Collection<EntityDefinition> systemEntityDefinitions,
                                  String entity) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException, NoSuchEntityActionException {
         EntityDefinition primary;
         EntityDefinition secondary = null;
@@ -51,7 +58,8 @@ public class ContextDefinitionImpl implements ContextDefinition {
                 secondary,
                 secondaryEntityAmount,
                 new BasicBooleanExpression(Boolean.TRUE),
-                envVariables
+                envVariables,
+                systemEntityDefinitions
         );
         return new ContextDefinitionImpl(primary,
                 secondary,
@@ -59,7 +67,8 @@ public class ContextDefinitionImpl implements ContextDefinition {
                 prdCondition == null? null: new BooleanComplexExpression(
                         prdCondition,
                         contextDefinition),
-                envVariables);
+                envVariables,
+                systemEntityDefinitions);
     }
 
                                  @Override
@@ -70,6 +79,11 @@ public class ContextDefinitionImpl implements ContextDefinition {
     @Override
     public EntityDefinition getSecondaryEntityDefinition() {
         return secondaryEntityDefinition;
+    }
+
+    @Override
+    public Collection<EntityDefinition> getSystemEntityDefinitions() {
+        return systemEntityDefinitions;
     }
 
     @Override

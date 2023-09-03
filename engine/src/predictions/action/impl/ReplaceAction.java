@@ -16,12 +16,24 @@ public class ReplaceAction extends AbstractAction {
     private final String mode;
     public ReplaceAction(ContextDefinition contextDefinition, String kill, String create, String mode) {
         super(ActionType.REPLACE, contextDefinition);
+        EntityDefinition createEntity1;
         killEntity = contextDefinition.getPrimaryEntityDefinition().getName().equals(kill)?
                 contextDefinition.getPrimaryEntityDefinition() :
                 contextDefinition.getSecondaryEntityDefinition();
-        createEntity = contextDefinition.getPrimaryEntityDefinition().getName().equals(kill)?
-                contextDefinition.getSecondaryEntityDefinition():
-                contextDefinition.getPrimaryEntityDefinition();
+        if (contextDefinition.getSecondaryEntityDefinition()!=null
+        && contextDefinition.getSecondaryEntityDefinition().getName().equals(create))
+        {
+            createEntity1 = contextDefinition.getSecondaryEntityDefinition();
+        }
+        else if(contextDefinition.getPrimaryEntityDefinition().getName().equals(create)){
+            createEntity1 = contextDefinition.getPrimaryEntityDefinition();
+        }
+        else{
+            createEntity1 = contextDefinition.getSystemEntityDefinitions().stream()
+                    .filter(e -> e.getName().equals(create))
+                    .findFirst().orElse(null);
+        }
+        createEntity = createEntity1;
         this.mode = mode.equalsIgnoreCase("scratch")?
         mode: mode.equalsIgnoreCase("derived")? mode:
         null;
