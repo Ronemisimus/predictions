@@ -20,7 +20,8 @@ public class PropertyItem extends TreeItem<String> implements OpenableItem {
         Label nameLabel = new Label("Property Name: " + prop.getName());
         Label typeLabel = new Label("Property Type: " + prop.getType());
         Label randInitLabel = new Label("Random Initialization is " + (prop.isRandomInit()? "enabled" : "disabled"));
-        detailsBox.getChildren().addAll(nameLabel, typeLabel, randInitLabel);
+        Label initValueLabel = new Label("initial value if not random: \"" + prop.getInitValue()+"\"");
+        detailsBox.getChildren().addAll(nameLabel, typeLabel, randInitLabel, initValueLabel);
 
         if (prop.getFrom() != null || prop.getTo() != null)
         {
