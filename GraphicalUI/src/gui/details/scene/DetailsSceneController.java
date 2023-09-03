@@ -3,7 +3,9 @@ package gui.details.scene;
 import gui.EngineApi;
 import gui.details.tree.OpenableItem;
 import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -32,9 +34,11 @@ public class DetailsSceneController {
                     setText(null);
                 } else {
                     setText(item);
-                    setOnMouseClicked(e -> {
-                        if(getTreeItem() instanceof OpenableItem)
-                        {
+                }
+
+                selectedProperty().addListener(e -> {
+                    if (((ReadOnlyBooleanProperty)e).getValue()) {
+                        if (getTreeItem() instanceof OpenableItem) {
                             OpenableItem openableItem = (OpenableItem) getTreeItem();
                             Parent root = openableItem.getDetailsView();
                             if (root instanceof VBox) {
@@ -42,13 +46,11 @@ public class DetailsSceneController {
                                 root.setStyle("-fx-padding: 10px;");
                             }
                             detailView.setContent(root);
-                        }
-                        else
-                        {
+                        } else {
                             detailView.setContent(null);
                         }
-                    });
-                }
+                    }
+                });
             }
         });
     }

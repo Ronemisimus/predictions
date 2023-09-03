@@ -41,29 +41,29 @@ public class ActionItem extends TreeItem<String> implements OpenableItem {
 
     @Override
     public Parent getDetailsView() {
-        switch (action.getType()) {
-            case "Increase":
+        switch (action.getType().toLowerCase()) {
+            case "increase":
                 if (action instanceof IncreaseActionDto) return getDetailsView((IncreaseActionDto) action);
                 else return null;
-            case "Decrease":
+            case "decrease":
                 if (action instanceof decreaseActionDto) return getDetailsView((decreaseActionDto) action);
                 else return null;
-            case "Calculation":
+            case "calculation":
                 if (action instanceof CalculationActionDto) return getDetailsView((CalculationActionDto) action);
                 else return null;
-            case "Kill":
+            case "kill":
                 if (action instanceof KillActionDto) return getDetailsView((KillActionDto) action);
                 else return null;
-            case "Set":
+            case "set":
                 if (action instanceof SetActionDto) return getDetailsView((SetActionDto) action);
                 else return null;
-            case "Replace":
+            case "replace":
                 if (action instanceof ReplaceActionDto) return getDetailsView((ReplaceActionDto) action);
                 else return null;
-            case "Condition":
+            case "condition":
                 if (action instanceof ConditionActionDto) return getDetailsView((ConditionActionDto) action);
                 else return null;
-            case "Proximity":
+            case "proximity":
                 if (action instanceof ProximityActionDto) return getDetailsView((ProximityActionDto) action);
                 else return null;
             default:
@@ -75,8 +75,10 @@ public class ActionItem extends TreeItem<String> implements OpenableItem {
         VBox detailsBox = new VBox();
 
         Label nameLabel = new Label("Type: Proximity - sub actions performed if:");
-        Label sourceEntityLabel = new Label("Source Entity: " + action.getSourceEntity().getName());
-        Label targetEntityLabel = new Label("Target Entity: " + action.getTargetEntity().getName());
+        Label sourceEntityLabel = new Label("Source Entity: " + (action.getSourceEntity()==null? "" :
+                action.getSourceEntity().getName()));
+        Label targetEntityLabel = new Label("Target Entity: " + (action.getTargetEntity()==null? "" :
+                action.getTargetEntity().getName()));
         Label distanceLabel = new Label("Distance is " + (action.getOfValue()==1? "1 block" : "2 blocks"));
         detailsBox.getChildren().addAll(nameLabel, sourceEntityLabel, targetEntityLabel, distanceLabel);
 
@@ -88,7 +90,8 @@ public class ActionItem extends TreeItem<String> implements OpenableItem {
         Label conditionLabel = new Label("then sub actions performed if:" + action.getConditionExpression());
         Label elseLabel = new Label("otherwise else sub actions performed");
         Label primaryEntityLabel = new Label("Primary Entity: " + action.getPrimaryEntity().getName());
-        Label secondaryEntityLabel = new Label("Secondary Entity: " + action.getSecondaryEntity().getName());
+        Label secondaryEntityLabel = new Label("Secondary Entity: " + (action.getSecondaryEntity()==null? "" :
+                action.getSecondaryEntity().getName()));
 
         VBox detailsBox = new VBox();
         detailsBox.getChildren().addAll(nameLabel, primaryEntityLabel, secondaryEntityLabel, conditionLabel, elseLabel);
@@ -98,8 +101,10 @@ public class ActionItem extends TreeItem<String> implements OpenableItem {
 
     private Parent getDetailsView(ReplaceActionDto action) {
         Label typeLabel = new Label("Type: Replace");
-        Label bornEntity = new Label("Born Entity: " + action.getBornEntity().getName());
-        Label deadEntity = new Label("Killed Entity: " + action.getKilledEntity().getName());
+        Label bornEntity = new Label("Born Entity: " + (action.getBornEntity()==null? "" :
+                action.getBornEntity().getName()));
+        Label deadEntity = new Label("Killed Entity: " + (action.getKilledEntity()==null? "" :
+                action.getKilledEntity().getName()));
         Label modeLabel = new Label("Mode: " + action.getMode());
 
         VBox detailsBox = new VBox();
@@ -111,7 +116,8 @@ public class ActionItem extends TreeItem<String> implements OpenableItem {
     private Parent getDetailsView(SetActionDto action) {
         Label typeLabel = new Label("Type: Set");
         Label entityLabel = new Label("Primary Entity: " + action.getPrimaryEntity().getName());
-        Label secondaryEntityLabel = new Label("Secondary Entity: " + action.getSecondaryEntity().getName());
+        Label secondaryEntityLabel = new Label("Secondary Entity: " + (action.getSecondaryEntity()==null? "" :
+                action.getSecondaryEntity().getName()));
         Label propertyLabel = new Label("Property: " + action.getPropertyName() + " = " + action.getValueExpression());
 
         VBox detailsBox = new VBox();
@@ -133,7 +139,8 @@ public class ActionItem extends TreeItem<String> implements OpenableItem {
     private Parent getDetailsView(CalculationActionDto action) {
         Label typeLabel = new Label("Type: Calculation");
         Label primaryEntityLabel = new Label("Primary Entity: " + action.getPrimaryEntity().getName());
-        Label secondaryEntityLabel = new Label("Secondary Entity: " + action.getSecondaryEntity().getName());
+        Label secondaryEntityLabel = new Label("Secondary Entity: " + (action.getSecondaryEntity()==null? "" :
+                action.getSecondaryEntity().getName()));
         Label propertyLabel = new Label("Property: " + action.getResultPropName() + " = " + action.getCalculationExpression());
 
         VBox detailsBox = new VBox();
@@ -145,7 +152,8 @@ public class ActionItem extends TreeItem<String> implements OpenableItem {
     private Parent getDetailsView(decreaseActionDto action) {
         Label typeLabel = new Label("Type: Decrease");
         Label primaryEntityLabel = new Label("Primary Entity: " + action.getPrimaryEntity().getName());
-        Label secondaryEntityLabel = new Label("Secondary Entity: " + action.getSecondaryEntity().getName());
+        Label secondaryEntityLabel = new Label("Secondary Entity: " + (action.getSecondaryEntity()==null? null:
+                action.getSecondaryEntity().getName()));
         Label propertyLabel = new Label("Property: " + action.getPropertyName() + " = " + action.getPropertyName() + " - 1");
 
         VBox detailsBox = new VBox();
@@ -157,7 +165,8 @@ public class ActionItem extends TreeItem<String> implements OpenableItem {
     private Parent getDetailsView(IncreaseActionDto action) {
         Label typeLabel = new Label("Type: Increase");
         Label primaryEntityLabel = new Label("Primary Entity: " + action.getPrimaryEntity().getName());
-        Label secondaryEntityLabel = new Label("Secondary Entity: " + action.getSecondaryEntity().getName());
+        Label secondaryEntityLabel = new Label("Secondary Entity: " + (action.getSecondaryEntity()==null? "" :
+                action.getSecondaryEntity().getName()));
         Label propertyLabel = new Label("Property: " + action.getPropertyName() + " = " + action.getPropertyName() + " + 1");
 
         VBox detailsBox = new VBox();
