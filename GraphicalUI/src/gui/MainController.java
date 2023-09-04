@@ -1,6 +1,7 @@
 package gui;
 
 import gui.details.scene.DetailsSceneController;
+import gui.execution.scene.ExecutionController;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
@@ -10,9 +11,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 
 import java.io.IOException;
 
@@ -28,6 +27,10 @@ public class MainController {
     private Button DetailsButton;
     @FXML
     private BorderPane centerStage;
+    @FXML
+    private Button newExecutionButton;
+    @FXML
+    private Button resultsButton;
 
 
     // flags
@@ -64,9 +67,14 @@ public class MainController {
 
     @FXML
     private void handleDetailsButtonClick(ActionEvent event) {
+        loadSubScene("DetailsScene.fxml", event, DetailsSceneController.class);
+    }
+
+    private void loadSubScene(String fileName, ActionEvent event, Class<?> loaderClass)
+    {
         if (isLoaded.get()) {
             try {
-                FXMLLoader loader = new FXMLLoader(DetailsSceneController.class.getResource("DetailsScene.fxml"));
+                FXMLLoader loader = new FXMLLoader(loaderClass.getResource(fileName));
                 Parent root = loader.load();
                 centerStage.setCenter(root);
             } catch (IOException e) {
@@ -78,4 +86,11 @@ public class MainController {
             centerStage.setCenter(null);
         }
     }
+
+    @FXML
+    public void handleNewExecutionButtonClick(ActionEvent event) {
+        loadSubScene("ExecutionScene.fxml", event, ExecutionController.class);
+    }
+
+
 }

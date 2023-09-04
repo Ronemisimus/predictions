@@ -50,12 +50,12 @@
                      </children>
                   </TextFlow>
                   <Button fx:id="DetailsButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="190.0" text="Details" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="3" />
-                  <Button mnemonicParsing="false" prefHeight="24.0" prefWidth="164.0" text="New Execution" GridPane.columnIndex="4" GridPane.columnSpan="3" GridPane.rowIndex="3">
+                  <Button fx:id="newExecutionButton" mnemonicParsing="false" onAction="#handleNewExecutionButtonClick" prefHeight="24.0" prefWidth="164.0" text="New Execution" GridPane.columnIndex="4" GridPane.columnSpan="3" GridPane.rowIndex="3">
                      <GridPane.margin>
                         <Insets left="5.0" />
                      </GridPane.margin>
                   </Button>
-                  <Button mnemonicParsing="false" prefHeight="24.0" prefWidth="228.0" text="Results" GridPane.columnIndex="7" GridPane.columnSpan="3" GridPane.rowIndex="3">
+                  <Button fx:id="resultsButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="228.0" text="Results" GridPane.columnIndex="7" GridPane.columnSpan="3" GridPane.rowIndex="3">
                      <GridPane.margin>
                         <Insets left="5.0" />
                      </GridPane.margin>
