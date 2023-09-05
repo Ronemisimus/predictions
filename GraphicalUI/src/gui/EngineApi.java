@@ -1,10 +1,13 @@
 package gui;
 
+import dto.EnvDto;
 import dto.ReadFileDto;
 import dto.ShowWorldDto;
 import dto.subdto.show.world.EntityDto;
+import dto.subdto.show.world.PropertyDto;
 import gui.details.tree.WorldDetailsItem;
 import gui.execution.environment.EntityAmountGetter;
+import gui.execution.environment.EnvironmentVariableGetter;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Parent;
 import javafx.scene.control.TreeItem;
@@ -14,6 +17,7 @@ import predictions.MainApiImpl;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EngineApi {
@@ -71,6 +75,37 @@ public class EngineApi {
     }
 
     public void setEntityAmount(String name, int i) {
+        if (i < 0) throw new RuntimeException("Invalid amount");
         api.setEntityAmount(name, i);
+    }
+
+    public List<EnvironmentVariableGetter> getEnvironmentVariables() {
+        EnvDto res = api.getEnv();
+        return res.getEnvironment().stream().map(EnvironmentVariableGetter::new).collect(Collectors.toList());
+    }
+
+    public void setEnvironmentVariable(String name, String text) {
+        EnvDto env = api.getEnv();
+        Optional<PropertyDto> property = env.getEnvironment().stream().filter(e -> e.getName().equals(name)).findFirst();
+        if (property.isPresent())
+        {
+            switch (property.get().getType().toLowerCase())
+            {
+                case "decimal":
+                    api.setEnv(name, Optional.of(Integer.parseInt(text)));
+                    break;
+                case "float":
+                    api.setEnv(name, Optional.of(Double.parseDouble(text)));
+                    break;
+                case "boolean":
+                    Boolean val = text.equals("true")? true : text.equals("false")? false : null;
+                    if (val==null) throw new RuntimeException("Invalid boolean value");
+                    api.setEnv(name, Optional.of(val));
+                    break;
+                case "string":
+                    api.setEnv(name, Optional.of(text));
+                    break;
+            }
+        }
     }
 }

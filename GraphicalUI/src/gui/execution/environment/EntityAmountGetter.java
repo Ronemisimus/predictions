@@ -2,11 +2,12 @@ package gui.execution.environment;
 
 import dto.subdto.show.world.EntityDto;
 import gui.EngineApi;
+import gui.util.PopUtility;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
-import javafx.stage.Popup;
 
 public class EntityAmountGetter extends FlowPane {
     private Button update;
@@ -20,10 +21,7 @@ public class EntityAmountGetter extends FlowPane {
             try{
                 EngineApi.getInstance().setEntityAmount(entity.getName(), Integer.parseInt(entityAmount.getText()));
             }catch (Exception ex){
-                Popup popup = new Popup();
-                popup.setWidth(300);
-                popup.setHeight(100);
-                popup.getContent().addAll(new Label("please enter a whole number"));
+                PopUtility.openPopup(getScene().getWindow(), "please enter a positive whole number", Alert.AlertType.ERROR);
             }
         });
         this.getChildren().addAll(entityName, entityAmount, update);

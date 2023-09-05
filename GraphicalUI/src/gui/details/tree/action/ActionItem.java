@@ -74,7 +74,7 @@ public class ActionItem extends TreeItem<String> implements OpenableItem {
     private Parent getDetailsView(ProximityActionDto action) {
         VBox detailsBox = new VBox();
 
-        Label nameLabel = new Label("Type: Proximity:");
+        Label nameLabel = new Label("Type: Proximity");
         Label sourceEntityLabel = new Label("Source Entity: " + (action.getSourceEntity()==null? "" :
                 action.getSourceEntity().getName()));
         Label targetEntityLabel = new Label("Target Entity: " + (action.getTargetEntity()==null? "" :
@@ -86,7 +86,7 @@ public class ActionItem extends TreeItem<String> implements OpenableItem {
     }
 
     private Parent getDetailsView(ConditionActionDto action) {
-        Label nameLabel = new Label("Type: Condition" + action.getType());
+        Label nameLabel = new Label("Type: Condition");
         Label conditionLabel = new Label("then sub actions performed if:" + action.getConditionExpression());
         Label elseLabel = new Label("otherwise else sub actions performed");
         Label primaryEntityLabel = new Label("Primary Entity: " + action.getPrimaryEntity().getName());

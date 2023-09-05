@@ -2,8 +2,8 @@ package gui.execution.scene;
 
 import gui.EngineApi;
 import gui.execution.environment.EntityAmountGetter;
+import gui.execution.environment.EnvironmentVariableGetter;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -27,5 +27,10 @@ public class ExecutionController {
         VBox res = new VBox();
         res.getChildren().addAll(roots);
         leftPane.setCenter(res);
+
+        List<EnvironmentVariableGetter> environmentVariables = EngineApi.getInstance().getEnvironmentVariables();
+        VBox env = new VBox();
+        env.getChildren().addAll(environmentVariables);
+        centerPane.setCenter(env);
     }
 }
