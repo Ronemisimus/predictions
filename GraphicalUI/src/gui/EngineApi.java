@@ -2,14 +2,19 @@ package gui;
 
 import dto.ReadFileDto;
 import dto.ShowWorldDto;
+import dto.subdto.show.world.EntityDto;
 import gui.details.tree.WorldDetailsItem;
+import gui.execution.environment.EntityAmountGetter;
 import javafx.beans.property.StringProperty;
+import javafx.scene.Parent;
 import javafx.scene.control.TreeItem;
 import javafx.stage.FileChooser;
 import predictions.MainApi;
 import predictions.MainApiImpl;
 
 import java.io.File;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class EngineApi {
 
@@ -56,5 +61,16 @@ public class EngineApi {
     {
         ShowWorldDto res = api.showLoadedWorld();
         return new WorldDetailsItem(res);
+    }
+
+    public List<EntityAmountGetter> getEntityAmounts()
+    {
+        List<EntityDto> res = api.getEntityDefinitionCounts();
+
+        return res.stream().map(EntityAmountGetter::new).collect(Collectors.toList());
+    }
+
+    public void setEntityAmount(String name, int i) {
+        api.setEntityAmount(name, i);
     }
 }

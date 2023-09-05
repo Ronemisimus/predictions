@@ -58,7 +58,13 @@ public class EntityDefinitionImpl implements EntityDefinition {
     @Override
     public EntityDto getDto() {
         List<PropertyDto> props = properties.stream().map(PropertyDefinition::getDto).collect(Collectors.toList());
-        return new EntityDto(props, name);
+        return new EntityDto(props, name, population);
+    }
+
+    @Override
+    public void setPopulation(Integer population) {
+        if (population>=0)
+            this.population = population;
     }
 
     @Override
@@ -68,6 +74,8 @@ public class EntityDefinitionImpl implements EntityDefinition {
         EntityDefinitionImpl that = (EntityDefinitionImpl) o;
         return Objects.equals(name, that.name);
     }
+
+
 
     @Override
     public int hashCode() {

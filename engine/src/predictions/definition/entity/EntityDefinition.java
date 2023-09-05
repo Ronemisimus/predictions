@@ -13,4 +13,6 @@ public interface EntityDefinition {
     boolean isInstance(EntityInstance entityInstance);
 
     EntityDto getDto();
+
+    void setPopulation(Integer population);
 }

@@ -4,6 +4,7 @@ import dto.*;
 import dto.subdto.InitializeDto;
 import dto.subdto.SingleRunHistoryDto;
 import dto.subdto.show.EntityListDto;
+import dto.subdto.show.world.EntityDto;
 import dto.subdto.show.world.WorldDto;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.world.api.World;
@@ -20,9 +21,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class MainApiImpl implements MainApi {
@@ -132,5 +131,19 @@ public class MainApiImpl implements MainApi {
     @Override
     public void setEnv(String name, Optional<Comparable<?>> value) {
         activeDefinition.getEnvVariablesManager().set(name, value);
+    }
+
+    @Override
+    public List<EntityDto> getEntityDefinitionCounts() {
+        List<EntityDto> res = new ArrayList<>();
+        activeDefinition.getEntityDefinitions()
+                .forEachRemaining( e -> res.add(e.getDto()));
+        return res;
+    }
+
+    @Override
+    public void setEntityAmount(String name, int i) {
+        Optional<EntityDefinition> res = activeDefinition.getEntityDefinitionByName(name);
+        res.ifPresent(entityDefinition -> entityDefinition.setPopulation(i));
     }
 }

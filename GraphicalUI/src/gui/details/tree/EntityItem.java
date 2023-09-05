@@ -14,7 +14,7 @@ public class EntityItem extends TreeItem<String> implements OpenableItem {
     public EntityItem(EntityDto entity) {
         super(entity.getName(), null);
         this.entity = entity;
-        entityAmount = 0;
+        entityAmount = entity.getAmount();
         entity.getProps().forEach(this::accept);
     }
 

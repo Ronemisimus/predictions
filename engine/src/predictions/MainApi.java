@@ -4,7 +4,9 @@ import dto.*;
 import dto.subdto.InitializeDto;
 import dto.subdto.SingleRunHistoryDto;
 import dto.subdto.show.EntityListDto;
+import dto.subdto.show.world.EntityDto;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface MainApi {
@@ -24,4 +26,8 @@ public interface MainApi {
     SingleRunHistoryDto getRunPropertyHistogram(int runId, String entityName, String propertyName);
 
     void setEnv(String name, Optional<Comparable<?>> value);
+
+    List<EntityDto> getEntityDefinitionCounts();
+
+    void setEntityAmount(String name, int i);
 }
