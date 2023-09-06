@@ -16,6 +16,7 @@ import predictions.termination.impl.SignalImpl;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class WorldInstanceImpl implements WorldInstance{
 
@@ -33,8 +34,9 @@ public class WorldInstanceImpl implements WorldInstance{
         this.tick = 0;
 
         world.getEntityDefinitions()
-                .forEachRemaining(
-                        this.entityInstanceManager::create);
+                .forEachRemaining(entityDefinition ->{
+                    IntStream.range(0, entityDefinition.getPopulation()).mapToObj(i -> entityDefinition).forEach(entityInstanceManager::create);
+                });
     }
 
     @Override

@@ -45,9 +45,6 @@ public class SetAction extends AbstractAction {
     @Override
     public void invoke(Context context) {
         PropertyInstance<?> propertyInstance = context.getPrimaryEntityInstance().getPropertyByName(property);
-        if (verifyNonNumericPropertyType(propertyInstance)) {
-            throw new IllegalArgumentException("increase action can't operate on a none number property [" + property);
-        }
 
         Comparable<?> expVal = valueExpression.evaluate(context);
 

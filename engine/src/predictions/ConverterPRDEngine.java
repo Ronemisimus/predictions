@@ -36,33 +36,28 @@ public class ConverterPRDEngine {
 
     protected static PropertyDefinition<?> getPropertyDefinitionFromPRDinner(String propertyType, PRDRange range, String propertyName, Comparable<?> value) {
         PropertyDefinition<?> res = null;
+        Double from=null, to=null;
+        if (range!=null) {
+            from = range.getFrom();
+            to = range.getTo();
+        }
         switch (propertyType.toLowerCase())
         {
             case "decimal":
-                Integer from = null, to = null;
-                if (range!=null) {
-                    from = (int) range.getFrom();
-                    to = (int) range.getTo();
-                }
-                ValueGenerator<Integer> vg = value==null? ValueGeneratorFactory.createRandomInteger(from,to):
+                ValueGenerator<Integer> vg = value==null? ValueGeneratorFactory.createRandomInteger(from.intValue(),to.intValue()):
                         ValueGeneratorFactory.createFixed((Integer)value);
                 res = new IntegerPropertyDefinition(propertyName,
                         vg,
-                        from,
-                        to);
+                        from.intValue(),
+                        to.intValue());
                 break;
             case "float":
-                Double fromD = null, toD = null;
-                if(range!=null) {
-                    fromD = range.getFrom();
-                    toD = range.getTo();
-                }
-                ValueGenerator<Double> vgd = value==null? ValueGeneratorFactory.createRandomDouble(fromD,toD):
+                ValueGenerator<Double> vgd = value==null? ValueGeneratorFactory.createRandomDouble(from,to):
                         ValueGeneratorFactory.createFixed((Double)value);
                 res = new DoublePropertyDefinition(propertyName,
                         vgd,
-                        fromD,
-                        toD);
+                        from,
+                        to);
                 break;
             case "string":
                 res = new StringPropertyDefinition(propertyName,
