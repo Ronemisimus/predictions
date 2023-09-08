@@ -47,15 +47,12 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
     public void moveEntities() {
         IntStream.range(0, instances.size())
                 .mapToObj(locations::get)
-                .forEach(loc -> {
-                    loc.setValue(getStepLocation(loc.getValue()));
-                });
+                .forEach(loc -> loc.setValue(getStepLocation(loc.getValue())));
     }
 
     private Coordinate getStepLocation(Coordinate value) {
-        EntityInstance moving  = this.grid[value.getX()][value.getY()];
-        Integer gridWidth = this.grid.length;
-        Integer gridHeight = this.grid[0].length;
+        int gridWidth = this.grid.length;
+        int gridHeight = this.grid[0].length;
         List<Coordinate> possibleMoves = Stream.of(
                 new Coordinate((value.getX() + 1)%gridWidth, value.getY()),
                 new Coordinate((gridWidth + value.getX() - 1)%gridWidth, value.getY()),
@@ -75,9 +72,7 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
         Property<Coordinate> location = new SimpleObjectProperty<>(coordinate);
         locations.add(location);
         EntityInstance newEntityInstance = new EntityInstanceImpl(entityDefinition, count, location);
-        location.addListener((observable, oldValue, newValue) -> {
-            updateGrid(newEntityInstance, newValue);
-        });
+        location.addListener((observable, oldValue, newValue) -> updateGrid(newEntityInstance, newValue));
         instances.add(newEntityInstance);
 
         entityDefinition.getProps().forEach(prop -> {
@@ -101,7 +96,9 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
             }
             newEntityInstance.addPropertyInstance(res);
         });
-        grid[coordinate.getX()][coordinate.getY()] = newEntityInstance;
+        if (coordinate != null) {
+            grid[coordinate.getX()][coordinate.getY()] = newEntityInstance;
+        }
         return newEntityInstance;
     }
 
@@ -134,7 +131,7 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
         for (EntityInstance entityInstance : instances) {
             if (entityInstance.getId() == id) {
                 Coordinate location = entityInstance.getLocation();
-                locations.remove(location);
+                locations.remove(new SimpleObjectProperty<>(location));
                 instances.remove(entityInstance);
                 grid[location.getX()][location.getY()] = null;
                 return;

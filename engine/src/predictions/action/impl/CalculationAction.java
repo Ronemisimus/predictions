@@ -5,8 +5,6 @@ import dto.subdto.show.world.action.CalculationActionDto;
 import predictions.action.api.AbstractAction;
 import predictions.action.api.ActionType;
 import predictions.action.api.ContextDefinition;
-import predictions.definition.entity.EntityDefinition;
-import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.definition.property.api.PropertyType;
 import predictions.exception.BadExpressionException;
 import predictions.exception.BadFunctionExpressionException;
@@ -46,8 +44,7 @@ public class CalculationAction extends AbstractAction {
                                      BadPropertyTypeExpressionException | BadExpressionException e) {
                                 throw new RuntimeException(e);
                             }
-                        })
-                .map(t -> t).collect(Collectors.toList());
+                        }).collect(Collectors.toList());
         List<Expression<Double>> args2Exp = Arrays.stream(args2)
                 .map(exp -> {
                     try {
@@ -56,8 +53,7 @@ public class CalculationAction extends AbstractAction {
                              BadPropertyTypeExpressionException | BadExpressionException e) {
                         throw new RuntimeException(e);
                     }
-                })
-                .map(t -> t).collect(Collectors.toList());
+                }).collect(Collectors.toList());
         exps = new ArrayList<>();
         for (int i=0;i<ops.length;i++) {
             exps.add(new DualMathExpression(ops[i], args1Exp.get(i), args2Exp.get(i)));

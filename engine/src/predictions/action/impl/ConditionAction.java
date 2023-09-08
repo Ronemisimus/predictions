@@ -7,8 +7,6 @@ import predictions.action.api.AbstractAction;
 import predictions.action.api.Action;
 import predictions.action.api.ActionType;
 import predictions.action.api.ContextDefinition;
-import predictions.definition.entity.EntityDefinition;
-import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.exception.*;
 import predictions.execution.context.Context;
 import predictions.expression.api.Expression;
