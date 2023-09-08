@@ -42,6 +42,7 @@ public class MainController {
         LoadFileButton.setOnAction(this::handleLoadFileButtonClick);
         DetailsButton.setOnAction(this::handleDetailsButtonClick);
         isLoaded.addListener(this::handleFileLoaded);
+        newExecutionButton.setOnAction(this::handleNewExecutionButtonClick);
     }
 
     public static MainController getInstance(MainController mainController){
@@ -56,7 +57,12 @@ public class MainController {
     }
 
     private void handleFileLoaded(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-        DetailsButton.fire();
+        if (newValue)
+            DetailsButton.fire();
+        else {
+            FileLabel.textProperty().set("loaded file will show here");
+            centerStage.setCenter(null);
+        }
     }
 
     @FXML
@@ -93,4 +99,7 @@ public class MainController {
     }
 
 
+    public void unload() {
+        isLoaded.set(false);
+    }
 }

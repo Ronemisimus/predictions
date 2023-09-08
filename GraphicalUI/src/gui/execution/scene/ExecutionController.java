@@ -1,8 +1,10 @@
 package gui.execution.scene;
 
 import gui.EngineApi;
+import gui.MainController;
 import gui.execution.environment.EntityAmountGetter;
 import gui.execution.environment.EnvironmentVariableGetter;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
@@ -32,5 +34,17 @@ public class ExecutionController {
         VBox env = new VBox();
         env.getChildren().addAll(environmentVariables);
         centerPane.setCenter(env);
+
+        clearButton.setOnAction(this::handleClearButtonClick);
+        startButton.setOnAction(this::handleStartButtonClick);
+    }
+
+    @FXML
+    private void handleClearButtonClick(ActionEvent event) {
+        MainController.getInstance(null).unload();
+    }
+
+    private void handleStartButtonClick(ActionEvent event) {
+        EngineApi.getInstance().runSimulation();
     }
 }

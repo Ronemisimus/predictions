@@ -2,7 +2,9 @@ package gui;
 
 import dto.EnvDto;
 import dto.ReadFileDto;
+import dto.RunSimulationDto;
 import dto.ShowWorldDto;
+import dto.subdto.InitializeDto;
 import dto.subdto.show.world.EntityDto;
 import dto.subdto.show.world.PropertyDto;
 import gui.details.tree.WorldDetailsItem;
@@ -107,5 +109,10 @@ public class EngineApi {
                     break;
             }
         }
+    }
+
+    public void runSimulation() {
+        InitializeDto init = api.initialize();
+        RunSimulationDto run = api.runSimulation();
     }
 }

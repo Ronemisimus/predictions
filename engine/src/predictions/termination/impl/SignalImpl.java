@@ -8,7 +8,6 @@ public class SignalImpl implements Signal {
 
     private final boolean userRequestedTermination;
     private final int world_ticks;
-
     private final Instant startTime;
 
     public SignalImpl(boolean userRequestedTermination, int world_ticks, Instant startTime) {

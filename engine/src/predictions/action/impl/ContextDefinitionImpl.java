@@ -5,13 +5,23 @@ import predictions.definition.entity.EntityDefinition;
 import predictions.definition.entity.EntityDefinitionImpl;
 import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.exception.*;
+import predictions.execution.context.Context;
+import predictions.execution.context.ContextImpl;
+import predictions.execution.instance.entity.EntityInstance;
+import predictions.execution.instance.entity.manager.EntityInstanceManager;
+import predictions.execution.instance.environment.api.ActiveEnvironment;
 import predictions.expression.api.Expression;
 import predictions.expression.impl.BasicBooleanExpression;
 import predictions.expression.impl.BooleanComplexExpression;
 import predictions.generated.PRDCondition;
 import predictions.generated.PRDEntity;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class ContextDefinitionImpl implements ContextDefinition {
 
@@ -20,6 +30,8 @@ public class ContextDefinitionImpl implements ContextDefinition {
     private final Integer secondaryEntityAmount;
     private final Expression<Boolean> secondaryExpression;
     private final EnvVariablesManager envVariables;
+
+    private final Boolean randomChoice;
 
     private final Collection<EntityDefinition> systemEntityDefinitions;
 
@@ -35,6 +47,8 @@ public class ContextDefinitionImpl implements ContextDefinition {
         this.secondaryExpression = secondaryExpression;
         this.envVariables = envVariables;
         this.systemEntityDefinitions = systemEntityDefinitions;
+        this.randomChoice = secondaryEntityDefinition != null &&
+                getSecondaryEntityRealAmount() < secondaryEntityDefinition.getPopulation();
     }
 
     public static ContextDefinitionImpl getInstance(PRDEntity primaryEntity,
@@ -99,5 +113,60 @@ public class ContextDefinitionImpl implements ContextDefinition {
     @Override
     public EnvVariablesManager getEnvVariables() {
         return envVariables;
+    }
+
+    @Override
+    public Collection<Context> getContextList(EntityInstance entityInstance, List<EntityInstance> entityInstances,
+                                              EntityInstanceManager entityInstanceManager,
+                                              ActiveEnvironment activeEnvironment, Integer tick) {
+
+        if (!primaryEntityDefinition.isInstance(entityInstance)) return new ArrayList<>();
+
+        List<EntityInstance> secondaryEntities = secondaryEntityDefinition == null? new ArrayList<>():
+                entityInstances.stream()
+                .filter(entity-> entity.getEntityTypeName().equals(secondaryEntityDefinition.getName()))
+                .filter( entity -> secondaryExpression==null || secondaryExpression.evaluate(new ContextImpl(
+                        entityInstance,
+                        entity,
+                        entityInstanceManager,
+                        activeEnvironment,
+                        this,
+                        tick)).equals(true))
+                .collect(Collectors.toList());
+
+        return secondaryEntityDefinition==null? Arrays.asList(
+                new ContextImpl(entityInstance,
+                        null,
+                        entityInstanceManager,
+                        activeEnvironment,
+                        this,
+                        tick)
+        ) :
+        IntStream.range(0, getSecondaryEntityRealAmount())
+                .mapToObj(i -> new ContextImpl(
+                    entityInstance,
+                    secondaryEntities.isEmpty()?null:
+                            secondaryEntities.get(randomChoice? (int)(Math.random() * secondaryEntities.size()): i),
+                    entityInstanceManager,
+                    activeEnvironment,
+                    this,
+                    tick
+                ))
+                .collect(Collectors.toList());
+
+    }
+
+    private int getSecondaryEntityRealAmount() {
+        if(secondaryEntityAmount==null)
+        {
+            return secondaryEntityDefinition.getPopulation();
+        }
+        else if (secondaryEntityAmount<secondaryEntityDefinition.getPopulation()){
+            return secondaryEntityAmount;
+        }
+        else
+        {
+            return secondaryEntityDefinition.getPopulation();
+        }
     }
 }

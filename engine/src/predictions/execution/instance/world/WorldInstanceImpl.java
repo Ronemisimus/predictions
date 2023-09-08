@@ -1,5 +1,7 @@
 package predictions.execution.instance.world;
 
+import predictions.action.api.Action;
+import predictions.action.api.ActionType;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.world.api.World;
 import predictions.execution.EntityCountHistory;
@@ -24,6 +26,13 @@ public class WorldInstanceImpl implements WorldInstance{
     private final EntityInstanceManager entityInstanceManager;
     private final World world;
 
+    private static final List<ActionType> finalPhaseTypes = Arrays.asList(
+            ActionType.KILL,// obvious
+            ActionType.CONDITION, // can contain kill or replace
+            ActionType.REPLACE, // obvious
+            ActionType.PROXIMITY // has sub actions - could be "kill" or "replace"
+    );
+
     private int tick;
     private Instant startTime;
 
@@ -33,9 +42,16 @@ public class WorldInstanceImpl implements WorldInstance{
         this.entityInstanceManager = new EntityInstanceManagerImpl();
         this.tick = 0;
 
+        this.entityInstanceManager.initializeGrid(world.getGridWidth(), world.getGridHeight());
+
         world.getEntityDefinitions()
                 .forEachRemaining(entityDefinition ->{
-                    IntStream.range(0, entityDefinition.getPopulation()).mapToObj(i -> entityDefinition).forEach(entityInstanceManager::create);
+                    IntStream.range(0,
+                            Math.min(
+                                    entityDefinition.getPopulation(),
+                                    world.getGridWidth() * world.getGridHeight()))
+                            .mapToObj(i -> entityDefinition)
+                            .forEach(entityInstanceManager::create);
                 });
     }
 
@@ -46,14 +62,53 @@ public class WorldInstanceImpl implements WorldInstance{
         Signal s = new SignalImpl(false, tick, this.startTime);
         while((resTermination = isTerminated(s))==null)
         {
-            List<EntityInstance> tempList = new ArrayList<>(entityInstanceManager.getInstances());
-            tempList.forEach(entityInstance -> world.getRules().forEachRemaining(rule -> {
+            // move entities
+            entityInstanceManager.moveEntities();
+
+            // get runnable actions
+            List<Action> firstPhaseActions = new ArrayList<>();
+            List<Action> lastPhaseActions = new ArrayList<>();
+            world.getRules().forEachRemaining(rule -> {
                 if(rule.getActivation().isActive(tick))
-                {
-                    Context context = new ContextImpl(entityInstance, entityInstanceManager, activeEnvironment, tick);
-                    rule.getActionsToPerform().forEach(action -> action.invoke(context));
-                }
-            }));
+                    rule.getActionsToPerform()
+                            .forEach(action -> {
+                                if (finalPhaseTypes.contains(action.getActionType()))
+                                {
+                                    lastPhaseActions.add(action);
+                                }
+                                else
+                                {
+                                    firstPhaseActions.add(action);
+                                }
+                            });
+            });
+
+            // execute actions phase 1
+            List<EntityInstance> tempList = new ArrayList<>(entityInstanceManager.getInstances());
+            tempList.forEach(entityInstance -> {
+                firstPhaseActions.forEach(action -> {
+                    action.getContextDefinition()
+                            .getContextList(entityInstance,
+                                    tempList,
+                                    entityInstanceManager,
+                                    activeEnvironment,
+                                    tick)
+                            .forEach(action::invoke);
+                });
+            });
+            // execute actions phase 2: kill or replace
+            tempList.forEach(entityInstance -> {
+                lastPhaseActions.forEach(action -> {
+                    action.getContextDefinition()
+                            .getContextList(entityInstance,
+                                    tempList,
+                                    entityInstanceManager,
+                                    activeEnvironment,
+                                    tick)
+                            .forEach(action::invoke);
+                });
+            });
+            System.out.println("done with tick " + this.tick);
             this.tick++;
             s = new SignalImpl(false,this.tick, this.startTime);
         }

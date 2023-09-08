@@ -10,5 +10,9 @@ public interface EntityInstanceManager {
     EntityInstance create(EntityDefinition entityDefinition);
     List<EntityInstance> getInstances();
 
+    void initializeGrid(int gridWidth, int gridHeight);
+
+    void moveEntities();
+
     void killEntity(int id);
 }

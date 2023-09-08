@@ -19,5 +19,11 @@ public interface World {
 
     Iterator<Termination> getTerminations();
 
+    Integer getThreadCount();
+
     WorldDto getDto();
+
+    int getGridWidth();
+
+    int getGridHeight();
 }

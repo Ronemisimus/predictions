@@ -122,14 +122,15 @@ public class WorldImpl implements World {
         return this.terminations.iterator();
     }
 
-    public Integer getGridWidth() {
+    @Override
+    public int getGridWidth() {
         return this.gridWidth;
     }
-
-    public Integer getGridHeight() {
+    @Override
+    public int getGridHeight() {
         return this.gridHeight;
     }
-
+    @Override
     public Integer getThreadCount() {
         return this.threadCount;
     }

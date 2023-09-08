@@ -9,6 +9,7 @@ import predictions.action.api.ActionType;
 import predictions.action.api.ContextDefinition;
 import predictions.exception.*;
 import predictions.execution.context.Context;
+import predictions.execution.instance.entity.EntityInstance;
 import predictions.expression.ExpressionBuilder;
 import predictions.expression.api.Expression;
 import predictions.generated.PRDActions;
@@ -46,7 +47,14 @@ public class ProximityAction extends AbstractAction {
 
     @Override
     public void invoke(Context context) {
-        // TODO: complete proximity invoke
+        EntityInstance primary = context.getPrimaryEntityInstance();
+        EntityInstance secondary = context.getSecondaryEntityInstance();
+        if (primary == null || secondary == null)
+            return;
+        Integer distMax = ((Double)distanceOf1.evaluate(context)).intValue();
+        Integer distance = primary.getLocation().distance(secondary.getLocation());
+        if (distance <= distMax)
+            actions.forEach(a->a.invoke(context));
     }
 
     public List<Action> getActions() {

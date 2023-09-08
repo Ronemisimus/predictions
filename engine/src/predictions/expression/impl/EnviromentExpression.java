@@ -13,7 +13,9 @@ public class EnviromentExpression<T> implements Expression<T> {
 
     @Override
     public Comparable<T> evaluate(Context context) {
-        return (Comparable<T>) context.getEnvironmentVariable(property);
+        PropertyInstance res = context.getEnvironmentVariable(property);
+        if (res == null) throw new RuntimeException("environment variable \"" + property + "\" doesn't exist");
+        return (Comparable<T>) res.getValue();
     }
 
     @Override

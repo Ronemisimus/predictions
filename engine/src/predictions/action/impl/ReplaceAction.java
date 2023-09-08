@@ -7,7 +7,10 @@ import predictions.action.api.Action;
 import predictions.action.api.ActionType;
 import predictions.action.api.ContextDefinition;
 import predictions.definition.entity.EntityDefinition;
+import predictions.definition.property.api.PropertyDefinition;
 import predictions.execution.context.Context;
+import predictions.execution.grid.Coordinate;
+import predictions.execution.instance.entity.EntityInstance;
 
 public class ReplaceAction extends AbstractAction {
 
@@ -46,6 +49,30 @@ public class ReplaceAction extends AbstractAction {
     @Override
     public void invoke(Context context) {
 
+        // backup killed entity
+        EntityInstance source = context.getPrimaryEntityInstance();
+        Coordinate location = source.getLocation();
+
+        // kill entity
+        context.removeEntity(source);
+
+        // create new entity
+        EntityInstance target = context.createEntity(createEntity);
+
+        if (!mode.equals("scratch")) {
+            target.setLocation(source.getLocation());
+
+            createEntity.getProps().stream()
+                    .map(PropertyDefinition::getName)
+                    .filter(name -> killEntity.getProps().stream()
+                            .anyMatch(p1 -> p1.getName().equals(name)))
+                    .forEach(name -> target.getPropertyByName(name)
+                            .updateValue(
+                                    source.getPropertyByName(name).getValue(),
+                                    context.getTick()
+                            )
+                    );
+        }
     }
 
     public EntityDefinition getKillEntity() {
