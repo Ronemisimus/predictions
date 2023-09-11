@@ -37,7 +37,8 @@ public class IncreaseAction extends AbstractAction {
         super(ActionType.INCREASE, contextDefinition);
         ExpressionErrorDto.Builder expBuilder = new ExpressionErrorDto.Builder();
         this.property = property;
-        this.propInSecondary = contextDefinition.getSecondaryEntityDefinition().getName().equals(entityName);
+        this.propInSecondary = contextDefinition.getSecondaryEntityDefinition()!=null &&
+                contextDefinition.getSecondaryEntityDefinition().getName().equals(entityName);
 
         Optional<PropertyDefinition<?>> propertyDefinition = ConverterPRDEngine.checkEntityAndPropertyInContext(entityName, property, contextDefinition, builder);
 

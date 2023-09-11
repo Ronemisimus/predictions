@@ -64,8 +64,10 @@ public class ContextDefinitionImpl implements ContextDefinition {
         EntityDefinition secondary = null;
         if (primaryEntity!=null)
             primary = new EntityDefinitionImpl(primaryEntity, bigBuilder);
-        else
-            builder.message("Entity "+entity+" not found");
+        else {
+            builder.message("Entity " + entity + " not found");
+            throw new RuntimeException("Entity " + entity + " not found");
+        }
         if (secondaryEntity!=null)
             secondary = new EntityDefinitionImpl(secondaryEntity, bigBuilder);
 
@@ -78,19 +80,25 @@ public class ContextDefinitionImpl implements ContextDefinition {
                 systemEntityDefinitions
         );
         ExpressionErrorDto.Builder builderExpression = new ExpressionErrorDto.Builder();
-        ContextDefinition ret = new ContextDefinitionImpl(primary,
-                secondary,
-                secondaryEntityAmount,
-                prdCondition == null? null:
-                    new BooleanComplexExpression(
-                        prdCondition,
-                        contextDefinition,
-                        builderExpression
-                    ),
-                envVariables,
-                systemEntityDefinitions);
-        builder.expressionError(builderExpression.build());
-        return ret;
+        try {
+            ContextDefinition ret = new ContextDefinitionImpl(primary,
+                    secondary,
+                    secondaryEntityAmount,
+                    prdCondition == null ? null :
+                            new BooleanComplexExpression(
+                                    prdCondition,
+                                    contextDefinition,
+                                    builderExpression
+                            ),
+                    envVariables,
+                    systemEntityDefinitions);
+
+            return ret;
+        }catch (Exception e)
+        {
+            builder.expressionError(builderExpression.build());
+            throw e;
+        }
     }
 
                                  @Override

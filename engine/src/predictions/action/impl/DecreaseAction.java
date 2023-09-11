@@ -38,7 +38,8 @@ public class DecreaseAction extends AbstractAction {
         super(ActionType.DECREASE, contextDefinition);
         ExpressionErrorDto.Builder expressionBuilder = new ExpressionErrorDto.Builder();
         this.property = property;
-        this.propInSecondary = contextDefinition.getSecondaryEntityDefinition().getName().equals(entityName);
+        this.propInSecondary = contextDefinition.getSecondaryEntityDefinition()!=null &&
+                contextDefinition.getSecondaryEntityDefinition().getName().equals(entityName);
 
         Optional<PropertyDefinition<?>> propertyDefinition = ConverterPRDEngine.checkEntityAndPropertyInContext(entityName, property, contextDefinition, builder);
 

@@ -8,16 +8,31 @@ import predictions.action.api.ActionType;
 import predictions.action.api.ContextDefinition;
 import predictions.definition.entity.EntityDefinition;
 import predictions.execution.context.Context;
+import predictions.execution.instance.entity.EntityInstance;
 
 public class KillAction extends AbstractAction {
 
-    public KillAction(ContextDefinition entityDefinition, ActionErrorDto.Builder builder) {
-        super(ActionType.KILL, entityDefinition);
+    private final Boolean killSecondary;
+    public KillAction(ContextDefinition contextDefinition,
+                      String entityName,
+                      ActionErrorDto.Builder builder) {
+        super(ActionType.KILL, contextDefinition);
+        if (!contextDefinition.getPrimaryEntityDefinition().getName().equals(entityName) &&
+                (contextDefinition.getSecondaryEntityDefinition()==null ||
+                !contextDefinition.getSecondaryEntityDefinition().getName().equals(entityName)))
+        {
+            builder.entityNotInContext(entityName);
+            throw new RuntimeException("bad entity name");
+        }
+        killSecondary = contextDefinition.getSecondaryEntityDefinition() !=null &&
+                contextDefinition.getSecondaryEntityDefinition().getName().equals(entityName);
     }
 
     @Override
     public void invoke(Context context) {
-        context.removeEntity(context.getPrimaryEntityInstance());
+        EntityInstance killed = killSecondary?context.getSecondaryEntityInstance():context.getPrimaryEntityInstance();
+        if (killed != null)
+            context.removeEntity(killed);
     }
 
     @Override

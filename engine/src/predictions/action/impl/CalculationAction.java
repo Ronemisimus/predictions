@@ -42,7 +42,8 @@ public class CalculationAction extends AbstractAction {
         super(ActionType.CALCULATION, contextDefinition);
         ExpressionErrorDto.Builder expBuilder = new ExpressionErrorDto.Builder();
         this.property = property;
-        this.propInSecondary = contextDefinition.getSecondaryEntityDefinition().getName().equals(entityName);
+        this.propInSecondary = contextDefinition.getSecondaryEntityDefinition()!=null &&
+                contextDefinition.getSecondaryEntityDefinition().getName().equals(entityName);
         Optional<PropertyDefinition<?>> prop = ConverterPRDEngine.checkEntityAndPropertyInContext(entityName, property, contextDefinition, builder);
 
         if ( prop.isPresent() && verifyNonNumericPropertyType(prop.get())) {

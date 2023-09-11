@@ -32,6 +32,7 @@ public class ActivationImpl implements Activation {
                     .activationError(
                 new ActivationErrorDto(cycleSizeInTicks,probability)
             );
+            throw new RuntimeException("Invalid cycle size or probability");
         }
     }
 

@@ -31,7 +31,8 @@ public class ReplaceAction extends AbstractAction {
             killEntity = contextDefinition.getPrimaryEntityDefinition();
             secondaryEntity = false;
         }
-        else if (contextDefinition.getSecondaryEntityDefinition().getName().equals(kill))
+        else if (contextDefinition.getSecondaryEntityDefinition()!=null &&
+                contextDefinition.getSecondaryEntityDefinition().getName().equals(kill))
         {
             killEntity = contextDefinition.getSecondaryEntityDefinition();
             secondaryEntity = true;
@@ -50,6 +51,11 @@ public class ReplaceAction extends AbstractAction {
         }
         if (killEntity == null) {
             builder.entityNotInContext(kill);
+            throw new RuntimeException("bad entity name");
+        }
+        if (createEntity == null) {
+            builder.entityNotInContext(create);
+            throw new RuntimeException("bad entity name");
         }
     }
 

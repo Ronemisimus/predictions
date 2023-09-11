@@ -33,7 +33,8 @@ public class SetAction extends AbstractAction {
                      ActionErrorDto.Builder builder) {
         super(ActionType.SET, contextDefinition);
         this.property = property;
-        this.propInSecondary = contextDefinition.getSecondaryEntityDefinition().getName().equals(entityName);
+        this.propInSecondary = contextDefinition.getSecondaryEntityDefinition() !=null &&
+                contextDefinition.getSecondaryEntityDefinition().getName().equals(entityName);
 
         ExpressionErrorDto.Builder expressionBuilder = new ExpressionErrorDto.Builder();
 

@@ -94,52 +94,50 @@ public class ConverterPRDEngine {
                                            Boolean environmentProp,
                                            ReadFileDto.Builder builder) {
         PropertyBadDto.Builder res = new PropertyBadDto.Builder(propertyName);
-        if(random && value!=null){
-            res.environmentError(environmentProp)
-                    .message("Bad property: " + propertyName + "cannot be random when value is given: " + value)
-                    .valueGivenOnRandom(value);
-            setPropertyBadinBuilder(builder, res, environmentProp);
-        }
-        if (range!=null) {
-            Double from = range.getFrom();
-            Double to = range.getTo();
-            checkRange(propertyType,
-                    from,
-                    to,
-                    environmentProp,
-                    res);
-            setPropertyBadinBuilder(builder,res,environmentProp);
-        }
-        else {
-            if (random && !propertyType.equalsIgnoreCase("boolean"))
-            {
-                res.environmentError(environmentProp).
-                        message("Bad property: " + propertyName + "cannot be random without a range unless it is boolean").
-                        badRandom();
-                setPropertyBadinBuilder(builder,res,environmentProp);
-            }
-        }
-        if (value!=null) {
-            if(!propertyType.equalsIgnoreCase(getValueType(value)))
-            {
+        try {
+            if (random && value != null) {
                 res.environmentError(environmentProp)
-                        .message("Bad value: " + value + " for property " + propertyName)
-                        .badValueType(value, propertyType);
-                setPropertyBadinBuilder(builder,res,environmentProp);
+                        .message("Bad property: " + propertyName + "cannot be random when value is given: " + value)
+                        .valueGivenOnRandom(value);
+                throw new RuntimeException("Bad property: " + propertyName + "cannot be random when value is given: " + value);
             }
-            if (range!=null)
-            {
-                double from = range.getFrom();
-                double to = range.getTo();
-                double valueD = (value instanceof Integer) ? ((Integer) value).doubleValue() : (Double) value;
-                if (valueD<from || valueD>to)
-                {
-                    res.environmentError(environmentProp)
-                            .message("Bad range")
-                            .valueOutOfRange(value,from, to).build();
-                    setPropertyBadinBuilder(builder,res,environmentProp);
+            if (range != null) {
+                Double from = range.getFrom();
+                Double to = range.getTo();
+                checkRange(propertyType,
+                        from,
+                        to,
+                        environmentProp,
+                        res);
+            } else {
+                if (random && !propertyType.equalsIgnoreCase("boolean")) {
+                    res.environmentError(environmentProp).
+                            message("Bad property: " + propertyName + "cannot be random without a range unless it is boolean").
+                            badRandom();
+                    throw new RuntimeException("Bad property: " + propertyName + "cannot be random without a range unless it is boolean");
                 }
             }
+            if (value != null) {
+                if (!propertyType.equalsIgnoreCase(getValueType(value))) {
+                    res.environmentError(environmentProp)
+                            .message("Bad value: " + value + " for property " + propertyName)
+                            .badValueType(value, propertyType);
+                    throw new RuntimeException("Bad value: " + value + " for property " + propertyName);
+                }
+                if (range != null) {
+                    double from = range.getFrom();
+                    double to = range.getTo();
+                    double valueD = (value instanceof Integer) ? ((Integer) value).doubleValue() : (Double) value;
+                    if (valueD < from || valueD > to) {
+                        res.environmentError(environmentProp)
+                                .message("Bad range")
+                                .valueOutOfRange(value, from, to).build();
+                        throw new RuntimeException("Bad range");
+                    }
+                }
+            }
+        }catch (Exception e){
+            setPropertyBadinBuilder(builder, res, environmentProp);
         }
     }
 
@@ -174,7 +172,7 @@ public class ConverterPRDEngine {
                     builder.environmentError(environmentProp)
                             .message("flipped range")
                             .rangeFlipped(from, to);
-                    return;
+                    throw new RuntimeException("flipped range");
                 }
                 break;
             case "string":
@@ -182,7 +180,7 @@ public class ConverterPRDEngine {
                 builder.environmentError(environmentProp)
                         .message("bad range type")
                         .badRangedType(true, propertyType);
-                return;
+                throw new RuntimeException("bad range type");
             default:
         }
     }
@@ -202,8 +200,8 @@ public class ConverterPRDEngine {
     public static PropertyDefinition<?> getPropertyDefinitionFromPRDEntity(PRDProperty def, ReadFileDto.Builder builder) {
         Comparable<?> res = null;
         boolean random = false;
+        random = def.getPRDValue()!=null && def.getPRDValue().isRandomInitialize();
         if (def.getPRDValue()!=null && def.getPRDValue().getInit()!=null) {
-            random = def.getPRDValue().isRandomInitialize();
             try {
                 switch (def.getType().toLowerCase()) {
                     case "decimal":
@@ -247,7 +245,9 @@ public class ConverterPRDEngine {
                         actionBuilder);
                 break;
             case "kill":
-                res = new KillAction(contextDefinition, actionBuilder);
+                res = new KillAction(contextDefinition,
+                        def.getEntity(),
+                        actionBuilder);
                 break;
             case "set":
                 res = new SetAction(contextDefinition,
@@ -272,10 +272,17 @@ public class ConverterPRDEngine {
                         actionBuilder);
                 break;
             case "proximity":
-                res = new ProximityAction(contextDefinition, def.getPRDEnvDepth().getOf(), def.getPRDActions(), actionBuilder);
+                res = new ProximityAction(contextDefinition,
+                        def.getPRDEnvDepth().getOf(),
+                        def.getPRDActions(),
+                        actionBuilder);
                 break;
             case "replace":
-                res = new ReplaceAction(contextDefinition, def.getKill(), def.getCreate(), def.getMode(), actionBuilder);
+                res = new ReplaceAction(contextDefinition,
+                        def.getKill(),
+                        def.getCreate(),
+                        def.getMode(),
+                        actionBuilder);
                 break;
         }
         return res;
@@ -287,7 +294,8 @@ public class ConverterPRDEngine {
                                                        ActionErrorDto.Builder builder)
     {
         if (!contextDefinition.getPrimaryEntityDefinition().getName().equals(entityName) &&
-                !contextDefinition.getSecondaryEntityDefinition().getName().equals(entityName))
+                ( contextDefinition.getSecondaryEntityDefinition() == null ||
+                !contextDefinition.getSecondaryEntityDefinition().getName().equals(entityName)))
         {
             builder.entityNotInContext(entityName);
             throw new RuntimeException("bad entity name");
@@ -364,55 +372,55 @@ public class ConverterPRDEngine {
                                       EnvVariablesManager env,
                                       ReadFileDto.Builder builder) {
         RuleErrorDto.Builder buildRule = new RuleErrorDto.Builder();
-        Activation act = new ActivationImpl(def.getPRDActivation(), buildRule);
-        builder.ruleError(buildRule.build());
-        buildRule.throwIfError();
-        List<Action> res = new ArrayList<>();
-        for (PRDAction prdAction: def.getPRDActions().getPRDAction()) {
-            String primaryEntityName = getPrimaryFromPRD(prdAction);
-            String secondaryEntityName = getSecondaryFromPRD(prdAction);
-            Optional<PRDEntity> mainEntityOpt = entities.getPRDEntity().stream()
-                    .filter(prdEntity -> prdEntity.getName().equals(primaryEntityName)).findFirst();
-            Optional<PRDEntity> secondaryEntityOpt = entities.getPRDEntity().stream()
-                    .filter(prdEntity -> prdEntity.getName().equals(secondaryEntityName)).findFirst();
-            Optional<String> secondaryEntity = prdAction.getPRDSecondaryEntity() == null?
-                    Optional.empty() :
-                    prdAction.getPRDSecondaryEntity().getPRDSelection() == null?
-                    Optional.empty() :
-                    Optional.of(prdAction.getPRDSecondaryEntity().getPRDSelection().getCount());
-            Optional<PRDCondition> prdCondition = prdAction.getPRDSecondaryEntity()== null?
-                    Optional.empty() :
-                    prdAction.getPRDSecondaryEntity().getPRDSelection()== null?
-                    Optional.empty() :
-                    Optional.of(prdAction.getPRDSecondaryEntity().getPRDSelection().getPRDCondition());
+        try {
+            Activation act = new ActivationImpl(def.getPRDActivation(), buildRule);
 
-            ContextDefinition context = ContextDefinitionImpl.getInstance(
-                    mainEntityOpt.orElse(null),
-                    secondaryEntityOpt.orElse(null),
-                    secondaryEntity.isPresent()? Integer.parseInt(secondaryEntity.get()): null,
-                    prdCondition.orElse(null),
-                    env,
-                    entities.getPRDEntity() == null? new ArrayList<>():
-                            entities.getPRDEntity().stream().map(prdEntity -> new EntityDefinitionImpl(prdEntity,builder)).collect(Collectors.toList()),
-                    primaryEntityName,
-                    buildRule,
-                    builder
-            );
-            builder.ruleError(buildRule.build());
-            buildRule.throwIfError();
-            ActionErrorDto.Builder builderAction = new ActionErrorDto.Builder();
-            try {
-                res.add(getActionFromPRD(prdAction, context, builderAction));
-            }catch (Exception e) {
-                buildRule.actionError(builderAction.build());
-                throw e;
+            List<Action> res = new ArrayList<>();
+            for (PRDAction prdAction: def.getPRDActions().getPRDAction()) {
+                String primaryEntityName = getPrimaryFromPRD(prdAction);
+                String secondaryEntityName = getSecondaryFromPRD(prdAction);
+                Optional<PRDEntity> mainEntityOpt = entities.getPRDEntity().stream()
+                        .filter(prdEntity -> prdEntity.getName().equals(primaryEntityName)).findFirst();
+                Optional<PRDEntity> secondaryEntityOpt = entities.getPRDEntity().stream()
+                        .filter(prdEntity -> prdEntity.getName().equals(secondaryEntityName)).findFirst();
+                Optional<String> secondaryEntity = prdAction.getPRDSecondaryEntity() == null ?
+                        Optional.empty() :
+                        prdAction.getPRDSecondaryEntity().getPRDSelection() == null ?
+                                Optional.empty() :
+                                Optional.of(prdAction.getPRDSecondaryEntity().getPRDSelection().getCount());
+                Optional<PRDCondition> prdCondition = prdAction.getPRDSecondaryEntity() == null ?
+                        Optional.empty() :
+                        prdAction.getPRDSecondaryEntity().getPRDSelection() == null ?
+                                Optional.empty() :
+                                Optional.of(prdAction.getPRDSecondaryEntity().getPRDSelection().getPRDCondition());
+
+                ContextDefinition context = ContextDefinitionImpl.getInstance(
+                        mainEntityOpt.orElse(null),
+                        secondaryEntityOpt.orElse(null),
+                        secondaryEntity.isPresent() ? Integer.parseInt(secondaryEntity.get()) : null,
+                        prdCondition.orElse(null),
+                        env,
+                        entities.getPRDEntity() == null ? new ArrayList<>() :
+                                entities.getPRDEntity().stream().map(prdEntity -> new EntityDefinitionImpl(prdEntity, builder)).collect(Collectors.toList()),
+                        primaryEntityName,
+                        buildRule,
+                        builder
+                );
+                ActionErrorDto.Builder builderAction = new ActionErrorDto.Builder();
+                try {
+                    res.add(getActionFromPRD(prdAction, context, builderAction));
+                } catch (Exception e) {
+                    buildRule.actionError(builderAction.build());
+                    throw e;
+                }
             }
+            Rule r = new RuleImpl(def.getName(), act);
+            res.forEach(r::addAction);
+            return r;
+        }catch(Exception e){
             builder.ruleError(buildRule.build());
-            buildRule.throwIfError();
+            throw e;
         }
-        Rule r = new RuleImpl(def.getName(), act);
-        res.forEach(r::addAction);
-        return r;
     }
 
     private static String getSecondaryFromPRD(PRDAction prdAction) {
