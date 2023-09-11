@@ -1,12 +1,16 @@
 package predictions.action.impl;
 
+import dto.subdto.read.dto.rule.ActionErrorDto;
+import dto.subdto.read.dto.rule.ExpressionErrorDto;
 import dto.subdto.show.world.action.ActionDto;
 import dto.subdto.show.world.action.IncreaseActionDto;
+import predictions.ConverterPRDEngine;
 import predictions.action.api.AbstractAction;
 import predictions.action.api.ActionType;
 import predictions.action.api.ContextDefinition;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.environment.api.EnvVariablesManager;
+import predictions.definition.property.api.PropertyDefinition;
 import predictions.definition.property.api.PropertyType;
 import predictions.exception.BadExpressionException;
 import predictions.exception.BadFunctionExpressionException;
@@ -18,24 +22,42 @@ import predictions.expression.ExpressionBuilder;
 import predictions.expression.api.Expression;
 import predictions.expression.api.MathOperation;
 
+import java.util.Optional;
+
 public class IncreaseAction extends AbstractAction {
 
+    private final Boolean propInSecondary;
     private final String property;
     private final Expression<Double> byExpression;
 
     public IncreaseAction(ContextDefinition contextDefinition,
-                          String property, String byExpression) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
+                          String entityName,
+                          String property, String byExpression,
+                          ActionErrorDto.Builder builder) {
         super(ActionType.INCREASE, contextDefinition);
+        ExpressionErrorDto.Builder expBuilder = new ExpressionErrorDto.Builder();
         this.property = property;
-        this.byExpression = ExpressionBuilder.buildDoubleExpression(byExpression, contextDefinition);
+        this.propInSecondary = contextDefinition.getSecondaryEntityDefinition().getName().equals(entityName);
+
+        Optional<PropertyDefinition<?>> propertyDefinition = ConverterPRDEngine.checkEntityAndPropertyInContext(entityName, property, contextDefinition, builder);
+
+        if (propertyDefinition.isPresent() && verifyNonNumericPropertyType(propertyDefinition.get())) {
+            builder.propertyTypeMismatch(property, ActionType.INCREASE.name());
+            throw new RuntimeException("increase action can't operate on a none number property " + property);
+        }
+
+        try {
+            this.byExpression = ExpressionBuilder.buildDoubleExpression(byExpression, contextDefinition, expBuilder);
+        }catch (Exception e) {
+            builder.expressionError(expBuilder.build());
+            throw e;
+        }
     }
 
     @Override
     public void invoke(Context context) {
-        PropertyInstance<?> propertyInstance = context.getPrimaryEntityInstance().getPropertyByName(property);
-        if (verifyNonNumericPropertyType(propertyInstance)) {
-            throw new IllegalArgumentException("increase action can't operate on a none number property [" + property);
-        }
+        PropertyInstance<?> propertyInstance = propInSecondary? context.getSecondaryEntityInstance().getPropertyByName(property):
+                context.getPrimaryEntityInstance().getPropertyByName(property);
 
         Comparable<Double> expVal = byExpression.evaluate(context);
 

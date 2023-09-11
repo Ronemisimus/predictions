@@ -1,5 +1,8 @@
 package predictions.definition.environment.impl;
 
+import dto.ReadFileDto;
+import dto.subdto.read.dto.EnvironmentErrorDto;
+import dto.subdto.read.dto.RepeatPropertyDto;
 import predictions.exception.RepeatNameException;
 import predictions.execution.instance.environment.api.ActiveEnvironment;
 import predictions.definition.environment.api.EnvVariablesManager;
@@ -15,22 +18,25 @@ public class EnvVariableManagerImpl implements EnvVariablesManager {
 
     private final Map<String, PropertyDefinition<?>> propNameToPropDefinition;
 
-    public EnvVariableManagerImpl(PRDEnvironment prdEnvironment) throws RepeatNameException {
+    public EnvVariableManagerImpl(PRDEnvironment prdEnvironment, ReadFileDto.Builder builder) {
         propNameToPropDefinition = new HashMap<>();
-        final boolean[] keyRepeat = {false};
-        final String[] repeatedKey = {null};
         prdEnvironment.getPRDEnvProperty().forEach(def -> {
             if (propNameToPropDefinition.getOrDefault(def.getPRDName(), null) != null)
             {
-                keyRepeat[0] = true;
-                repeatedKey[0] = def.getPRDName();
+                builder.environmentError(
+                        new EnvironmentErrorDto.Builder()
+                                .repeatPropertyError(
+                                        new RepeatPropertyDto(
+                                                def.getPRDName(),
+                                                true,
+                                                null
+                                        )
+                                ).build()
+                );
+                throw new RuntimeException("Duplicate environment variable: " + def.getPRDName());
             }
-            propNameToPropDefinition.put(def.getPRDName(), getPropertyDefinitionFromPRD(def, null));
+            propNameToPropDefinition.put(def.getPRDName(), getPropertyDefinitionFromPRD(def, null, builder));
         });
-        if (keyRepeat[0])
-        {
-            throw new RepeatNameException(null,repeatedKey[0], true);
-        }
     }
 
     @Override

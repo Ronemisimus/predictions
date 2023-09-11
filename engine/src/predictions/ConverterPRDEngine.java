@@ -1,9 +1,14 @@
 package predictions;
 
+import dto.ReadFileDto;
+import dto.subdto.read.dto.EntityErrorDto;
+import dto.subdto.read.dto.EnvironmentErrorDto;
+import dto.subdto.read.dto.PropertyBadDto;
+import dto.subdto.read.dto.rule.ActionErrorDto;
+import dto.subdto.read.dto.rule.RuleErrorDto;
 import predictions.action.api.Action;
 import predictions.action.api.ContextDefinition;
 import predictions.action.impl.*;
-import predictions.definition.entity.EntityDefinition;
 import predictions.definition.entity.EntityDefinitionImpl;
 import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.definition.property.api.PropertyDefinition;
@@ -13,9 +18,7 @@ import predictions.definition.property.impl.IntegerPropertyDefinition;
 import predictions.definition.property.impl.StringPropertyDefinition;
 import predictions.definition.value.generator.api.ValueGenerator;
 import predictions.definition.value.generator.api.ValueGeneratorFactory;
-import predictions.exception.*;
 import predictions.expression.api.MathOperation;
-import predictions.expression.impl.BooleanComplexExpression;
 import predictions.generated.*;
 import predictions.rule.api.Activation;
 import predictions.rule.api.Rule;
@@ -30,29 +33,39 @@ import java.util.stream.Collectors;
 public class ConverterPRDEngine {
     private ConverterPRDEngine() {}
 
-    public static PropertyDefinition<?> getPropertyDefinitionFromPRD(PRDEnvProperty def, Comparable<?> val) {
-        return getPropertyDefinitionFromPRDinner(def.getType(), def.getPRDRange(), def.getPRDName(), val);
+    public static PropertyDefinition<?> getPropertyDefinitionFromPRD(PRDEnvProperty def, Comparable<?> val, ReadFileDto.Builder builder) {
+        return getPropertyDefinitionFromPRDinner(def.getType(), def.getPRDRange(), def.getPRDName(), val, false, true, builder);
     }
 
-    protected static PropertyDefinition<?> getPropertyDefinitionFromPRDinner(String propertyType, PRDRange range, String propertyName, Comparable<?> value) {
+    private static PropertyDefinition<?> getPropertyDefinitionFromPRDinner(String propertyType,
+                                                                           PRDRange range,
+                                                                           String propertyName,
+                                                                           Comparable<?> value,
+                                                                           Boolean random,
+                                                                           Boolean environmentProp,
+                                                                           ReadFileDto.Builder builder) {
         PropertyDefinition<?> res = null;
         Double from=null, to=null;
+
+        propertyValidation(propertyName, random, range, propertyType, value, environmentProp,builder);
+
         if (range!=null) {
             from = range.getFrom();
             to = range.getTo();
         }
+
         switch (propertyType.toLowerCase())
         {
             case "decimal":
-                ValueGenerator<Integer> vg = value==null? ValueGeneratorFactory.createRandomInteger(from.intValue(),to.intValue()):
+                ValueGenerator<Integer> vg = value==null? (random && from!=null? ValueGeneratorFactory.createRandomInteger(from.intValue(),to.intValue()): ValueGeneratorFactory.createFixed(0)):
                         ValueGeneratorFactory.createFixed((Integer)value);
                 res = new IntegerPropertyDefinition(propertyName,
                         vg,
-                        from.intValue(),
-                        to.intValue());
+                        from != null ? from.intValue() : null,
+                        to != null ? to.intValue() : null);
                 break;
             case "float":
-                ValueGenerator<Double> vgd = value==null? ValueGeneratorFactory.createRandomDouble(from,to):
+                ValueGenerator<Double> vgd = value==null? (random?ValueGeneratorFactory.createRandomDouble(from,to): ValueGeneratorFactory.createFixed(0.0)):
                         ValueGeneratorFactory.createFixed((Double)value);
                 res = new DoublePropertyDefinition(propertyName,
                         vgd,
@@ -64,7 +77,7 @@ public class ConverterPRDEngine {
                         ValueGeneratorFactory.createFixed(value==null?"":value.toString()));
                 break;
             case "boolean":
-                ValueGenerator<Boolean> vgb = value==null? ValueGeneratorFactory.createRandomBoolean():
+                ValueGenerator<Boolean> vgb = value==null? (random?ValueGeneratorFactory.createRandomBoolean():ValueGeneratorFactory.createFixed(false)):
                         ValueGeneratorFactory.createFixed((Boolean)value);
                 res = new BooleanPropertyDefinition(propertyName,
                         vgb);
@@ -73,9 +86,124 @@ public class ConverterPRDEngine {
         return res;
     }
 
-    public static PropertyDefinition<?> getPropertyDefinitionFromPRDEntity(PRDProperty def) {
+    private static void propertyValidation(String propertyName,
+                                           Boolean random,
+                                           PRDRange range,
+                                           String propertyType,
+                                           Comparable<?> value,
+                                           Boolean environmentProp,
+                                           ReadFileDto.Builder builder) {
+        PropertyBadDto.Builder res = new PropertyBadDto.Builder(propertyName);
+        if(random && value!=null){
+            res.environmentError(environmentProp)
+                    .message("Bad property: " + propertyName + "cannot be random when value is given: " + value)
+                    .valueGivenOnRandom(value);
+            setPropertyBadinBuilder(builder, res, environmentProp);
+        }
+        if (range!=null) {
+            Double from = range.getFrom();
+            Double to = range.getTo();
+            checkRange(propertyType,
+                    from,
+                    to,
+                    environmentProp,
+                    res);
+            setPropertyBadinBuilder(builder,res,environmentProp);
+        }
+        else {
+            if (random && !propertyType.equalsIgnoreCase("boolean"))
+            {
+                res.environmentError(environmentProp).
+                        message("Bad property: " + propertyName + "cannot be random without a range unless it is boolean").
+                        badRandom();
+                setPropertyBadinBuilder(builder,res,environmentProp);
+            }
+        }
+        if (value!=null) {
+            if(!propertyType.equalsIgnoreCase(getValueType(value)))
+            {
+                res.environmentError(environmentProp)
+                        .message("Bad value: " + value + " for property " + propertyName)
+                        .badValueType(value, propertyType);
+                setPropertyBadinBuilder(builder,res,environmentProp);
+            }
+            if (range!=null)
+            {
+                double from = range.getFrom();
+                double to = range.getTo();
+                double valueD = (value instanceof Integer) ? ((Integer) value).doubleValue() : (Double) value;
+                if (valueD<from || valueD>to)
+                {
+                    res.environmentError(environmentProp)
+                            .message("Bad range")
+                            .valueOutOfRange(value,from, to).build();
+                    setPropertyBadinBuilder(builder,res,environmentProp);
+                }
+            }
+        }
+    }
+
+    private static void setPropertyBadinBuilder(ReadFileDto.Builder builder,
+                                                PropertyBadDto.Builder res,
+                                                Boolean environmentProp) {
+        if (environmentProp)
+        {
+            builder.environmentError(
+                    new EnvironmentErrorDto.Builder()
+                            .envPropertyError(res.build()).build());
+        }
+        else
+        {
+            builder.entityError(
+                    new EntityErrorDto.Builder()
+                            .propertyError(res.build()).build()
+            );
+        }
+        res.throwIfError();
+    }
+
+    private static void checkRange(String propertyType,
+                                   Double from,
+                                   Double to,
+                                   Boolean environmentProp,
+                                   PropertyBadDto.Builder builder) {
+        switch (propertyType.toLowerCase()) {
+            case "decimal":
+            case "float":
+                if (from > to) {
+                    builder.environmentError(environmentProp)
+                            .message("flipped range")
+                            .rangeFlipped(from, to);
+                    return;
+                }
+                break;
+            case "string":
+            case "boolean":
+                builder.environmentError(environmentProp)
+                        .message("bad range type")
+                        .badRangedType(true, propertyType);
+                return;
+            default:
+        }
+    }
+
+    private static String getValueType(Comparable<?> value) {
+        if (value instanceof Integer)
+            return "decimal";
+        else if (value instanceof Double)
+            return "float";
+        else if (value instanceof String)
+            return "string";
+        else if (value instanceof Boolean)
+            return "boolean";
+        return  null;
+    }
+
+    public static PropertyDefinition<?> getPropertyDefinitionFromPRDEntity(PRDProperty def, ReadFileDto.Builder builder) {
         Comparable<?> res = null;
+        boolean random = false;
         if (def.getPRDValue()!=null && def.getPRDValue().getInit()!=null) {
+            random = def.getPRDValue().isRandomInitialize();
             try {
                 switch (def.getType().toLowerCase()) {
                     case "decimal":
@@ -95,48 +223,95 @@ public class ConverterPRDEngine {
                 throw new RuntimeException("Invalid init value" + def.getPRDValue().getInit() + " for property " + def.getPRDName());
             }
         }
-        return getPropertyDefinitionFromPRDinner(def.getType(), def.getPRDRange(), def.getPRDName(), res);
+        return getPropertyDefinitionFromPRDinner(def.getType(), def.getPRDRange(), def.getPRDName(), res, random, false, builder);
     }
 
-        public static Action getActionFromPRD(PRDAction def,
-                                              ContextDefinition contextDefinition) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException, MissingPropertyActionException {
+    public static Action getActionFromPRD(PRDAction def,
+                                              ContextDefinition contextDefinition,
+                                          ActionErrorDto.Builder actionBuilder) {
         Action res = null;
         switch (def.getType().toLowerCase())
         {
             case "increase":
-                res = new IncreaseAction(contextDefinition,
-                        def.getProperty(),
-                        def.getBy());
+                    res = new IncreaseAction(contextDefinition,
+                            def.getEntity(),
+                            def.getProperty(),
+                            def.getBy(),
+                            actionBuilder);
                 break;
             case "decrease":
-                res = new DecreaseAction(contextDefinition, def.getProperty(), def.getBy());
+                res = new DecreaseAction(contextDefinition,
+                        def.getEntity(),
+                        def.getProperty(),
+                        def.getBy(),
+                        actionBuilder);
                 break;
             case "kill":
-                res = new KillAction(contextDefinition);
+                res = new KillAction(contextDefinition, actionBuilder);
                 break;
             case "set":
-                res = new SetAction(contextDefinition, def.getProperty(), def.getValue());
+                res = new SetAction(contextDefinition,
+                        def.getEntity(),
+                        def.getProperty(),
+                        def.getValue(),
+                        actionBuilder);
                 break;
             case "condition":
-                res = new ConditionAction(contextDefinition, def.getPRDCondition(), def.getPRDThen(), def.getPRDElse());
+                res = new ConditionAction(contextDefinition, def.getPRDCondition(), def.getPRDThen(), def.getPRDElse(), actionBuilder);
                 break;
             case "calculation":
                 MathOperation[] ops = ConverterPRDEngine.getCalculationOps(def.getPRDMultiply(), def.getPRDDivide());
                 String[] args1 = ConverterPRDEngine.getArgs1(def.getPRDMultiply(), def.getPRDDivide());
                 String[] args2 = ConverterPRDEngine.getArgs2(def.getPRDMultiply(), def.getPRDDivide());
-                res = new CalculationAction(contextDefinition, def.getResultProp(), ops, args1, args2);
+                res = new CalculationAction(contextDefinition,
+                        def.getEntity(),
+                        def.getResultProp(),
+                        ops,
+                        args1,
+                        args2,
+                        actionBuilder);
                 break;
             case "proximity":
-                res = new ProximityAction(contextDefinition, def.getPRDEnvDepth().getOf(), def.getPRDActions());
+                res = new ProximityAction(contextDefinition, def.getPRDEnvDepth().getOf(), def.getPRDActions(), actionBuilder);
                 break;
             case "replace":
-                res = new ReplaceAction(contextDefinition, def.getKill(), def.getCreate(), def.getMode());
+                res = new ReplaceAction(contextDefinition, def.getKill(), def.getCreate(), def.getMode(), actionBuilder);
                 break;
         }
         return res;
     }
 
-    private static String[] getArgs2(PRDMultiply prdMultiply, PRDDivide prdDivide) {
+    public static Optional<PropertyDefinition<?>> checkEntityAndPropertyInContext(String entityName,
+                                                       String property,
+                                                       ContextDefinition contextDefinition,
+                                                       ActionErrorDto.Builder builder)
+    {
+        if (!contextDefinition.getPrimaryEntityDefinition().getName().equals(entityName) &&
+                !contextDefinition.getSecondaryEntityDefinition().getName().equals(entityName))
+        {
+            builder.entityNotInContext(entityName);
+            throw new RuntimeException("bad entity name");
+        }
+        Optional<PropertyDefinition<?>> prop;
+        if (contextDefinition.getPrimaryEntityDefinition().getName().equals(entityName))
+        {
+            prop = contextDefinition.getPrimaryEntityDefinition().getProps().stream()
+                    .filter(p -> p.getName().equals(property)).findFirst();
+        }
+        else
+        {
+            prop = contextDefinition.getSecondaryEntityDefinition().getProps().stream()
+                    .filter(p -> p.getName().equals(property)).findFirst();
+        }
+        if (!prop.isPresent()) {
+            builder.propertyNotInContext(property);
+            throw new RuntimeException("property not in context");
+        }
+        return prop;
+    }
+
+    private static String[] getArgs2(PRDMultiply prdMultiply,
+                                     PRDDivide prdDivide) {
         String[] res = new String[
                 (prdMultiply != null ? 1 : 0) + (prdDivide != null ? 1 : 0)];
         int clear = 0;
@@ -151,7 +326,8 @@ public class ConverterPRDEngine {
         return res;
     }
 
-    private static String[] getArgs1(PRDMultiply prdMultiply, PRDDivide prdDivide) {
+    private static String[] getArgs1(PRDMultiply prdMultiply,
+                                     PRDDivide prdDivide) {
         String[] res = new String[
                 (prdMultiply != null ? 1 : 0) + (prdDivide != null ? 1 : 0)];
         int clear = 0;
@@ -166,7 +342,8 @@ public class ConverterPRDEngine {
         return res;
     }
 
-    private static MathOperation[] getCalculationOps(PRDMultiply prdMultiply, PRDDivide prdDivide) {
+    private static MathOperation[] getCalculationOps(PRDMultiply prdMultiply,
+                                                     PRDDivide prdDivide) {
         MathOperation[] res = new MathOperation[
                 ((prdMultiply != null) ? 1 : 0) + ((prdDivide != null) ? 1 : 0)
                 ];
@@ -182,8 +359,14 @@ public class ConverterPRDEngine {
         return res;
     }
 
-    public static Rule getRuleFromPRD(PRDRule def, PRDEntities entities, EnvVariablesManager env) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException, MissingPropertyActionException, NoSuchEntityActionException {
-        Activation act = new ActivationImpl(def.getPRDActivation());
+    public static Rule getRuleFromPRD(PRDRule def,
+                                      PRDEntities entities,
+                                      EnvVariablesManager env,
+                                      ReadFileDto.Builder builder) {
+        RuleErrorDto.Builder buildRule = new RuleErrorDto.Builder();
+        Activation act = new ActivationImpl(def.getPRDActivation(), buildRule);
+        builder.ruleError(buildRule.build());
+        buildRule.throwIfError();
         List<Action> res = new ArrayList<>();
         for (PRDAction prdAction: def.getPRDActions().getPRDAction()) {
             String primaryEntityName = getPrimaryFromPRD(prdAction);
@@ -202,23 +385,30 @@ public class ConverterPRDEngine {
                     prdAction.getPRDSecondaryEntity().getPRDSelection()== null?
                     Optional.empty() :
                     Optional.of(prdAction.getPRDSecondaryEntity().getPRDSelection().getPRDCondition());
-            try {
-                ContextDefinition context = ContextDefinitionImpl.getInstance(
-                        mainEntityOpt.orElse(null),
-                        secondaryEntityOpt.orElse(null),
-                        secondaryEntity.isPresent()? Integer.parseInt(secondaryEntity.get()): null,
-                        prdCondition.orElse(null),
-                        env,
-                        entities.getPRDEntity() == null? new ArrayList<EntityDefinition>():
-                                entities.getPRDEntity().stream().map(EntityDefinitionImpl::new).collect(Collectors.toList()), 
-                        primaryEntityName
-                );
 
-                res.add(getActionFromPRD(prdAction, context));
-            }catch (NumberFormatException e)
-            {
-                throw new NumberFormatException("Invalid secondary entity count " + secondaryEntity.get() + " in action " + prdAction.getType());
+            ContextDefinition context = ContextDefinitionImpl.getInstance(
+                    mainEntityOpt.orElse(null),
+                    secondaryEntityOpt.orElse(null),
+                    secondaryEntity.isPresent()? Integer.parseInt(secondaryEntity.get()): null,
+                    prdCondition.orElse(null),
+                    env,
+                    entities.getPRDEntity() == null? new ArrayList<>():
+                            entities.getPRDEntity().stream().map(prdEntity -> new EntityDefinitionImpl(prdEntity,builder)).collect(Collectors.toList()),
+                    primaryEntityName,
+                    buildRule,
+                    builder
+            );
+            builder.ruleError(buildRule.build());
+            buildRule.throwIfError();
+            ActionErrorDto.Builder builderAction = new ActionErrorDto.Builder();
+            try {
+                res.add(getActionFromPRD(prdAction, context, builderAction));
+            }catch (Exception e) {
+                buildRule.actionError(builderAction.build());
+                throw e;
             }
+            builder.ruleError(buildRule.build());
+            buildRule.throwIfError();
         }
         Rule r = new RuleImpl(def.getName(), act);
         res.forEach(r::addAction);

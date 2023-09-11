@@ -1,5 +1,8 @@
 package predictions.action.impl;
 
+import dto.ReadFileDto;
+import dto.subdto.read.dto.rule.ExpressionErrorDto;
+import dto.subdto.read.dto.rule.RuleErrorDto;
 import predictions.action.api.ContextDefinition;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.entity.EntityDefinitionImpl;
@@ -48,21 +51,23 @@ public class ContextDefinitionImpl implements ContextDefinition {
                 getSecondaryEntityRealAmount() < secondaryEntityDefinition.getPopulation();
     }
 
-    public static ContextDefinitionImpl getInstance(PRDEntity primaryEntity,
-                                 PRDEntity secondaryEntity,
-                                 Integer secondaryEntityAmount,
-                                 PRDCondition prdCondition,
-                                 EnvVariablesManager envVariables,
-                                 Collection<EntityDefinition> systemEntityDefinitions,
-                                 String entity) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException, NoSuchEntityActionException {
-        EntityDefinition primary;
+    public static ContextDefinition getInstance(PRDEntity primaryEntity,
+                                                    PRDEntity secondaryEntity,
+                                                    Integer secondaryEntityAmount,
+                                                    PRDCondition prdCondition,
+                                                    EnvVariablesManager envVariables,
+                                                    Collection<EntityDefinition> systemEntityDefinitions,
+                                                    String entity,
+                                                    RuleErrorDto.Builder builder,
+                                                    ReadFileDto.Builder bigBuilder) {
+        EntityDefinition primary = null;
         EntityDefinition secondary = null;
         if (primaryEntity!=null)
-            primary = new EntityDefinitionImpl(primaryEntity);
+            primary = new EntityDefinitionImpl(primaryEntity, bigBuilder);
         else
-            throw new NoSuchEntityActionException(entity);
+            builder.message("Entity "+entity+" not found");
         if (secondaryEntity!=null)
-            secondary = new EntityDefinitionImpl(secondaryEntity);
+            secondary = new EntityDefinitionImpl(secondaryEntity, bigBuilder);
 
         ContextDefinition contextDefinition = new ContextDefinitionImpl(
                 primary,
@@ -72,14 +77,20 @@ public class ContextDefinitionImpl implements ContextDefinition {
                 envVariables,
                 systemEntityDefinitions
         );
-        return new ContextDefinitionImpl(primary,
+        ExpressionErrorDto.Builder builderExpression = new ExpressionErrorDto.Builder();
+        ContextDefinition ret = new ContextDefinitionImpl(primary,
                 secondary,
                 secondaryEntityAmount,
-                prdCondition == null? null: new BooleanComplexExpression(
+                prdCondition == null? null:
+                    new BooleanComplexExpression(
                         prdCondition,
-                        contextDefinition),
+                        contextDefinition,
+                        builderExpression
+                    ),
                 envVariables,
                 systemEntityDefinitions);
+        builder.expressionError(builderExpression.build());
+        return ret;
     }
 
                                  @Override

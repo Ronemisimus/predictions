@@ -1,7 +1,10 @@
 package predictions.action.impl;
 
+import dto.subdto.read.dto.rule.ActionErrorDto;
+import dto.subdto.read.dto.rule.ExpressionErrorDto;
 import dto.subdto.show.world.action.ActionDto;
 import dto.subdto.show.world.action.SetActionDto;
+import predictions.ConverterPRDEngine;
 import predictions.action.api.AbstractAction;
 import predictions.action.api.ActionType;
 import predictions.action.api.ContextDefinition;
@@ -13,39 +16,52 @@ import predictions.execution.instance.property.PropertyInstance;
 import predictions.expression.ExpressionBuilder;
 import predictions.expression.api.Expression;
 
+import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class SetAction extends AbstractAction {
 
+    private final Boolean propInSecondary;
     private final String property;
     private Expression<?> valueExpression;
 
     public SetAction(ContextDefinition contextDefinition,
+                     String entityName,
                      String property,
-                     String valueExpression) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException, MissingPropertyActionException {
+                     String valueExpression,
+                     ActionErrorDto.Builder builder) {
         super(ActionType.SET, contextDefinition);
         this.property = property;
-        Optional<PropertyDefinition<?>> prop = contextDefinition.getPrimaryEntityDefinition().getProps().stream()
-                .filter(p -> p.getName().equals(property)).findFirst();
-        if (!prop.isPresent()) throw new MissingPropertyActionException(property, ActionType.SET);
+        this.propInSecondary = contextDefinition.getSecondaryEntityDefinition().getName().equals(entityName);
+
+        ExpressionErrorDto.Builder expressionBuilder = new ExpressionErrorDto.Builder();
+
+        Optional<PropertyDefinition<?>> prop = ConverterPRDEngine.checkEntityAndPropertyInContext(entityName, property, contextDefinition, builder);
+        try{
         switch (prop.get().getType())
         {
             case DECIMAL:
             case FLOAT:
-                this.valueExpression = ExpressionBuilder.buildDoubleExpression(valueExpression, contextDefinition);
+                this.valueExpression = ExpressionBuilder.buildDoubleExpression(valueExpression, contextDefinition, expressionBuilder);
                 break;
             case STRING:
-                this.valueExpression = ExpressionBuilder.buildStringExpression(valueExpression, contextDefinition);
+                this.valueExpression = ExpressionBuilder.buildStringExpression(valueExpression, contextDefinition, expressionBuilder);
                 break;
             case BOOLEAN:
-                this.valueExpression = ExpressionBuilder.buildBooleanExpression(valueExpression, contextDefinition);
+                this.valueExpression = ExpressionBuilder.buildBooleanExpression(valueExpression, contextDefinition, expressionBuilder);
                 break;
+        }
+        }catch (Exception e)
+        {
+            builder.expressionError(expressionBuilder.build());
+            throw e;
         }
     }
     @Override
     public void invoke(Context context) {
-        PropertyInstance<?> propertyInstance = context.getPrimaryEntityInstance().getPropertyByName(property);
-
+        PropertyInstance<?> propertyInstance = propInSecondary? context.getSecondaryEntityInstance().getPropertyByName(property):
+                context.getPrimaryEntityInstance().getPropertyByName(property);
         Comparable<?> expVal = valueExpression.evaluate(context);
 
         int world_time = context.getTick();

@@ -1,5 +1,7 @@
 package predictions.action.impl;
 
+import dto.subdto.read.dto.rule.ActionErrorDto;
+import dto.subdto.read.dto.rule.ExpressionErrorDto;
 import dto.subdto.show.world.action.ActionDto;
 import dto.subdto.show.world.action.ProximityActionDto;
 import predictions.ConverterPRDEngine;
@@ -22,27 +24,23 @@ public class ProximityAction extends AbstractAction {
     private final List<Action> actions;
     private final Expression<Double> distanceOf1;
 
-    public ProximityAction(ContextDefinition contextDefinition, String s, PRDActions prdActions) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
+    public ProximityAction(ContextDefinition contextDefinition,
+                           String s,
+                           PRDActions prdActions,
+                           ActionErrorDto.Builder builder) {
         super(ActionType.PROXIMITY, contextDefinition);
         actions = prdActions==null? null:
                 prdActions.getPRDAction().stream()
-                        .map(prdAction-> {
-                            try {
-                                return ConverterPRDEngine.getActionFromPRD(prdAction,contextDefinition);
-                            } catch (BadExpressionException e) {
-                                throw new RuntimeException(e);
-                            } catch (MissingPropertyExpressionException e) {
-                                throw new RuntimeException(e);
-                            } catch (BadFunctionExpressionException e) {
-                                throw new RuntimeException(e);
-                            } catch (BadPropertyTypeExpressionException e) {
-                                throw new RuntimeException(e);
-                            } catch (MissingPropertyActionException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
+                        .map(prdAction-> ConverterPRDEngine.getActionFromPRD(prdAction,contextDefinition, builder))
                         .collect(Collectors.toList());
-        distanceOf1 = ExpressionBuilder.buildDoubleExpression(s, contextDefinition);
+        ExpressionErrorDto.Builder expressionBuilder = new ExpressionErrorDto.Builder();
+        try {
+            distanceOf1 = ExpressionBuilder.buildDoubleExpression(s, contextDefinition, expressionBuilder);
+        }catch (Exception e)
+        {
+            builder.expressionError(expressionBuilder.build());
+            throw e;
+        }
     }
 
     @Override

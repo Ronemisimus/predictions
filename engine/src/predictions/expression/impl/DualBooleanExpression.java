@@ -1,12 +1,7 @@
 package predictions.expression.impl;
 
+import dto.subdto.read.dto.rule.ExpressionErrorDto;
 import predictions.action.api.ContextDefinition;
-import predictions.definition.entity.EntityDefinition;
-import predictions.definition.environment.api.EnvVariablesManager;
-import predictions.exception.BadExpressionException;
-import predictions.exception.BadFunctionExpressionException;
-import predictions.exception.BadPropertyTypeExpressionException;
-import predictions.exception.MissingPropertyExpressionException;
 import predictions.execution.context.Context;
 import predictions.expression.api.BooleanOperation;
 import predictions.expression.api.DualExpression;
@@ -19,10 +14,11 @@ public class DualBooleanExpression extends DualExpression<Boolean> {
     private final BooleanOperation booleanOperation;
 
     public DualBooleanExpression(PRDCondition prdCondition,
-                                 ContextDefinition contextDefinition) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
+                                 ContextDefinition contextDefinition,
+                                 ExpressionErrorDto.Builder builder) {
         super(
-                new BooleanComplexExpression(prdCondition.getPRDCondition().get(0), contextDefinition),
-                new BooleanComplexExpression(Objects.requireNonNull(subCondition(prdCondition)), contextDefinition));
+                new BooleanComplexExpression(prdCondition.getPRDCondition().get(0), contextDefinition, builder),
+                new BooleanComplexExpression(Objects.requireNonNull(subCondition(prdCondition)), contextDefinition, builder));
         this.booleanOperation = BooleanOperation.valueOf(prdCondition.getLogical().toUpperCase());
     }
 

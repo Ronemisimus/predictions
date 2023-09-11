@@ -1,5 +1,7 @@
 package predictions.action.impl;
 
+import dto.subdto.read.dto.rule.ActionErrorDto;
+import dto.subdto.read.dto.rule.ExpressionErrorDto;
 import dto.subdto.show.world.action.ActionDto;
 import dto.subdto.show.world.action.ConditionActionDto;
 import predictions.ConverterPRDEngine;
@@ -30,28 +32,26 @@ public class ConditionAction extends AbstractAction {
     public ConditionAction(ContextDefinition contextDefinition,
                            PRDCondition prdCondition,
                            PRDThen prdThen,
-                           PRDElse prdElse) throws RuntimeException, BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
+                           PRDElse prdElse,
+                           ActionErrorDto.Builder builder) {
         super(ActionType.CONDITION, contextDefinition);
-        this.condition = new BooleanComplexExpression(prdCondition, contextDefinition);
+        ExpressionErrorDto.Builder Builder = new ExpressionErrorDto.Builder();
+        this.condition = new BooleanComplexExpression(prdCondition, contextDefinition, Builder);
         this.then_actions = prdThen==null? new ArrayList<>(): prdThen.getPRDAction().stream()
                 .map(def -> {
                     try {
-                        return ConverterPRDEngine.getActionFromPRD(def, contextDefinition);
-                    } catch (BadExpressionException | MissingPropertyActionException |
-                             MissingPropertyExpressionException | BadFunctionExpressionException |
-                             BadPropertyTypeExpressionException e) {
-                        throw new RuntimeException(e);
+                        return ConverterPRDEngine.getActionFromPRD(def, contextDefinition, builder);
+                    } catch (Exception e) {
+                        throw e;
                     }
                 })
                 .collect(Collectors.toList());
         this.else_actions = prdElse==null? new ArrayList<>(): prdElse.getPRDAction().stream()
                 .map(def -> {
                     try {
-                        return ConverterPRDEngine.getActionFromPRD(def, contextDefinition);
-                    } catch (BadExpressionException | MissingPropertyExpressionException |
-                             BadFunctionExpressionException | BadPropertyTypeExpressionException |
-                             MissingPropertyActionException e) {
-                        throw new RuntimeException(e);
+                        return ConverterPRDEngine.getActionFromPRD(def, contextDefinition, builder);
+                    } catch (Exception e) {
+                        throw e;
                     }
                 })
                 .collect(Collectors.toList());

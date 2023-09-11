@@ -2,6 +2,7 @@ package predictions.action.api;
 
 import dto.subdto.show.world.action.ActionDto;
 import predictions.definition.entity.EntityDefinition;
+import predictions.definition.property.api.PropertyDefinition;
 import predictions.definition.property.api.PropertyType;
 import predictions.execution.instance.property.PropertyInstance;
 
@@ -27,9 +28,8 @@ public abstract class AbstractAction implements Action {
         return contextDefinition;
     }
 
-    public static boolean verifyNonNumericPropertyType(PropertyInstance<?> propertyValue) {
-        return
-                !PropertyType.DECIMAL.equals(propertyValue.getPropertyDefinition().getType()) && !PropertyType.FLOAT.equals(propertyValue.getPropertyDefinition().getType());
+    public static boolean verifyNonNumericPropertyType(PropertyDefinition<?> propertyValue) {
+        return propertyValue.getType() != PropertyType.DECIMAL && propertyValue.getType() != PropertyType.FLOAT;
     }
 
     @Override

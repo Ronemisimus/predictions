@@ -3,13 +3,13 @@ package predictions;
 import dto.*;
 import dto.subdto.InitializeDto;
 import dto.subdto.SingleRunHistoryDto;
+import dto.subdto.read.dto.FileSelectionDto;
 import dto.subdto.show.EntityListDto;
 import dto.subdto.show.world.EntityDto;
 import dto.subdto.show.world.WorldDto;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.world.api.World;
 import predictions.definition.world.impl.WorldImpl;
-import predictions.exception.RepeatNameException;
 import predictions.execution.EntityCountHistory;
 import predictions.execution.instance.world.WorldInstance;
 import predictions.execution.instance.world.WorldInstanceImpl;
@@ -40,18 +40,8 @@ public class MainApiImpl implements MainApi {
     public ReadFileDto readFile(String file) {
         File f = new File(file);
 
-        boolean absolutePathError = !f.isAbsolute();
-        boolean fileDoesNotExist = !f.exists();
-        boolean isNotFile = !f.isFile();
-        boolean isNotXML = !f.getName().endsWith(".xml");
-
-        if(absolutePathError ||
-                fileDoesNotExist ||
-                isNotFile||
-                isNotXML)
-        {
-            return GeneralDtoBuilder.getReadFileDtoBasic(absolutePathError, fileDoesNotExist, isNotFile, isNotXML);
-        }
+        ReadFileDto resDto = checkPath(file, f);
+        if(resDto != null) return resDto;
 
         PRDWorld res;
 
@@ -60,23 +50,43 @@ public class MainApiImpl implements MainApi {
             Unmarshaller unmarshaller = context.createUnmarshaller();
             res = (PRDWorld) unmarshaller.unmarshal(f);
         } catch (JAXBException e) {
-            return GeneralDtoBuilder.getReadFileDtoJAXB();
+            return new ReadFileDto.Builder().matchesSchema(false).build();
         }
 
+        ReadFileDto.Builder builder = new ReadFileDto.Builder().matchesSchema(true);
         try {
-            activeDefinition = WorldImpl.fromPRD(res);
-        } catch (RepeatNameException e) {
-            return GeneralDtoBuilder.getReadFileDtoRepeatName(e.isEnvironmentVariable(), e.getVariableName(), e.getEntityName());
-        }catch (RuntimeException e)
+            activeDefinition = WorldImpl.fromPRD(res, builder);
+        } catch (Exception e)
         {
-            return GeneralDtoBuilder.getReadFileDtoException(e.getCause());
-        }
-        catch (Exception e)
-        {
-            return GeneralDtoBuilder.getReadFileDtoUnknown();
+            return builder.build();
         }
 
-        return GeneralDtoBuilder.getReadFileDtoSuccess();
+        return builder.fileLoaded().build();
+    }
+
+    private ReadFileDto checkPath(String path, File f){
+        FileSelectionDto.Builder builder = new FileSelectionDto.Builder(path);
+
+        if(!f.isAbsolute()) return new ReadFileDto.Builder()
+                .fileSelectionError(
+                        builder.fullPathError().build()
+                ).build();
+        if (!f.exists()) return new ReadFileDto.Builder()
+                .fileSelectionError(
+                        builder.fileExists().build()
+                ).build();
+        if(!f.isFile())
+        {
+            return new ReadFileDto.Builder()
+                    .fileSelectionError(
+                            builder.isFile().build()
+                    ).build();
+        }
+        if(!f.getName().endsWith(".xml")) return new ReadFileDto.Builder()
+                .fileSelectionError(
+                        builder.isXML().build()
+                ).build();
+        return null;
     }
 
     @Override
@@ -111,7 +121,14 @@ public class MainApiImpl implements MainApi {
     @Override
     public SingleRunHistoryDto getRunEntityCounts(int runId) {
         Map<String, EntityCountHistory> res = history.get(runId).getEntityCounts();
-        return GeneralDtoBuilder.buildSingleRunDtoEntity(res);
+        return createEntityCountHistoryDto(res);
+    }
+
+    private SingleRunHistoryDto createEntityCountHistoryDto(Map<String, EntityCountHistory> res) {
+        List<String> entities = new ArrayList<>(res.keySet());
+        List<Integer> startCounts = entities.stream().map(res::get).map(EntityCountHistory::getInitialCount).collect(Collectors.toList());
+        List<Integer> finalCounts = entities.stream().map(res::get).map(EntityCountHistory::getEndCount).collect(Collectors.toList());
+        return new SingleRunHistoryDto(entities, startCounts, finalCounts, null);
     }
 
     @Override
@@ -125,7 +142,7 @@ public class MainApiImpl implements MainApi {
     @Override
     public SingleRunHistoryDto getRunPropertyHistogram(int runId, String entityName, String propertyName) {
         Map<Comparable<?>, Integer> propertyHist = history.get(runId).getEntityPropertyHistogram(entityName,propertyName);
-        return GeneralDtoBuilder.buildSingleRunDtoProperty(propertyHist);
+        return new SingleRunHistoryDto(null, null, null, propertyHist);
     }
 
     @Override

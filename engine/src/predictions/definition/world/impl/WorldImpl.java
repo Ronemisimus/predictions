@@ -1,5 +1,10 @@
 package predictions.definition.world.impl;
 
+import dto.ReadFileDto;
+import dto.subdto.read.dto.EntityErrorDto;
+import dto.subdto.read.dto.RepeatEntityDto;
+import dto.subdto.read.dto.RepeatPropertyDto;
+import dto.subdto.read.dto.TerminationBadDto;
 import dto.subdto.show.world.EntityDto;
 import dto.subdto.show.world.PropertyDto;
 import dto.subdto.show.world.RuleDto;
@@ -12,10 +17,7 @@ import predictions.definition.environment.impl.EnvVariableManagerImpl;
 import predictions.definition.property.api.PropertyDefinition;
 import predictions.definition.world.api.World;
 import predictions.exception.*;
-import predictions.generated.PRDBySecond;
-import predictions.generated.PRDByTicks;
-import predictions.generated.PRDTermination;
-import predictions.generated.PRDWorld;
+import predictions.generated.*;
 import predictions.rule.api.Rule;
 import predictions.termination.api.Termination;
 import predictions.termination.impl.TicksTermination;
@@ -53,28 +55,21 @@ public class WorldImpl implements World {
         this.threadCount = threadCount;
     }
 
-    private WorldImpl(final PRDWorld res, final EnvVariablesManager env) throws RuntimeException {
+    private WorldImpl(final PRDWorld res,
+                      final EnvVariablesManager env,
+                      final Collection<EntityDefinition> entityDefinitions,
+                      final ReadFileDto.Builder builder) {
         this(env,
-                res.getPRDEntities().getPRDEntity().stream()
-                        .map(EntityDefinitionImpl::new).collect(Collectors.toList()),
-                res.getPRDRules().getPRDRule().stream().map(prdRule->
-                        {
-                            try {
-                                return ConverterPRDEngine.getRuleFromPRD(prdRule, res.getPRDEntities(), env);
-                            } catch (final BadExpressionException | BadFunctionExpressionException |
-                                           MissingPropertyExpressionException | BadPropertyTypeExpressionException |
-                                           MissingPropertyActionException | NoSuchEntityActionException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
-                        .collect(Collectors.toList()),
-                createTerminations(res.getPRDTermination()),
-                res.getPRDGrid().getColumns(),
-                res.getPRDGrid().getRows(),
-                res.getPRDThreadCount());
+            entityDefinitions,
+            res.getPRDRules().getPRDRule().stream().map(prdRule-> ConverterPRDEngine.getRuleFromPRD(prdRule, res.getPRDEntities(), env, builder))
+                    .collect(Collectors.toList()),
+            createTerminations(res.getPRDTermination(),builder),
+            res.getPRDGrid().getColumns(),
+            res.getPRDGrid().getRows(),
+            res.getPRDThreadCount());
     }
 
-    private static Collection<Termination> createTerminations(PRDTermination prdTermination) {
+    private static Collection<Termination> createTerminations(PRDTermination prdTermination, ReadFileDto.Builder builder) {
         List<Termination> res = new ArrayList<>();
         if (prdTermination.getPRDByUser()!=null)
         {
@@ -82,19 +77,59 @@ public class WorldImpl implements World {
         }
         if (prdTermination.getPRDBySecondOrPRDByTicks()!=null)
         {
-            prdTermination.getPRDBySecondOrPRDByTicks().stream()
-                    .forEach(prdBySecondOrPRDByTicks ->
-                            res.add(prdBySecondOrPRDByTicks instanceof PRDByTicks?
-                                            new TicksTermination((PRDByTicks)prdBySecondOrPRDByTicks):
-                                            new TimeTermination((PRDBySecond)prdBySecondOrPRDByTicks))
-                                    );
+            prdTermination.getPRDBySecondOrPRDByTicks()
+                    .forEach(prdBySecondOrPRDByTicks ->{
+                        Integer countBySeconds = prdBySecondOrPRDByTicks instanceof PRDBySecond? ((PRDBySecond)prdBySecondOrPRDByTicks).getCount():null;
+                        Integer countByTicks = prdBySecondOrPRDByTicks instanceof PRDByTicks? ((PRDByTicks)prdBySecondOrPRDByTicks).getCount():null;
+                        boolean badCount = (countBySeconds!=null && countBySeconds<=0) ||
+                                (countByTicks!=null && countByTicks<=0);
+                        if (badCount)
+                        {
+                            builder.terminationError(
+                                    new TerminationBadDto(countBySeconds,countByTicks)
+                            );
+                            throw new RuntimeException("Invalid termination count " + prdBySecondOrPRDByTicks);
+                        }
+
+                        res.add(prdBySecondOrPRDByTicks instanceof PRDByTicks?
+                                        new TicksTermination((PRDByTicks)prdBySecondOrPRDByTicks):
+                                        new TimeTermination((PRDBySecond)prdBySecondOrPRDByTicks));
+                    });
         }
         return res;
     }
 
-    public static World fromPRD(final PRDWorld res) throws RepeatNameException, RuntimeException {
-        final EnvVariablesManager env = new EnvVariableManagerImpl(res.getPRDEnvironment());
-        return new WorldImpl(res, env);
+    public static World fromPRD(final PRDWorld res, final ReadFileDto.Builder builder) {
+        final EnvVariablesManager env = new EnvVariableManagerImpl(res.getPRDEnvironment(), builder);
+        final Collection<EntityDefinition> entityDefinitions = buildEntityDefinitions(res.getPRDEntities(), builder);
+        if (res.getPRDThreadCount()<=0) {
+            builder.badThreadCountError();
+            throw new RuntimeException("Invalid thread count");
+        }
+        if (res.getPRDGrid().getRows()<=0 || res.getPRDGrid().getColumns()<=0) {
+            builder.gridSizeError(res.getPRDGrid().getColumns(), res.getPRDGrid().getRows());
+            throw new RuntimeException("Invalid grid size");
+        }
+        return new WorldImpl(res, env, entityDefinitions, builder);
+    }
+
+    private static Collection<EntityDefinition> buildEntityDefinitions(PRDEntities prdEntities, ReadFileDto.Builder builder) {
+        List<String> entityNames = new ArrayList<>();
+        return prdEntities.getPRDEntity().stream()
+                .map(prdEntity -> {
+                    if (entityNames.contains(prdEntity.getName()))
+                    {
+                        builder.entityError(
+                                new EntityErrorDto.Builder()
+                                        .repeatEntityError(
+                                                new RepeatEntityDto(prdEntity.getName())
+                                        ).build()
+                        );
+                        throw new RuntimeException("Duplicate entity: " + prdEntity.getName());
+                    }
+                    entityNames.add(prdEntity.getName());
+                    return new EntityDefinitionImpl(prdEntity, builder);
+                }).collect(Collectors.toList());
     }
 
     @Override

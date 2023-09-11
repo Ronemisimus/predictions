@@ -1,5 +1,6 @@
 package predictions.action.impl;
 
+import dto.subdto.read.dto.rule.ActionErrorDto;
 import dto.subdto.show.world.action.ActionDto;
 import dto.subdto.show.world.action.KillActionDto;
 import predictions.action.api.AbstractAction;
@@ -10,7 +11,7 @@ import predictions.execution.context.Context;
 
 public class KillAction extends AbstractAction {
 
-    public KillAction(ContextDefinition entityDefinition) {
+    public KillAction(ContextDefinition entityDefinition, ActionErrorDto.Builder builder) {
         super(ActionType.KILL, entityDefinition);
     }
 

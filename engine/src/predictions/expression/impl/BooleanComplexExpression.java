@@ -1,5 +1,7 @@
 package predictions.expression.impl;
 
+import dto.subdto.read.dto.rule.ExpressionErrorDto;
+import dto.subdto.read.dto.rule.RuleErrorDto;
 import predictions.action.api.ContextDefinition;
 import predictions.action.impl.ContextDefinitionImpl;
 import predictions.definition.entity.EntityDefinition;
@@ -17,14 +19,15 @@ public class BooleanComplexExpression implements Expression<Boolean> {
     private Expression<Boolean> res;
 
     public BooleanComplexExpression(PRDCondition prdCondition,
-                                    ContextDefinition contextDefinition) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
+                                    ContextDefinition contextDefinition,
+                                    ExpressionErrorDto.Builder builder) {
         switch(prdCondition.getSingularity().toLowerCase())
         {
             case "multiple":
-                res = new DualBooleanExpression(prdCondition, contextDefinition);
+                res = new DualBooleanExpression(prdCondition, contextDefinition, builder);
                 break;
             case "single":
-                res = new SingleBooleanExpression(prdCondition, contextDefinition);
+                res = new SingleBooleanExpression(prdCondition, contextDefinition, builder);
                 break;
         }
     }

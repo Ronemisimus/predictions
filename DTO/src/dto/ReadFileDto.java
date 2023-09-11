@@ -1,142 +1,146 @@
 package dto;
 
+import dto.subdto.read.dto.EntityErrorDto;
+import dto.subdto.read.dto.EnvironmentErrorDto;
+import dto.subdto.read.dto.FileSelectionDto;
+import dto.subdto.read.dto.TerminationBadDto;
+import dto.subdto.read.dto.rule.RuleErrorDto;
+
 public class ReadFileDto implements DTO{
-    private final boolean fullPathError;
-    private final boolean fileExists;
-    private final boolean isFile;
-    private final boolean isXML;
+    private final FileSelectionDto fileSelectionDto;
     private final boolean matchesSchema;
-    private final boolean repeatedKeyFlag;
+    private final boolean badThreadCountError;
+    private final Boolean gridSizeError;
+    private final int gridWidth;
+    private final int gridHeight;
+    private final EnvironmentErrorDto environmentErrorDto;
+    private final EntityErrorDto entityErrorDto;
+    private final RuleErrorDto ruleErrorDto;
+    private final TerminationBadDto terminationBadDto;
     private final boolean fileLoaded;
-    private final boolean environmentVariableRepeatedKey;
-    private final boolean ruleExceedsContext;
-    private final boolean propertyDoesNotExistInEntity;
-    private final boolean increaseDecreaseCalculationParametersNumerical;
 
-    private final String propertyName;
-    private final String entityName;
-    private final String ruleName;
-    private final String actionType;
-
-    private final String propertyType;
-    private final boolean missingPropertyEnvironmentVariable;
-
-    private final boolean badFunctionExpression;
-    private final boolean missingEntity;
-
-    public ReadFileDto(boolean fullPathError,
-                       boolean fileExists,
-                       boolean isFile,
-                       boolean isXML,
-                       boolean matchesSchema,
-                       boolean repeatedKeyFlag,
-                       boolean fileLoaded,
-                       boolean environmentVariableRepeatedKey,
-                       boolean ruleExceedsContext,
-                       boolean propertyDoesNotExistInEntity,
-                       boolean increaseDecreaseCalculationParametersNumerical,
-                       boolean missingPropertyEnvironmentVariable,
-                       boolean badFunctionExpression,
-                       boolean missingEntity,
-                       String propertyName,
-                       String entityName,
-                       String ruleName,
-                       String actionType,
-                       String propertyType) {
-        this.fullPathError = fullPathError;
-        this.fileExists = fileExists;
-        this.isFile = isFile;
-        this.isXML = isXML;
-        this.matchesSchema = matchesSchema;
-        this.repeatedKeyFlag = repeatedKeyFlag;
-        this.fileLoaded = fileLoaded;
-        this.environmentVariableRepeatedKey = environmentVariableRepeatedKey;
-        this.ruleExceedsContext = ruleExceedsContext;
-        this.propertyDoesNotExistInEntity = propertyDoesNotExistInEntity;
-        this.increaseDecreaseCalculationParametersNumerical = increaseDecreaseCalculationParametersNumerical;
-        this.propertyName = propertyName;
-        this.entityName = entityName;
-        this.ruleName = ruleName;
-        this.actionType = actionType;
-        this.missingPropertyEnvironmentVariable = missingPropertyEnvironmentVariable;
-        this.propertyType = propertyType;
-        this.badFunctionExpression = badFunctionExpression;
-        this.missingEntity = missingEntity;
+    private ReadFileDto(Builder builder) {
+        this.fileSelectionDto = builder.fileSelectionDto;
+        this.matchesSchema = builder.matchesSchema;
+        this.badThreadCountError = builder.badThreadCountError;
+        this.gridSizeError = builder.gridSizeError;
+        this.gridWidth = builder.gridWidth;
+        this.gridHeight = builder.gridHeight;
+        this.environmentErrorDto = builder.environmentErrorDto;
+        this.entityErrorDto = builder.entityErrorDto;
+        this.ruleErrorDto = builder.ruleErrorDto;
+        this.terminationBadDto = builder.terminationBadDto;
+        this.fileLoaded = builder.fileLoaded;
     }
 
-    public boolean isFullPathError() {
-        return fullPathError;
+    public static class Builder {
+        // Add more default values and parameters as needed
+        private FileSelectionDto fileSelectionDto = null;
+        private Boolean matchesSchema = false;
+        private Boolean badThreadCountError = false;
+        public Boolean gridSizeError;
+        public int gridWidth;
+        public int gridHeight;
+
+        private EnvironmentErrorDto environmentErrorDto = null;
+        private EntityErrorDto entityErrorDto = null;
+        private RuleErrorDto ruleErrorDto = null;
+        private TerminationBadDto terminationBadDto = null;
+        private Boolean fileLoaded = false;
+        public Builder() {}
+
+        public Builder fileSelectionError(FileSelectionDto fileSelectionDto) {
+            this.fileSelectionDto = fileSelectionDto;
+            return this;
+        }
+
+        public Builder terminationError(TerminationBadDto terminationBadDto) {
+            this.terminationBadDto = terminationBadDto;
+            matchesSchema = true;
+            return this;
+        }
+
+        public Builder matchesSchema(boolean matchesSchema) {
+            this.matchesSchema = matchesSchema;
+            return this;
+        }
+
+        public Builder fileLoaded() {
+            this.fileLoaded = true;
+            return this;
+        }
+
+        public Builder environmentError(EnvironmentErrorDto environmentErrorDto) {
+            this.environmentErrorDto = environmentErrorDto;
+            return this;
+        }
+
+        public Builder entityError(EntityErrorDto entityErrorDto) {
+            this.entityErrorDto = entityErrorDto;
+            return this;
+        }
+
+
+
+        public ReadFileDto build() {
+            return new ReadFileDto(this);
+        }
+
+        public Builder badThreadCountError() {
+            badThreadCountError = true;
+            return this;
+        }
+
+        public Builder gridSizeError(int gridWidth, int gridHeight) {
+            this.gridSizeError = true;
+            this.gridWidth = gridWidth;
+            this.gridHeight = gridHeight;
+            return this;
+        }
+
+        public Builder ruleError(RuleErrorDto build) {
+            this.ruleErrorDto = build;
+            return this;
+        }
     }
 
-    public boolean isFileExists() {
-        return fileExists;
-    }
-
-    public boolean isFile() {
-        return isFile;
-    }
-
-    public boolean isXML() {
-        return isXML;
+    public FileSelectionDto getFileSelectionDto() {
+        return fileSelectionDto;
     }
 
     public boolean isMatchesSchema() {
         return matchesSchema;
     }
 
-    public boolean isRepeatedKeyFlag() {
-        return repeatedKeyFlag;
+    public boolean isBadThreadCountError() {
+        return badThreadCountError;
+    }
+
+    public EnvironmentErrorDto getEnvironmentErrorDto() {
+        return environmentErrorDto;
+    }
+
+    public EntityErrorDto getEntityErrorDto() {
+        return entityErrorDto;
+    }
+
+    public TerminationBadDto getTerminationBadDto() {
+        return terminationBadDto;
     }
 
     public boolean isFileLoaded() {
         return fileLoaded;
     }
 
-    public boolean isEnvironmentVariableRepeatedKey() {
-        return environmentVariableRepeatedKey;
+    public Boolean getGridSizeError() {
+        return gridSizeError;
     }
 
-    public boolean isRuleExceedsContext() {
-        return ruleExceedsContext;
+    public int getGridWidth() {
+        return gridWidth;
     }
 
-    public boolean isPropertyDoesNotExistInEntity() {
-        return propertyDoesNotExistInEntity;
-    }
-
-    public boolean isIncreaseDecreaseCalculationParametersNumerical() {
-        return increaseDecreaseCalculationParametersNumerical;
-    }
-
-    public String getPropertyName() {
-        return propertyName;
-    }
-
-    public String getEntityName() {
-        return entityName;
-    }
-
-    public String getRuleName() {
-        return ruleName;
-    }
-
-    public String getActionType() {
-        return actionType;
-    }
-
-    public boolean isMissingPropertyEnvironmentVariable() {
-        return missingPropertyEnvironmentVariable;
-    }
-
-    public String getPropertyType() {
-        return propertyType;
-    }
-
-    public boolean isBadFunctionExpression() {
-        return badFunctionExpression;
-    }
-
-    public boolean isMissingEntity() {
-        return missingEntity;
+    public int getGridHeight() {
+        return gridHeight;
     }
 }

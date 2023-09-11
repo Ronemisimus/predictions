@@ -1,16 +1,21 @@
 package predictions.definition.entity;
 
+import dto.ReadFileDto;
+import dto.subdto.read.dto.EntityErrorDto;
+import dto.subdto.read.dto.RepeatPropertyDto;
 import dto.subdto.show.world.EntityDto;
 import dto.subdto.show.world.PropertyDto;
-import predictions.ConverterPRDEngine;
 import predictions.definition.property.api.PropertyDefinition;
 import predictions.execution.instance.entity.EntityInstance;
 import predictions.generated.PRDEntity;
+import predictions.generated.PRDProperty;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static predictions.ConverterPRDEngine.getPropertyDefinitionFromPRDEntity;
 
 public class EntityDefinitionImpl implements EntityDefinition {
 
@@ -24,11 +29,23 @@ public class EntityDefinitionImpl implements EntityDefinition {
         properties = new ArrayList<>();
     }
 
-    public EntityDefinitionImpl(PRDEntity prdEntity) {
+    public EntityDefinitionImpl(PRDEntity prdEntity, ReadFileDto.Builder builder) {
         this(prdEntity.getName(), 0);
         prdEntity.getPRDProperties().getPRDProperty().stream()
-                .map(ConverterPRDEngine::getPropertyDefinitionFromPRDEntity)
-                .forEach(properties::add);
+                .map((PRDProperty def) -> getPropertyDefinitionFromPRDEntity(def, builder))
+                .forEach(propertyDefinition -> {
+                    if(properties.contains(propertyDefinition))
+                    {
+                        builder.entityError(
+                                new EntityErrorDto.Builder()
+                                        .repeatPropertyError(
+                                                new RepeatPropertyDto(propertyDefinition.getName(), false, prdEntity.getName())
+                                        ).build()
+                        );
+                        throw new RuntimeException("Duplicate property: " + propertyDefinition.getName());
+                    }
+                    else properties.add(propertyDefinition);
+                });
     }
 
     @Override

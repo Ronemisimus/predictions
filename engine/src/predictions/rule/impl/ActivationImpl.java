@@ -1,5 +1,8 @@
 package predictions.rule.impl;
 
+import dto.ReadFileDto;
+import dto.subdto.read.dto.rule.ActivationErrorDto;
+import dto.subdto.read.dto.rule.RuleErrorDto;
 import predictions.generated.PRDActivation;
 import predictions.rule.api.Activation;
 
@@ -20,10 +23,16 @@ public class ActivationImpl implements Activation {
         rand = new Random();
     }
 
-    public ActivationImpl(PRDActivation prdActivation) {
-        this(
-                prdActivation==null? 1 : Optional.ofNullable(prdActivation.getTicks()).orElse(1),
+    public ActivationImpl(PRDActivation prdActivation, RuleErrorDto.Builder builder) {
+        this(prdActivation==null? 1 : Optional.ofNullable(prdActivation.getTicks()).orElse(1),
                 prdActivation==null? 1. : Optional.ofNullable(prdActivation.getProbability()).orElse(1.));
+        if (cycleSizeInTicks<=0 || probability<0 || probability>1)
+        {
+            builder.message("Invalid cycle size or probability")
+                    .activationError(
+                new ActivationErrorDto(cycleSizeInTicks,probability)
+            );
+        }
     }
 
     @Override

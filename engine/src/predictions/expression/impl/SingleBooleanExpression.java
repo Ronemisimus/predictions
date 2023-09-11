@@ -1,5 +1,6 @@
 package predictions.expression.impl;
 
+import dto.subdto.read.dto.rule.ExpressionErrorDto;
 import predictions.action.api.ContextDefinition;
 import predictions.action.impl.ContextDefinitionImpl;
 import predictions.definition.entity.EntityDefinition;
@@ -27,12 +28,13 @@ public class SingleBooleanExpression implements Expression<Boolean> {
     private final Expression<?> valueExpression;
 
     public SingleBooleanExpression(PRDCondition prdCondition,
-                                   ContextDefinition contextDefinition) throws BadExpressionException, MissingPropertyExpressionException, BadFunctionExpressionException, BadPropertyTypeExpressionException {
+                                   ContextDefinition contextDefinition,
+                                   ExpressionErrorDto.Builder builder) {
         operation = Arrays.stream(SingleBooleanOperation.values())
                 .filter(op -> op.getVal().equals(prdCondition.getOperator().toLowerCase()))
                 .findFirst().orElseThrow(() -> new RuntimeException("bad Single Expression. unknown operator " + prdCondition.getOperator()));
-        property = ExpressionBuilder.buildGenericExpression(prdCondition.getProperty(), contextDefinition);
-        valueExpression = ExpressionBuilder.buildGenericExpression(prdCondition.getValue(), contextDefinition);
+        property = ExpressionBuilder.buildGenericExpression(prdCondition.getProperty(), contextDefinition, builder);
+        valueExpression = ExpressionBuilder.buildGenericExpression(prdCondition.getValue(), contextDefinition, builder);
     }
 
     @Override
