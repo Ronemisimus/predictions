@@ -46,6 +46,7 @@ public class ConverterPRDEngine {
                                                                            ReadFileDto.Builder builder) {
         PropertyDefinition<?> res = null;
         Double from=null, to=null;
+        Comparable<?> defaultValue = null;
 
         propertyValidation(propertyName, random, range, propertyType, value, environmentProp,builder);
 
@@ -57,7 +58,8 @@ public class ConverterPRDEngine {
         switch (propertyType.toLowerCase())
         {
             case "decimal":
-                ValueGenerator<Integer> vg = value==null? (random && from!=null? ValueGeneratorFactory.createRandomInteger(from.intValue(),to.intValue()): ValueGeneratorFactory.createFixed(0)):
+                defaultValue = from == null? 0 : from.intValue();
+                ValueGenerator<Integer> vg = value==null? (random && from!=null? ValueGeneratorFactory.createRandomInteger(from.intValue(),to.intValue()): ValueGeneratorFactory.createFixed((Integer)defaultValue)):
                         ValueGeneratorFactory.createFixed((Integer)value);
                 res = new IntegerPropertyDefinition(propertyName,
                         vg,
@@ -65,7 +67,8 @@ public class ConverterPRDEngine {
                         to != null ? to.intValue() : null);
                 break;
             case "float":
-                ValueGenerator<Double> vgd = value==null? (random?ValueGeneratorFactory.createRandomDouble(from,to): ValueGeneratorFactory.createFixed(0.0)):
+                defaultValue = from == null? 0. : from.doubleValue();
+                ValueGenerator<Double> vgd = value==null? (random?ValueGeneratorFactory.createRandomDouble(from,to): ValueGeneratorFactory.createFixed((Double)defaultValue)):
                         ValueGeneratorFactory.createFixed((Double)value);
                 res = new DoublePropertyDefinition(propertyName,
                         vgd,

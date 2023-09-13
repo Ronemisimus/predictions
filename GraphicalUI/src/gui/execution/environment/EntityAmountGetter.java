@@ -3,10 +3,7 @@ package gui.execution.environment;
 import dto.subdto.show.world.EntityDto;
 import gui.EngineApi;
 import gui.util.PopUtility;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 
 public class EntityAmountGetter extends FlowPane {
@@ -20,6 +17,8 @@ public class EntityAmountGetter extends FlowPane {
         update.setOnAction(e -> {
             try{
                 EngineApi.getInstance().setEntityAmount(entity.getName(), Integer.parseInt(entityAmount.getText()));
+                Alert success = new Alert(Alert.AlertType.INFORMATION, "Successfully updated " + entity.getName(), ButtonType.OK);
+                success.showAndWait();
             }catch (Exception ex){
                 PopUtility.openPopup(getScene().getWindow(), "please enter a positive whole number", Alert.AlertType.ERROR);
             }

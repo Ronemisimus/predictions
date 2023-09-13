@@ -93,6 +93,16 @@ public class EngineApi {
         Optional<PropertyDto> property = env.getEnvironment().stream().filter(e -> e.getName().equals(name)).findFirst();
         if (property.isPresent())
         {
+            if (property.get().getFrom()!=null)
+            {
+                Double from = (Double) property.get().getFrom();
+                Double to = (Double) property.get().getTo();
+                Double val = Double.parseDouble(text);
+                if (val<from || val>to)
+                {
+                    throw new RuntimeException("Invalid value");
+                }
+            }
             switch (property.get().getType().toLowerCase())
             {
                 case "decimal":
