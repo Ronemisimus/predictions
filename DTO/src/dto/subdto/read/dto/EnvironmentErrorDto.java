@@ -32,4 +32,11 @@ public class EnvironmentErrorDto implements DTO {
         }
     }
 
+    public RepeatPropertyDto getRepeatPropertyDto() {
+        return repeatPropertyDto;
+    }
+
+    public PropertyBadDto getPropertyBadDto() {
+        return propertyBadDto;
+    }
 }

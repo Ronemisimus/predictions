@@ -3,21 +3,22 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="748.0" prefWidth="1602.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.execution.scene.ExecutionController">
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.execution.scene.ExecutionController">
    <bottom>
-      <BorderPane prefHeight="50.0" prefWidth="600.0" BorderPane.alignment="CENTER">
-         <left>
-            <Button fx:id="clearButton" mnemonicParsing="false" text="Clear" BorderPane.alignment="CENTER" />
-         </left>
-         <right>
-            <Button fx:id="startButton" mnemonicParsing="false" text="Start!" BorderPane.alignment="CENTER" />
-         </right>
-      </BorderPane>
+      <ButtonBar BorderPane.alignment="CENTER">
+         <buttons>
+            <Button fx:id="clearButton" mnemonicParsing="false" text="Clear" />
+            <Button fx:id="startButton" mnemonicParsing="false" text="Start" />
+         </buttons>
+      </ButtonBar>
    </bottom>
-   <left>
-      <BorderPane fx:id="leftPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-   </left>
    <center>
-      <BorderPane fx:id="centerPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+      <SplitPane dividerPositions="0.5" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
+        <items>
+            <BorderPane fx:id="leftPane" prefHeight="200.0" prefWidth="200.0" />
+            <BorderPane fx:id="centerPane" prefHeight="200.0" prefWidth="200.0" />
+        </items>
+      </SplitPane>
    </center>
 </BorderPane>

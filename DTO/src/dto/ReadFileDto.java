@@ -38,7 +38,7 @@ public class ReadFileDto implements DTO{
         private FileSelectionDto fileSelectionDto = null;
         private Boolean matchesSchema = false;
         private Boolean badThreadCountError = false;
-        public Boolean gridSizeError;
+        public Boolean gridSizeError = false;
         public int gridWidth;
         public int gridHeight;
 
@@ -142,5 +142,9 @@ public class ReadFileDto implements DTO{
 
     public int getGridHeight() {
         return gridHeight;
+    }
+
+    public RuleErrorDto getRuleErrorDto() {
+        return ruleErrorDto;
     }
 }

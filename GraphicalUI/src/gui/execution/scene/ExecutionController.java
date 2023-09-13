@@ -46,5 +46,6 @@ public class ExecutionController {
 
     private void handleStartButtonClick(ActionEvent event) {
         EngineApi.getInstance().runSimulation();
+        MainController.getInstance(null).handleResultsButtonClick(null);
     }
 }

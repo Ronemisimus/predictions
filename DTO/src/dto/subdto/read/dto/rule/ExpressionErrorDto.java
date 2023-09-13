@@ -164,4 +164,84 @@ public class ExpressionErrorDto implements DTO {
             return this;
         }
     }
+
+    public String getExpression() {
+        return expression;
+    }
+
+    public Boolean getFunctionError() {
+        return functionError;
+    }
+
+    public String getFunctionName() {
+        return functionName;
+    }
+
+    public Boolean getEnvironmentError() {
+        return environmentError;
+    }
+
+    public String getNotFoundVariable() {
+        return notFoundVariable;
+    }
+
+    public String getPropertyType() {
+        return propertyType;
+    }
+
+    public Boolean getRandomTypeError() {
+        return randomTypeError;
+    }
+
+    public String getRandomType() {
+        return randomType;
+    }
+
+    public Boolean getRandomParameterError() {
+        return randomParameterError;
+    }
+
+    public String getRandomParameter() {
+        return randomParameter;
+    }
+
+    public Boolean getEvaluateError() {
+        return evaluateError;
+    }
+
+    public String getEvaluateExpression() {
+        return evaluateExpression;
+    }
+
+    public Boolean getMissingEntityInContextError() {
+        return missingEntityInContextError;
+    }
+
+    public String getMissingEntityInContext() {
+        return missingEntityInContext;
+    }
+
+    public Boolean getMissingPropertyInEntityError() {
+        return missingPropertyInEntityError;
+    }
+
+    public String getMissingPropertyInEntity() {
+        return missingPropertyInEntity;
+    }
+
+    public String getEntity() {
+        return entity;
+    }
+
+    public Boolean getPercentTypeError() {
+        return percentTypeError;
+    }
+
+    public Boolean getTicksTypeError() {
+        return ticksTypeError;
+    }
+
+    public Boolean getTicksError() {
+        return ticksError;
+    }
 }

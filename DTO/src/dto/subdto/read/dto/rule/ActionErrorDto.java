@@ -35,7 +35,11 @@ public class ActionErrorDto implements DTO {
         private String actionType = null;
 
         public Builder() {
+        }
 
+        public Builder actionType(String actionType) {
+            this.actionType = actionType;
+            return this;
         }
         public ActionErrorDto build() {
             return new ActionErrorDto(this);
@@ -64,5 +68,33 @@ public class ActionErrorDto implements DTO {
             this.entityName = name;
             return this;
         }
+    }
+
+    public ExpressionErrorDto getExpressionErrorDto() {
+        return expressionErrorDto;
+    }
+
+    public Boolean getMissingPropertyInEntityError() {
+        return missingPropertyInEntityError;
+    }
+
+    public String getProperty() {
+        return property;
+    }
+
+    public Boolean getEntityNotInContext() {
+        return entityNotInContext;
+    }
+
+    public String getEntityName() {
+        return entityName;
+    }
+
+    public Boolean getPropertyTypeMismatch() {
+        return propertyTypeMismatch;
+    }
+
+    public String getActionType() {
+        return actionType;
     }
 }

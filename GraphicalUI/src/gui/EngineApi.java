@@ -1,15 +1,14 @@
 package gui;
 
-import dto.EnvDto;
-import dto.ReadFileDto;
-import dto.RunSimulationDto;
-import dto.ShowWorldDto;
+import dto.*;
 import dto.subdto.InitializeDto;
 import dto.subdto.show.world.EntityDto;
 import dto.subdto.show.world.PropertyDto;
 import gui.details.tree.WorldDetailsItem;
 import gui.execution.environment.EntityAmountGetter;
 import gui.execution.environment.EnvironmentVariableGetter;
+import gui.history.display.RunDisplayed;
+import gui.readFileError.ReadFileError;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Parent;
 import javafx.scene.control.TreeItem;
@@ -50,11 +49,14 @@ public class EngineApi {
         try {
             String filePath = fileChooser.showOpenDialog(null).getAbsolutePath();
             ReadFileDto res = api.readFile(filePath);
-            // TODO: check for errors and pop up error
-
             if (res.isFileLoaded())
             {
                 fileLabel.setValue(filePath);
+            }
+            else
+            {
+                ReadFileError error = ReadFileError.build(res);
+                error.show();
             }
             return res.isFileLoaded();
         }catch (NullPointerException e)
@@ -114,5 +116,12 @@ public class EngineApi {
     public void runSimulation() {
         InitializeDto init = api.initialize();
         RunSimulationDto run = api.runSimulation();
+    }
+
+    public List<RunDisplayed> getRunHistory() {
+        RunHistoryDto res = api.getRunHistory();
+        return res.getRunList().entrySet().stream()
+                .map(RunDisplayed::new)
+                .collect(Collectors.toList());
     }
 }

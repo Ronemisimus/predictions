@@ -52,6 +52,10 @@ public class RuleErrorDto implements DTO {
         }
     }
 
+    public ActionErrorDto getActionErrorDto() {
+        return actionErrorDto;
+    }
+
     public ActivationErrorDto getActivationErrorDto() {
         return activationErrorDto;
     }

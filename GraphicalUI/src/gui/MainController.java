@@ -2,6 +2,7 @@ package gui;
 
 import gui.details.scene.DetailsSceneController;
 import gui.execution.scene.ExecutionController;
+import gui.history.scene.HistoryController;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
@@ -43,6 +44,11 @@ public class MainController {
         DetailsButton.setOnAction(this::handleDetailsButtonClick);
         isLoaded.addListener(this::handleFileLoaded);
         newExecutionButton.setOnAction(this::handleNewExecutionButtonClick);
+        resultsButton.setOnAction(this::handleResultsButtonClick);
+    }
+
+    public void handleResultsButtonClick(ActionEvent actionEvent) {
+        loadSubScene("HistoryScene.fxml", actionEvent, HistoryController.class);
     }
 
     public static MainController getInstance(MainController mainController){
