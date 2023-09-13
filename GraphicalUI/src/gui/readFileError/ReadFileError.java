@@ -119,6 +119,12 @@ public class ReadFileError extends Alert {
             return "no primary entity error in action " +
                     actionErrorDto.getActionType();
         }
+        if(actionErrorDto.getNoEntityNamed())
+        {
+            return "no entity in action " +
+                    actionErrorDto.getActionType() + " named " +
+                    actionErrorDto.getEntityName();
+        }
         return "Something went wrong";
     }
 

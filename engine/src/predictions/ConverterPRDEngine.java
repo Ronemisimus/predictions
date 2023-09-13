@@ -399,6 +399,15 @@ public class ConverterPRDEngine {
                 ActionErrorDto.Builder builderAction = new ActionErrorDto.Builder();
                 builderAction.actionType(prdAction.getType().toLowerCase());
                 try {
+                    if ((primaryEntityName!=null && !mainEntityOpt.isPresent()) ||
+                            (secondaryEntityName!=null && !secondaryEntityOpt.isPresent()))
+                    {
+                        if (primaryEntityName!=null)
+                            builderAction.noEntityNamed(primaryEntityName);
+                        if (secondaryEntityName!=null)
+                            builderAction.noEntityNamed(secondaryEntityName);
+                        throw new RuntimeException("bad entity name");
+                    }
                     ContextDefinition context = ContextDefinitionImpl.getInstance(
                             mainEntityOpt.orElse(null),
                             secondaryEntityOpt.orElse(null),

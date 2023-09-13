@@ -106,7 +106,8 @@ public class WorldImpl implements World {
             builder.badThreadCountError();
             throw new RuntimeException("Invalid thread count");
         }
-        if (res.getPRDGrid().getRows()<=0 || res.getPRDGrid().getColumns()<=0) {
+        if (res.getPRDGrid().getRows()<10 || res.getPRDGrid().getColumns()<10 ||
+                res.getPRDGrid().getRows() >100 || res.getPRDGrid().getColumns() > 100) {
             builder.gridSizeError(res.getPRDGrid().getColumns(), res.getPRDGrid().getRows());
             throw new RuntimeException("Invalid grid size");
         }

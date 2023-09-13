@@ -8,7 +8,6 @@ import predictions.action.api.ContextDefinition;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.entity.EntityDefinitionImpl;
 import predictions.definition.environment.api.EnvVariablesManager;
-import predictions.exception.*;
 import predictions.execution.context.Context;
 import predictions.execution.context.ContextImpl;
 import predictions.execution.instance.entity.EntityInstance;
@@ -62,7 +61,7 @@ public class ContextDefinitionImpl implements ContextDefinition {
                                                     RuleErrorDto.Builder builder,
                                                     ReadFileDto.Builder bigBuilder,
                                                     ActionErrorDto.Builder actionBuilder) {
-        EntityDefinition primary = null;
+        EntityDefinition primary;
         EntityDefinition secondary = null;
         if (primaryEntity!=null)
             primary = new EntityDefinitionImpl(primaryEntity, bigBuilder);
@@ -90,7 +89,7 @@ public class ContextDefinitionImpl implements ContextDefinition {
         );
         ExpressionErrorDto.Builder builderExpression = new ExpressionErrorDto.Builder();
         try {
-            ContextDefinition ret = new ContextDefinitionImpl(primary,
+            return new ContextDefinitionImpl(primary,
                     secondary,
                     secondaryEntityAmount,
                     prdCondition == null ? null :
@@ -101,8 +100,6 @@ public class ContextDefinitionImpl implements ContextDefinition {
                             ),
                     envVariables,
                     systemEntityDefinitions);
-
-            return ret;
         }catch (Exception e)
         {
             builder.expressionError(builderExpression.build());

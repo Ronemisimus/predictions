@@ -16,6 +16,8 @@ public class ActionErrorDto implements DTO {
     private final String actionType;
 
     private final Boolean noPrimaryEntity;
+
+    private final Boolean noEntityNamed;
     private ActionErrorDto(Builder builder)
     {
         this.expressionErrorDto = builder.expressionErrorDto;
@@ -26,6 +28,7 @@ public class ActionErrorDto implements DTO {
         this.propertyTypeMismatch = builder.propertyTypeMismatch;
         this.actionType = builder.actionType;
         this.noPrimaryEntity = builder.noPrimaryEntity;
+        this.noEntityNamed = builder.noEntityNamed;
     }
 
     public static class Builder {
@@ -37,6 +40,7 @@ public class ActionErrorDto implements DTO {
         private Boolean propertyTypeMismatch = false;
         private String actionType = null;
         private Boolean noPrimaryEntity = false;
+        private Boolean noEntityNamed = false;
 
         public Builder() {
         }
@@ -76,6 +80,11 @@ public class ActionErrorDto implements DTO {
         public void noPrimaryEntity() {
             this.noPrimaryEntity = true;
         }
+
+        public void noEntityNamed(String primaryEntityName) {
+            this.noEntityNamed = true;
+            this.entityName = primaryEntityName;
+        }
     }
 
     public ExpressionErrorDto getExpressionErrorDto() {
@@ -108,5 +117,9 @@ public class ActionErrorDto implements DTO {
 
     public Boolean getNoPrimaryEntity() {
         return noPrimaryEntity;
+    }
+
+    public Boolean getNoEntityNamed() {
+        return noEntityNamed;
     }
 }
