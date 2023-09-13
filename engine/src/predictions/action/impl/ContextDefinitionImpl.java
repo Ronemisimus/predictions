@@ -1,6 +1,7 @@
 package predictions.action.impl;
 
 import dto.ReadFileDto;
+import dto.subdto.read.dto.rule.ActionErrorDto;
 import dto.subdto.read.dto.rule.ExpressionErrorDto;
 import dto.subdto.read.dto.rule.RuleErrorDto;
 import predictions.action.api.ContextDefinition;
@@ -59,14 +60,22 @@ public class ContextDefinitionImpl implements ContextDefinition {
                                                     Collection<EntityDefinition> systemEntityDefinitions,
                                                     String entity,
                                                     RuleErrorDto.Builder builder,
-                                                    ReadFileDto.Builder bigBuilder) {
+                                                    ReadFileDto.Builder bigBuilder,
+                                                    ActionErrorDto.Builder actionBuilder) {
         EntityDefinition primary = null;
         EntityDefinition secondary = null;
         if (primaryEntity!=null)
             primary = new EntityDefinitionImpl(primaryEntity, bigBuilder);
         else {
-            builder.message("Entity " + entity + " not found");
-            throw new RuntimeException("Entity " + entity + " not found");
+            if (entity!=null) {
+                actionBuilder.entityNotInContext(entity);
+                throw new RuntimeException("Entity " + entity + " not found");
+            }
+            else
+            {
+                actionBuilder.noPrimaryEntity();
+                throw new RuntimeException("No primary entity");
+            }
         }
         if (secondaryEntity!=null)
             secondary = new EntityDefinitionImpl(secondaryEntity, bigBuilder);

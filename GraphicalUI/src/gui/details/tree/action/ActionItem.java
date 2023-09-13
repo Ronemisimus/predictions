@@ -79,7 +79,8 @@ public class ActionItem extends TreeItem<String> implements OpenableItem {
                 action.getSourceEntity().getName()));
         Label targetEntityLabel = new Label("Target Entity: " + (action.getTargetEntity()==null? "" :
                 action.getTargetEntity().getName()));
-        Label distanceLabel = new Label("sub actions activated if source and target\n entities are within a distance of " + action.getOfValue());
+        Label distanceLabel = new Label("sub actions activated if source and target\n entities are within a distance of " + action.getOfValue() +
+                "\n amount of sub actions: " + (action.getActions()==null?0:action.getActions().size()));
         detailsBox.getChildren().addAll(nameLabel, sourceEntityLabel, targetEntityLabel, distanceLabel);
 
         return detailsBox;
@@ -87,14 +88,16 @@ public class ActionItem extends TreeItem<String> implements OpenableItem {
 
     private Parent getDetailsView(ConditionActionDto action) {
         Label nameLabel = new Label("Type: Condition");
-        Label conditionLabel = new Label("then sub actions performed if:" + action.getConditionExpression());
-        Label elseLabel = new Label("otherwise else sub actions performed");
+        Label conditionLabel = new Label("then sub-actions performed if:" + action.getConditionExpression());
+        Label elseLabel = new Label("otherwise else sub-actions performed");
+        Label amountsLabel = new Label("then amount: " + (action.getThenActions()==null?0:action.getThenActions().size()) +
+                ", else amount: " + (action.getElseActions()==null?0:action.getElseActions().size()));
         Label primaryEntityLabel = new Label("Primary Entity: " + action.getPrimaryEntity().getName());
         Label secondaryEntityLabel = new Label("Secondary Entity: " + (action.getSecondaryEntity()==null? "" :
                 action.getSecondaryEntity().getName()));
 
         VBox detailsBox = new VBox();
-        detailsBox.getChildren().addAll(nameLabel, primaryEntityLabel, secondaryEntityLabel, conditionLabel, elseLabel);
+        detailsBox.getChildren().addAll(nameLabel, primaryEntityLabel, secondaryEntityLabel, conditionLabel, elseLabel, amountsLabel);
 
         return detailsBox;
     }

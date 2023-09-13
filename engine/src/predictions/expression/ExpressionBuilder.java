@@ -49,6 +49,8 @@ public class ExpressionBuilder {
             return new NumberExpression(res);
         }catch (NumberFormatException e)
         {
+            builder.withExpression(expression)
+                    .badExpressionType("float");
             throw new RuntimeException("not a number: " + expression, e);
         }
     }

@@ -36,7 +36,13 @@ public class ConditionAction extends AbstractAction {
                            ActionErrorDto.Builder builder) {
         super(ActionType.CONDITION, contextDefinition);
         ExpressionErrorDto.Builder Builder = new ExpressionErrorDto.Builder();
-        this.condition = new BooleanComplexExpression(prdCondition, contextDefinition, Builder);
+        try {
+            this.condition = new BooleanComplexExpression(prdCondition, contextDefinition, Builder);
+        }catch (Exception e)
+        {
+            builder.expressionError(Builder.build());
+            throw e;
+        }
         this.then_actions = prdThen==null? new ArrayList<>(): prdThen.getPRDAction().stream()
                 .map(def -> {
                     try {

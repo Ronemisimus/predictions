@@ -6,20 +6,32 @@ import dto.subdto.read.dto.rule.ActionErrorDto;
 import dto.subdto.read.dto.rule.ActivationErrorDto;
 import dto.subdto.read.dto.rule.ExpressionErrorDto;
 import dto.subdto.read.dto.rule.RuleErrorDto;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.*;
+import javafx.scene.layout.Region;
 
 public class ReadFileError extends Alert {
     private ReadFileError(String readFileDto) {
-        super(AlertType.ERROR,
-                readFileDto,
-                ButtonType.OK);
-        setHeaderText("Read File Error");
+        super(AlertType.ERROR);
+        setTitle("Read File Error");
         setResizable(true);
+        setHeaderText(readFileDto);
     }
 
     public static ReadFileError build(ReadFileDto readFileDto) {
         return new ReadFileError(buildMessage(readFileDto));
+    }
+
+    protected DialogPane createDialogPane() {
+        DialogPane dialogPane = super.getDialogPane();
+
+        // Calculate the preferred width based on the text content
+        double textWidth = dialogPane.getScene().getWindow().getWidth(); // Adjust this as needed
+        dialogPane.setPrefWidth(textWidth);
+
+        // Ensure that the dialog can be resized vertically to fit the content
+        dialogPane.setMaxHeight(Region.USE_PREF_SIZE);
+
+        return dialogPane;
     }
 
     private static String buildMessage(ReadFileDto readFileDto) {
@@ -102,6 +114,11 @@ public class ReadFileError extends Alert {
                     actionErrorDto.getActionType() + " property " +
                     actionErrorDto.getProperty();
         }
+        if(actionErrorDto.getNoPrimaryEntity())
+        {
+            return "no primary entity error in action " +
+                    actionErrorDto.getActionType();
+        }
         return "Something went wrong";
     }
 
@@ -159,11 +176,26 @@ public class ReadFileError extends Alert {
                     expressionErrorDto.getExpression() +
                     " percent type " + expressionErrorDto.getRandomType();
         }
+        if (expressionErrorDto.getTicksTypeError())
+        {
+            return "ticks error in expression " +
+                    expressionErrorDto.getExpression() +
+                    " ticks cant be used, expected type of expression is: " +
+                    expressionErrorDto.getRandomType();
+        }
         if (expressionErrorDto.getTicksError())
         {
             return "ticks error in expression " +
                     expressionErrorDto.getExpression() +
-                    " ticks " + expressionErrorDto.getEvaluateExpression();
+                    " can't evaluate ticks of " +
+                    expressionErrorDto.getEvaluateExpression();
+        }
+        if (expressionErrorDto.getBadExpressionType())
+        {
+            return "bad expression type error in expression " +
+                    expressionErrorDto.getExpression() +
+                    " expected type of expression is: " +
+                    expressionErrorDto.getExpectedType();
         }
         return "Something went wrong";
     }

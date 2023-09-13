@@ -231,7 +231,6 @@ public class ConverterPRDEngine {
         switch (def.getType().toLowerCase())
         {
             case "increase":
-                actionBuilder.actionType("increase");
                 res = new IncreaseAction(contextDefinition,
                         def.getEntity(),
                         def.getProperty(),
@@ -239,7 +238,6 @@ public class ConverterPRDEngine {
                         actionBuilder);
                 break;
             case "decrease":
-                actionBuilder.actionType("decrease");
                 res = new DecreaseAction(contextDefinition,
                         def.getEntity(),
                         def.getProperty(),
@@ -247,13 +245,11 @@ public class ConverterPRDEngine {
                         actionBuilder);
                 break;
             case "kill":
-                actionBuilder.actionType("kill");
                 res = new KillAction(contextDefinition,
                         def.getEntity(),
                         actionBuilder);
                 break;
             case "set":
-                actionBuilder.actionType("set");
                 res = new SetAction(contextDefinition,
                         def.getEntity(),
                         def.getProperty(),
@@ -261,11 +257,9 @@ public class ConverterPRDEngine {
                         actionBuilder);
                 break;
             case "condition":
-                actionBuilder.actionType("condition");
                 res = new ConditionAction(contextDefinition, def.getPRDCondition(), def.getPRDThen(), def.getPRDElse(), actionBuilder);
                 break;
             case "calculation":
-                actionBuilder.actionType("calculation");
                 MathOperation[] ops = ConverterPRDEngine.getCalculationOps(def.getPRDMultiply(), def.getPRDDivide());
                 String[] args1 = ConverterPRDEngine.getArgs1(def.getPRDMultiply(), def.getPRDDivide());
                 String[] args2 = ConverterPRDEngine.getArgs2(def.getPRDMultiply(), def.getPRDDivide());
@@ -278,14 +272,12 @@ public class ConverterPRDEngine {
                         actionBuilder);
                 break;
             case "proximity":
-                actionBuilder.actionType("proximity");
                 res = new ProximityAction(contextDefinition,
                         def.getPRDEnvDepth().getOf(),
                         def.getPRDActions(),
                         actionBuilder);
                 break;
             case "replace":
-                actionBuilder.actionType("replace");
                 res = new ReplaceAction(contextDefinition,
                         def.getKill(),
                         def.getCreate(),
@@ -401,21 +393,22 @@ public class ConverterPRDEngine {
                         prdAction.getPRDSecondaryEntity().getPRDSelection() == null ?
                                 Optional.empty() :
                                 Optional.of(prdAction.getPRDSecondaryEntity().getPRDSelection().getPRDCondition());
-
-                ContextDefinition context = ContextDefinitionImpl.getInstance(
-                        mainEntityOpt.orElse(null),
-                        secondaryEntityOpt.orElse(null),
-                        secondaryEntity.isPresent() ? Integer.parseInt(secondaryEntity.get()) : null,
-                        prdCondition.orElse(null),
-                        env,
-                        entities.getPRDEntity() == null ? new ArrayList<>() :
-                                entities.getPRDEntity().stream().map(prdEntity -> new EntityDefinitionImpl(prdEntity, builder)).collect(Collectors.toList()),
-                        primaryEntityName,
-                        buildRule,
-                        builder
-                );
                 ActionErrorDto.Builder builderAction = new ActionErrorDto.Builder();
+                builderAction.actionType(prdAction.getType().toLowerCase());
                 try {
+                    ContextDefinition context = ContextDefinitionImpl.getInstance(
+                            mainEntityOpt.orElse(null),
+                            secondaryEntityOpt.orElse(null),
+                            secondaryEntity.isPresent() ? Integer.parseInt(secondaryEntity.get()) : null,
+                            prdCondition.orElse(null),
+                            env,
+                            entities.getPRDEntity() == null ? new ArrayList<>() :
+                                    entities.getPRDEntity().stream().map(prdEntity -> new EntityDefinitionImpl(prdEntity, builder)).collect(Collectors.toList()),
+                            primaryEntityName,
+                            buildRule,
+                            builder,
+                            builderAction
+                    );
                     res.add(getActionFromPRD(prdAction, context, builderAction));
                 } catch (Exception e) {
                     buildRule.actionError(builderAction.build());

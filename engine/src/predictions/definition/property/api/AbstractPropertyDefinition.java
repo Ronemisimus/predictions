@@ -4,6 +4,8 @@ import dto.subdto.show.world.PropertyDto;
 import predictions.definition.value.generator.api.ValueGenerator;
 import predictions.definition.value.generator.api.ValueGeneratorFactory;
 
+import java.util.Objects;
+
 public abstract class AbstractPropertyDefinition<T> implements PropertyDefinition<T> {
 
     private final String name;
@@ -52,5 +54,18 @@ public abstract class AbstractPropertyDefinition<T> implements PropertyDefinitio
     @Override
     public void setInit(Comparable<T> comparable) {
         valueGenerator = ValueGeneratorFactory.createFixed(comparable);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AbstractPropertyDefinition<?> that = (AbstractPropertyDefinition<?>) o;
+        return Objects.equals(getName(), that.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName());
     }
 }

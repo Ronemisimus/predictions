@@ -33,6 +33,18 @@ public class SingleBooleanExpression implements Expression<Boolean> {
         operation = Arrays.stream(SingleBooleanOperation.values())
                 .filter(op -> op.getVal().equals(prdCondition.getOperator().toLowerCase()))
                 .findFirst().orElseThrow(() -> new RuntimeException("bad Single Expression. unknown operator " + prdCondition.getOperator()));
+        if (prdCondition.getEntity()!=null)
+        {
+            boolean entityIsPrimary = prdCondition.getEntity().equals(contextDefinition.getPrimaryEntityDefinition().getName());
+            boolean entityIsSecondary = contextDefinition.getSecondaryEntityDefinition()!=null &&
+                    prdCondition.getEntity().equals(contextDefinition.getSecondaryEntityDefinition().getName());
+            if (!entityIsPrimary&&!entityIsSecondary)
+            {
+                builder.withExpression("single condition")
+                        .missingEntityInContextError(prdCondition.getEntity());
+                throw new RuntimeException("entity asked not in context");
+            }
+        }
         property = ExpressionBuilder.buildGenericExpression(prdCondition.getProperty(), contextDefinition, builder);
         valueExpression = ExpressionBuilder.buildGenericExpression(prdCondition.getValue(), contextDefinition, builder);
     }

@@ -18,4 +18,5 @@ public interface PropertyDefinition<T> {
     PropertyDto getDto();
 
     void setInit(Comparable<T> comparable);
+
 }

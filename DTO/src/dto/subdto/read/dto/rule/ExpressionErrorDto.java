@@ -45,6 +45,10 @@ public class ExpressionErrorDto implements DTO {
     // error type 10
     private final Boolean ticksError;
 
+    // error type 11
+    private final Boolean badExpressionType;
+    private final String expectedType;
+
     private ExpressionErrorDto(Builder builder) {
         this.expression = builder.expression;
         this.functionError = builder.functionError;
@@ -66,7 +70,8 @@ public class ExpressionErrorDto implements DTO {
         this.percentTypeError = builder.percentTypeError;
         this.ticksTypeError = builder.ticksTypeError;
         this.ticksError = builder.ticksError;
-
+        this.badExpressionType = builder.badExpressionType;
+        this.expectedType = builder.expectedType;
     }
 
     public static class Builder {
@@ -90,6 +95,8 @@ public class ExpressionErrorDto implements DTO {
         private Boolean percentTypeError = false;
         private Boolean ticksTypeError = false;
         private Boolean ticksError = false;
+        private Boolean badExpressionType = false;
+        private String expectedType = null;
         public Builder() {}
 
         public Builder withExpression(String expression) {
@@ -162,6 +169,11 @@ public class ExpressionErrorDto implements DTO {
             this.ticksError = true;
             this.evaluateExpression = expression;
             return this;
+        }
+
+        public void badExpressionType(String type) {
+            this.badExpressionType = true;
+            this.expectedType = type;
         }
     }
 
@@ -243,5 +255,13 @@ public class ExpressionErrorDto implements DTO {
 
     public Boolean getTicksError() {
         return ticksError;
+    }
+
+    public Boolean getBadExpressionType() {
+        return badExpressionType;
+    }
+
+    public String getExpectedType() {
+        return expectedType;
     }
 }
