@@ -10,15 +10,12 @@ import predictions.action.api.ActionType;
 import predictions.action.api.ContextDefinition;
 import predictions.definition.property.api.PropertyDefinition;
 import predictions.definition.property.api.PropertyType;
-import predictions.exception.*;
 import predictions.execution.context.Context;
 import predictions.execution.instance.property.PropertyInstance;
 import predictions.expression.ExpressionBuilder;
 import predictions.expression.api.Expression;
 
-import java.util.Collection;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public class SetAction extends AbstractAction {
 

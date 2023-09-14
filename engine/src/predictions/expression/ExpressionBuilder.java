@@ -3,13 +3,8 @@ package predictions.expression;
 import dto.subdto.read.dto.rule.ExpressionErrorDto;
 import predictions.action.api.ContextDefinition;
 import predictions.definition.entity.EntityDefinition;
-import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.definition.property.api.PropertyDefinition;
 import predictions.definition.property.api.PropertyType;
-import predictions.exception.BadExpressionException;
-import predictions.exception.BadFunctionExpressionException;
-import predictions.exception.BadPropertyTypeExpressionException;
-import predictions.exception.MissingPropertyExpressionException;
 import predictions.execution.context.Context;
 import predictions.expression.api.Expression;
 import predictions.expression.api.MathOperation;
@@ -18,7 +13,6 @@ import predictions.expression.impl.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public class ExpressionBuilder {
 

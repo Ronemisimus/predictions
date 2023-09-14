@@ -1,7 +1,5 @@
 package predictions.execution.instance.entity;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import predictions.definition.entity.EntityDefinition;

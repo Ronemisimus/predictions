@@ -4,7 +4,6 @@ import dto.subdto.read.dto.rule.ActionErrorDto;
 import dto.subdto.show.world.action.ActionDto;
 import dto.subdto.show.world.action.ReplaceActionDto;
 import predictions.action.api.AbstractAction;
-import predictions.action.api.Action;
 import predictions.action.api.ActionType;
 import predictions.action.api.ContextDefinition;
 import predictions.definition.entity.EntityDefinition;

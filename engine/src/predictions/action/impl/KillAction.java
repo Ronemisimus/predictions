@@ -6,7 +6,6 @@ import dto.subdto.show.world.action.KillActionDto;
 import predictions.action.api.AbstractAction;
 import predictions.action.api.ActionType;
 import predictions.action.api.ContextDefinition;
-import predictions.definition.entity.EntityDefinition;
 import predictions.execution.context.Context;
 import predictions.execution.instance.entity.EntityInstance;
 

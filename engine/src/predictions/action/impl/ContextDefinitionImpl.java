@@ -19,7 +19,10 @@ import predictions.expression.impl.BooleanComplexExpression;
 import predictions.generated.PRDCondition;
 import predictions.generated.PRDEntity;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 

@@ -3,14 +3,16 @@ package predictions.definition.environment.impl;
 import dto.ReadFileDto;
 import dto.subdto.read.dto.EnvironmentErrorDto;
 import dto.subdto.read.dto.RepeatPropertyDto;
-import predictions.exception.RepeatNameException;
-import predictions.execution.instance.environment.api.ActiveEnvironment;
 import predictions.definition.environment.api.EnvVariablesManager;
 import predictions.definition.property.api.PropertyDefinition;
+import predictions.execution.instance.environment.api.ActiveEnvironment;
 import predictions.execution.instance.environment.impl.ActiveEnvironmentImpl;
 import predictions.generated.PRDEnvironment;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import static predictions.ConverterPRDEngine.getPropertyDefinitionFromPRD;
 

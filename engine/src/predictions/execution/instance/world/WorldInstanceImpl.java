@@ -5,8 +5,6 @@ import predictions.action.api.ActionType;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.world.api.World;
 import predictions.execution.EntityCountHistory;
-import predictions.execution.context.Context;
-import predictions.execution.context.ContextImpl;
 import predictions.execution.instance.entity.EntityInstance;
 import predictions.execution.instance.entity.manager.EntityInstanceManager;
 import predictions.execution.instance.entity.manager.EntityInstanceManagerImpl;

@@ -1,15 +1,7 @@
 package predictions.expression.impl;
 
 import dto.subdto.read.dto.rule.ExpressionErrorDto;
-import dto.subdto.read.dto.rule.RuleErrorDto;
 import predictions.action.api.ContextDefinition;
-import predictions.action.impl.ContextDefinitionImpl;
-import predictions.definition.entity.EntityDefinition;
-import predictions.definition.environment.api.EnvVariablesManager;
-import predictions.exception.BadExpressionException;
-import predictions.exception.BadFunctionExpressionException;
-import predictions.exception.BadPropertyTypeExpressionException;
-import predictions.exception.MissingPropertyExpressionException;
 import predictions.execution.context.Context;
 import predictions.expression.api.Expression;
 import predictions.generated.PRDCondition;

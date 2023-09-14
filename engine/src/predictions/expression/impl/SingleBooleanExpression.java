@@ -2,24 +2,13 @@ package predictions.expression.impl;
 
 import dto.subdto.read.dto.rule.ExpressionErrorDto;
 import predictions.action.api.ContextDefinition;
-import predictions.action.impl.ContextDefinitionImpl;
-import predictions.definition.entity.EntityDefinition;
-import predictions.definition.environment.api.EnvVariablesManager;
-import predictions.definition.property.api.PropertyDefinition;
-import predictions.exception.BadExpressionException;
-import predictions.exception.BadFunctionExpressionException;
-import predictions.exception.BadPropertyTypeExpressionException;
-import predictions.exception.MissingPropertyExpressionException;
 import predictions.execution.context.Context;
 import predictions.expression.ExpressionBuilder;
 import predictions.expression.api.Expression;
 import predictions.expression.api.SingleBooleanOperation;
 import predictions.generated.PRDCondition;
-import predictions.generated.PRDEntity;
 
 import java.util.Arrays;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class SingleBooleanExpression implements Expression<Boolean> {
 

@@ -10,7 +10,6 @@ import predictions.expression.api.Expression;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.IntStream;
 
 public interface ContextDefinition {
 

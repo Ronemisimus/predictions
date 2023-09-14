@@ -1,6 +1,5 @@
 package predictions.rule.impl;
 
-import dto.ReadFileDto;
 import dto.subdto.read.dto.rule.ActivationErrorDto;
 import dto.subdto.read.dto.rule.RuleErrorDto;
 import predictions.generated.PRDActivation;

@@ -7,7 +7,6 @@ import predictions.termination.api.Termination;
 import predictions.termination.api.TerminationType;
 
 import java.time.Duration;
-import java.time.Instant;
 
 public class TimeTermination implements Termination {
 

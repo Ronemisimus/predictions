@@ -1,12 +1,8 @@
 package predictions.action.api;
 
 import dto.subdto.show.world.action.ActionDto;
-import predictions.definition.entity.EntityDefinition;
 import predictions.definition.property.api.PropertyDefinition;
 import predictions.definition.property.api.PropertyType;
-import predictions.execution.instance.property.PropertyInstance;
-
-import java.util.ArrayList;
 
 public abstract class AbstractAction implements Action {
 
