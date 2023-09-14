@@ -65,4 +65,9 @@ public class ContextImpl implements Context {
     public int getTick() {
         return tick;
     }
+
+    @Override
+    public void replaceEntity(int id, EntityDefinition killEntity, EntityDefinition createEntity, boolean derived) {
+        entityInstanceManager.replaceEntity(id, killEntity,createEntity,derived);
+    }
 }

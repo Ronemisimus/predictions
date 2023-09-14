@@ -10,9 +10,7 @@ import predictions.execution.instance.entity.EntityInstanceImpl;
 import predictions.execution.instance.property.PropertyInstance;
 import predictions.execution.instance.property.PropertyInstanceImpl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -24,6 +22,10 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
 
     private final List<Property<Coordinate>> locations;
 
+    private final Set<Integer> killed_ids;
+
+    private final Map<Integer, Map.Entry<EntityDefinition, Map.Entry<EntityDefinition,Boolean>>> replaceMap;
+
     private EntityInstance[][] grid;
 
     public EntityInstanceManagerImpl() {
@@ -31,6 +33,8 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
         instances = new ArrayList<>();
         locations = new ArrayList<>();
         grid = null;
+        killed_ids = new HashSet<>();
+        replaceMap = new HashMap<>();
     }
 
     @Override
@@ -128,14 +132,63 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
 
     @Override
     public void killEntity(int id) {
-        for (EntityInstance entityInstance : instances) {
-            if (entityInstance.getId() == id) {
-                Coordinate location = entityInstance.getLocation();
-                locations.remove(new SimpleObjectProperty<>(location));
-                instances.remove(entityInstance);
+        killed_ids.add(id);
+    }
+
+    @Override
+    public void replaceEntity(int id, EntityDefinition kill, EntityDefinition create, Boolean derived) {
+        if (replaceMap.getOrDefault(id,null)==null) {
+            replaceMap.put(id, new AbstractMap.SimpleEntry<>(create, new AbstractMap.SimpleEntry<>(kill,derived)));
+        }
+    }
+
+    @Override
+    public void finishKills() {
+        if (!killed_ids.isEmpty()) {
+            List<EntityInstance> temp = new ArrayList<>(instances);
+            temp.stream()
+                    .filter(e -> killed_ids.stream()
+                            .anyMatch(id -> e.getId() == id))
+                    .forEach(e -> {
+                        Coordinate location = e.getLocation();
+                        int idx = instances.indexOf(e);
+                        locations.remove(idx);
+                        instances.remove(idx);
+                        grid[location.getX()][location.getY()] = null;
+                        count--;
+                    });
+            killed_ids.clear();
+        }
+    }
+
+    @Override
+    public void finishReplace(int tick) {
+        if (!replaceMap.isEmpty()) {
+
+            List<EntityInstance> temp = new ArrayList<>(instances);
+            temp.stream().filter(e -> replaceMap.getOrDefault(e.getId(), null) != null).forEach(e -> {
+                Map.Entry<EntityDefinition, Map.Entry<EntityDefinition, Boolean>> res = replaceMap.getOrDefault(e.getId(), null);
+                Coordinate location = e.getLocation();
                 grid[location.getX()][location.getY()] = null;
-                return;
-            }
+                count--;
+                EntityInstance created = create(res.getKey());
+                if (res.getValue().getValue()) {
+                    res.getValue().getKey().getProps().stream()
+                            .filter(prop -> res.getKey().getProps().contains(prop))
+                            .forEach(prop ->
+                                    created.getPropertyByName(prop.getName())
+                                            .updateValue(
+                                                    e.getPropertyByName(prop.getName()).getValue(),
+                                                    tick
+                                            )
+                            );
+                    created.setLocation(location);
+                }
+                int idx = instances.indexOf(e);
+                instances.remove(idx);
+                locations.remove(idx);
+            });
+            replaceMap.clear();
         }
     }
 }

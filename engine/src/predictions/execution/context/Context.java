@@ -14,4 +14,6 @@ public interface Context {
     EntityInstance createEntity(EntityDefinition entityDefinition);
 
     int getTick();
+
+    void replaceEntity(int id, EntityDefinition killEntity, EntityDefinition createEntity, boolean derived);
 }

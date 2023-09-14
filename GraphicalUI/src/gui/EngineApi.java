@@ -2,6 +2,7 @@ package gui;
 
 import dto.*;
 import dto.subdto.InitializeDto;
+import dto.subdto.SingleRunHistoryDto;
 import dto.subdto.show.world.EntityDto;
 import dto.subdto.show.world.PropertyDto;
 import gui.details.tree.WorldDetailsItem;
@@ -17,9 +18,9 @@ import predictions.MainApi;
 import predictions.MainApiImpl;
 
 import java.io.File;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class EngineApi {
 
@@ -133,5 +134,13 @@ public class EngineApi {
         return res.getRunList().entrySet().stream()
                 .map(RunDisplayed::new)
                 .collect(Collectors.toList());
+    }
+
+    public Map<String, Map.Entry<Integer, Integer>> getSingleRunHistoryEntityAmount(Integer key) {
+        SingleRunHistoryDto res = api.getRunEntityCounts(key);
+        Map<String, Map.Entry<Integer, Integer>> map = new HashMap<>();
+        IntStream.range(0, res.getEntity().size())
+                .forEach(i -> map.put(res.getEntity().get(i), new AbstractMap.SimpleEntry<>(res.getStartCount().get(i), res.getEndCount().get(i))));
+        return map;
     }
 }

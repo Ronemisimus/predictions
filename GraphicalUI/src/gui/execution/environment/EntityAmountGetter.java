@@ -20,7 +20,8 @@ public class EntityAmountGetter extends FlowPane {
                 Alert success = new Alert(Alert.AlertType.INFORMATION, "Successfully updated " + entity.getName(), ButtonType.OK);
                 success.showAndWait();
             }catch (Exception ex){
-                PopUtility.openPopup(getScene().getWindow(), "please enter a positive whole number", Alert.AlertType.ERROR);
+                PopUtility.openPopup(getScene().getWindow(), "please enter a positive whole number\n" +
+                        "the sum of all entities must not exceed the grid size", Alert.AlertType.ERROR);
             }
         });
         this.getChildren().addAll(entityName, entityAmount, update);

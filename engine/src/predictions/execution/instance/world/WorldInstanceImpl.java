@@ -106,6 +106,10 @@ public class WorldInstanceImpl implements WorldInstance{
                             .forEach(action::invoke);
                 });
             });
+
+            entityInstanceManager.finishKills();
+            entityInstanceManager.finishReplace(this.tick);
+
             System.out.println("done with tick " + this.tick);
             this.tick++;
             s = new SignalImpl(false,this.tick, this.startTime);

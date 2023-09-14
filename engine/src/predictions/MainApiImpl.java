@@ -8,6 +8,8 @@ import dto.subdto.show.EntityListDto;
 import dto.subdto.show.world.EntityDto;
 import dto.subdto.show.world.WorldDto;
 import org.xml.sax.SAXException;
+import predictions.client.container.ClientDataContainer;
+import predictions.client.container.ClientDataContainerImpl;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.world.api.World;
 import predictions.definition.world.impl.WorldImpl;
@@ -34,10 +36,12 @@ public class MainApiImpl implements MainApi {
 
     private final Map<Integer, WorldInstance> history;
     private World activeDefinition;
+    private ClientDataContainer clientDataContainer;
 
     public MainApiImpl()
     {
         this.history = new HashMap<>();
+        clientDataContainer = null;
     }
 
     @Override
@@ -63,6 +67,7 @@ public class MainApiImpl implements MainApi {
         ReadFileDto.Builder builder = new ReadFileDto.Builder().matchesSchema(true);
         try {
             activeDefinition = WorldImpl.fromPRD(res, builder);
+            clientDataContainer = new ClientDataContainerImpl(activeDefinition);
         } catch (Exception e)
         {
             return builder.build();
@@ -104,10 +109,11 @@ public class MainApiImpl implements MainApi {
 
     @Override
     public EnvDto getEnv() {
-        return new EnvDto(activeDefinition.getDto().getEnvironment());
+        return new EnvDto(clientDataContainer.getEnv());
     }
 
     public InitializeDto initialize() {
+        clientDataContainer.initialize(activeDefinition);
         activeWorld = new WorldInstanceImpl(activeDefinition);
         return activeWorld.getEnvironmentVariables().getDto();
     }
@@ -154,20 +160,16 @@ public class MainApiImpl implements MainApi {
 
     @Override
     public void setEnv(String name, Optional<Comparable<?>> value) {
-        activeDefinition.getEnvVariablesManager().set(name, value);
+        clientDataContainer.setEnv(name, value);
     }
 
     @Override
     public List<EntityDto> getEntityDefinitionCounts() {
-        List<EntityDto> res = new ArrayList<>();
-        activeDefinition.getEntityDefinitions()
-                .forEachRemaining( e -> res.add(e.getDto()));
-        return res;
+        return clientDataContainer.getEntityCounts();
     }
 
     @Override
     public void setEntityAmount(String name, int i) {
-        Optional<EntityDefinition> res = activeDefinition.getEntityDefinitionByName(name);
-        res.ifPresent(entityDefinition -> entityDefinition.setPopulation(i));
+        clientDataContainer.setEntityAmount(name, i);
     }
 }

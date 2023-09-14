@@ -15,4 +15,10 @@ public interface EntityInstanceManager {
     void moveEntities();
 
     void killEntity(int id);
+
+    void replaceEntity(int id, EntityDefinition kill, EntityDefinition create, Boolean derived);
+
+    void finishKills();
+
+    void finishReplace(int tick);
 }

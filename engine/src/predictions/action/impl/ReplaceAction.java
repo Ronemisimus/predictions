@@ -64,28 +64,8 @@ public class ReplaceAction extends AbstractAction {
         // backup killed entity
         EntityInstance source = secondaryEntity? context.getSecondaryEntityInstance():
                 context.getPrimaryEntityInstance();
-        Coordinate location = source.getLocation();
 
-        // kill entity
-        context.removeEntity(source);
-
-        // create new entity
-        EntityInstance target = context.createEntity(createEntity);
-
-        if (!mode.equals("scratch")) {
-            target.setLocation(location);
-
-            createEntity.getProps().stream()
-                    .map(PropertyDefinition::getName)
-                    .filter(name -> killEntity.getProps().stream()
-                            .anyMatch(p1 -> p1.getName().equals(name)))
-                    .forEach(name -> target.getPropertyByName(name)
-                            .updateValue(
-                                    source.getPropertyByName(name).getValue(),
-                                    context.getTick()
-                            )
-                    );
-        }
+        context.replaceEntity(source.getId(), killEntity, createEntity, mode.equals("derived"));
     }
 
     public EntityDefinition getKillEntity() {
