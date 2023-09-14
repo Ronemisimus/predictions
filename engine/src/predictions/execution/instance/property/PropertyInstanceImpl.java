@@ -37,6 +37,29 @@ public class PropertyInstanceImpl<T> implements PropertyInstance<T> {
             this.value = (Comparable<T>) val;
             this.timeModification = timeModification;
         }
+        else
+        {
+            Double from=null ,to=null;
+            if (val instanceof Integer && this.value instanceof Integer) {
+                from = ((Integer) this.propertyDefinition.getDto().getFrom()).doubleValue();
+                to = ((Integer) this.propertyDefinition.getDto().getTo()).doubleValue();
+            }
+            if (val instanceof Double && this.value instanceof Double) {
+                from = (Double) this.propertyDefinition.getDto().getFrom();
+                to = (Double) this.propertyDefinition.getDto().getTo();
+            }
+            if (from!=null)
+            {
+                if (from > (Integer) val) {
+                    this.value = (Comparable<T>) from;
+                    this.timeModification = timeModification;
+                }
+                if (to < (Integer) val) {
+                    this.value = (Comparable<T>) to;
+                    this.timeModification = timeModification;
+                }
+            }
+        }
     }
 
     @Override

@@ -17,13 +17,13 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class WorldInstanceImpl implements WorldInstance{
 
     private final ActiveEnvironment activeEnvironment;
     private final EntityInstanceManager entityInstanceManager;
     private final World world;
-
     private static final List<ActionType> finalPhaseTypes = Arrays.asList(
             ActionType.KILL,// obvious
             ActionType.CONDITION, // can contain kill or replace
@@ -37,20 +37,20 @@ public class WorldInstanceImpl implements WorldInstance{
     public WorldInstanceImpl(World world) {
         this.world = world;
         this.activeEnvironment = world.getEnvVariablesManager().createActiveEnvironment();
-        this.entityInstanceManager = new EntityInstanceManagerImpl();
+        List<String> entities = new ArrayList<>();
+        world.getEntityDefinitions().forEachRemaining(entityDefinition -> entities.add(entityDefinition.getName()));
+        this.entityInstanceManager = new EntityInstanceManagerImpl(entities);
         this.tick = 0;
 
         this.entityInstanceManager.initializeGrid(world.getGridWidth(), world.getGridHeight());
 
         world.getEntityDefinitions()
-                .forEachRemaining(entityDefinition ->{
-                    IntStream.range(0,
-                            Math.min(
-                                    entityDefinition.getPopulation(),
-                                    world.getGridWidth() * world.getGridHeight()))
-                            .mapToObj(i -> entityDefinition)
-                            .forEach(entityInstanceManager::create);
-                });
+                .forEachRemaining(entityDefinition -> IntStream.range(0,
+                        Math.min(
+                                entityDefinition.getPopulation(),
+                                world.getGridWidth() * world.getGridHeight()))
+                        .mapToObj(i -> entityDefinition)
+                        .forEach(entityInstanceManager::create));
     }
 
     @Override
@@ -60,6 +60,7 @@ public class WorldInstanceImpl implements WorldInstance{
         Signal s = new SignalImpl(false, tick, this.startTime);
         while((resTermination = isTerminated(s))==null)
         {
+            entityInstanceManager.updateEntityCounts();
             // move entities
             entityInstanceManager.moveEntities();
 
@@ -156,12 +157,7 @@ public class WorldInstanceImpl implements WorldInstance{
 
     @Override
     public Map<String, EntityCountHistory> getEntityCounts() {
-        Map<String, EntityCountHistory> res = new HashMap<>();
-        world.getEntityDefinitions().forEachRemaining(entityDefinition -> res.put(entityDefinition.getName(),
-                new EntityCountHistory(entityDefinition.getPopulation(), Math.toIntExact(
-                        entityInstanceManager.getInstances()
-                                .stream().filter(entityDefinition::isInstance).count()))));
-        return res;
+        return entityInstanceManager.getEntityCounts();
     }
 
     @Override

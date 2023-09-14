@@ -136,11 +136,11 @@ public class EngineApi {
                 .collect(Collectors.toList());
     }
 
-    public Map<String, Map.Entry<Integer, Integer>> getSingleRunHistoryEntityAmount(Integer key) {
+    public Map<String, Map<Integer, Integer>> getSingleRunHistoryEntityAmount(Integer key) {
         SingleRunHistoryDto res = api.getRunEntityCounts(key);
-        Map<String, Map.Entry<Integer, Integer>> map = new HashMap<>();
+        Map<String, Map<Integer, Integer>> map = new HashMap<>();
         IntStream.range(0, res.getEntity().size())
-                .forEach(i -> map.put(res.getEntity().get(i), new AbstractMap.SimpleEntry<>(res.getStartCount().get(i), res.getEndCount().get(i))));
+                .forEach(i -> map.put(res.getEntity().get(i), res.getCounts().get(i)));
         return map;
     }
 

@@ -1,9 +1,11 @@
 package predictions.execution.instance.entity.manager;
 
 import predictions.definition.entity.EntityDefinition;
+import predictions.execution.EntityCountHistory;
 import predictions.execution.instance.entity.EntityInstance;
 
 import java.util.List;
+import java.util.Map;
 
 public interface EntityInstanceManager {
 
@@ -21,4 +23,8 @@ public interface EntityInstanceManager {
     void finishKills();
 
     void finishReplace(int tick);
+
+    Map<String, EntityCountHistory> getEntityCounts();
+
+    void updateEntityCounts();
 }

@@ -7,35 +7,27 @@ import java.util.Map;
 
 public class SingleRunHistoryDto implements DTO {
     private final List<String> entity;
-
-    private final List<Integer> startCount;
-    private final List<Integer> endCount;
+    private final List<Map<Integer, Integer>> counts;
 
     private final Map<Comparable<?>, Integer> propertyHist;
 
     public SingleRunHistoryDto(List<String> entity,
-                               List<Integer> startCount,
-                               List<Integer> endCount,
+                               List<Map<Integer, Integer>> counts,
                                Map<Comparable<?>, Integer> propertyHist) {
         this.entity = entity;
-        this.endCount = endCount;
         this.propertyHist = propertyHist;
-        this.startCount =startCount;
+        this.counts = counts;
     }
 
     public List<String> getEntity() {
         return entity;
     }
 
-    public List<Integer> getEndCount() {
-        return endCount;
-    }
-
     public Map<Comparable<?>, Integer> getPropertyHist() {
         return propertyHist;
     }
 
-    public List<Integer> getStartCount() {
-        return startCount;
+    public List<Map<Integer, Integer>> getCounts() {
+        return counts;
     }
 }

@@ -4,6 +4,7 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.property.api.PropertyDefinition;
+import predictions.execution.EntityCountHistory;
 import predictions.execution.grid.Coordinate;
 import predictions.execution.instance.entity.EntityInstance;
 import predictions.execution.instance.entity.EntityInstanceImpl;
@@ -28,13 +29,17 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
 
     private EntityInstance[][] grid;
 
-    public EntityInstanceManagerImpl() {
+    private final Map<String, EntityCountHistory> entityCountHistoryMap;
+
+    public EntityInstanceManagerImpl(List<String> entities) {
         count = 0;
         instances = new ArrayList<>();
         locations = new ArrayList<>();
         grid = null;
         killed_ids = new HashSet<>();
         replaceMap = new HashMap<>();
+        entityCountHistoryMap = new HashMap<>();
+        entities.forEach(entity -> entityCountHistoryMap.put(entity, new EntityCountHistory()));
     }
 
     @Override
@@ -190,5 +195,17 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
             });
             replaceMap.clear();
         }
+    }
+
+    @Override
+    public Map<String, EntityCountHistory> getEntityCounts() {
+        return entityCountHistoryMap;
+    }
+
+    @Override
+    public void updateEntityCounts() {
+        instances.stream().map(EntityInstance::getEntityTypeName)
+                .collect(Collectors.groupingBy(name -> name, Collectors.counting()))
+                .forEach((e, v) -> entityCountHistoryMap.get(e).addEntityCount(v.intValue()));
     }
 }

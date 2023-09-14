@@ -139,9 +139,8 @@ public class MainApiImpl implements MainApi {
 
     private SingleRunHistoryDto createEntityCountHistoryDto(Map<String, EntityCountHistory> res) {
         List<String> entities = new ArrayList<>(res.keySet());
-        List<Integer> startCounts = entities.stream().map(res::get).map(EntityCountHistory::getInitialCount).collect(Collectors.toList());
-        List<Integer> finalCounts = entities.stream().map(res::get).map(EntityCountHistory::getEndCount).collect(Collectors.toList());
-        return new SingleRunHistoryDto(entities, startCounts, finalCounts, null);
+        List<Map<Integer, Integer>> counts = entities.stream().map(res::get).map(EntityCountHistory::getEntityCount).collect(Collectors.toList());
+        return new SingleRunHistoryDto(entities, counts, null);
     }
 
     @Override
@@ -155,7 +154,7 @@ public class MainApiImpl implements MainApi {
     @Override
     public SingleRunHistoryDto getRunPropertyHistogram(int runId, String entityName, String propertyName) {
         Map<Comparable<?>, Integer> propertyHist = history.get(runId).getEntityPropertyHistogram(entityName,propertyName);
-        return new SingleRunHistoryDto(null, null, null, propertyHist);
+        return new SingleRunHistoryDto(null, null, propertyHist);
     }
 
     @Override

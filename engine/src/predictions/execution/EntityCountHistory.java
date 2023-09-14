@@ -1,27 +1,20 @@
 package predictions.execution;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class EntityCountHistory {
-    private int initialCount;
-    private int endCount;
+    private Map<Integer, Integer> entityCount;
 
-    public EntityCountHistory(int initialCount, int endCount) {
-        this.initialCount = initialCount;
-        this.endCount = endCount;
+    public EntityCountHistory() {
+        this.entityCount = new HashMap<>();
     }
 
-    public int getInitialCount() {
-        return initialCount;
+    public Map<Integer, Integer> getEntityCount() {
+        return entityCount;
     }
 
-    public int getEndCount() {
-        return endCount;
-    }
-
-    public void setInitialCount(int initialCount) {
-        this.initialCount = initialCount;
-    }
-
-    public void setEndCount(int endCount) {
-        this.endCount = endCount;
+    public void addEntityCount(int count) {
+        entityCount.put(entityCount.size(), count);
     }
 }

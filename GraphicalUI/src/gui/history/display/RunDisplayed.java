@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class RunDisplayed extends HBox implements OpenableItem {
+public class RunDisplayed extends HBox {
 
     private final Map.Entry<Integer, LocalDateTime> entry;
     public RunDisplayed(Map.Entry<Integer, LocalDateTime> entry) {
@@ -26,15 +26,11 @@ public class RunDisplayed extends HBox implements OpenableItem {
 
     }
 
-    @Override
-    public Parent getDetailsView() {
-        Map<String, Map.Entry<Integer,Integer>> res = EngineApi.getInstance().getSingleRunHistoryEntityAmount(entry.getKey());
-        VBox vbox = new VBox();
-        vbox.getChildren().addAll(
-                res.entrySet().stream()
-                        .map(e -> new Label(e.getKey() + ": " + e.getValue().getKey() + "/" + e.getValue().getValue()))
-                        .collect(Collectors.toList())
-        );
-        return vbox;
+    public Integer getRunIdentifier() {
+        return entry.getKey();
+    }
+
+    public LocalDateTime getRunTime() {
+        return entry.getValue();
     }
 }

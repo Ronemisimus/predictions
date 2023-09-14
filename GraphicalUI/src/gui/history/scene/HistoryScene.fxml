@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -11,7 +12,19 @@
       <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
          <items>
             <ListView fx:id="CurrentRuns" prefHeight="200.0" prefWidth="200.0" />
-            <ListView fx:id="EndedRuns" prefHeight="200.0" prefWidth="200.0" />
+            <SplitPane dividerPositions="0.5">
+               <items>
+                  <ListView fx:id="EndedRuns" prefHeight="200.0" prefWidth="200.0" />
+                  <BarChart fx:id="chart" prefWidth="101.0">
+                    <xAxis>
+                      <CategoryAxis side="BOTTOM" />
+                    </xAxis>
+                    <yAxis>
+                      <NumberAxis side="LEFT" />
+                    </yAxis>
+                  </BarChart>
+               </items>
+            </SplitPane>
          </items>
       </SplitPane>
    </center>
