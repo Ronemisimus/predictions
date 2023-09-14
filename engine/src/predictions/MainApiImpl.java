@@ -172,4 +172,12 @@ public class MainApiImpl implements MainApi {
     public void setEntityAmount(String name, int i) {
         clientDataContainer.setEntityAmount(name, i);
     }
+
+    @Override
+    public void unload() {
+        activeDefinition = null;
+        clientDataContainer = null;
+        history.clear();
+        activeWorld = null;
+    }
 }

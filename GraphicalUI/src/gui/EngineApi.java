@@ -143,4 +143,8 @@ public class EngineApi {
                 .forEach(i -> map.put(res.getEntity().get(i), new AbstractMap.SimpleEntry<>(res.getStartCount().get(i), res.getEndCount().get(i))));
         return map;
     }
+
+    public void unload() {
+        api.unload();
+    }
 }

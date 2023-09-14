@@ -107,5 +107,6 @@ public class MainController {
 
     public void unload() {
         isLoaded.set(false);
+        EngineApi.getInstance().unload();
     }
 }

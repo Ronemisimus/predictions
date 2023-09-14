@@ -30,4 +30,6 @@ public interface MainApi {
     List<EntityDto> getEntityDefinitionCounts();
 
     void setEntityAmount(String name, int i);
+
+    void unload();
 }
