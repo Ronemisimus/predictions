@@ -18,6 +18,7 @@ public interface ContextDefinition {
     Collection<EntityDefinition> getSystemEntityDefinitions();
     Integer getSecondaryEntityAmount();
     Expression<Boolean> getSecondaryExpression();
+    Boolean getSecondaryEntityAll();
     EnvVariablesManager getEnvVariables();
 
     Collection<Context> getContextList(EntityInstance entityInstance, List<EntityInstance> entityInstances,

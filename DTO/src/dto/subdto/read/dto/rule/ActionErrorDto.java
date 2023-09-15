@@ -18,6 +18,9 @@ public class ActionErrorDto implements DTO {
     private final Boolean noPrimaryEntity;
 
     private final Boolean noEntityNamed;
+
+    private final Boolean badSecondaryCount;
+    private final String secondaryCount;
     private ActionErrorDto(Builder builder)
     {
         this.expressionErrorDto = builder.expressionErrorDto;
@@ -29,6 +32,8 @@ public class ActionErrorDto implements DTO {
         this.actionType = builder.actionType;
         this.noPrimaryEntity = builder.noPrimaryEntity;
         this.noEntityNamed = builder.noEntityNamed;
+        this.badSecondaryCount = builder.badSecondaryCount;
+        this.secondaryCount = builder.secondaryCount;
     }
 
     public static class Builder {
@@ -41,6 +46,8 @@ public class ActionErrorDto implements DTO {
         private String actionType = null;
         private Boolean noPrimaryEntity = false;
         private Boolean noEntityNamed = false;
+        private Boolean badSecondaryCount = false;
+        private String secondaryCount = null;
 
         public Builder() {
         }
@@ -85,6 +92,11 @@ public class ActionErrorDto implements DTO {
             this.noEntityNamed = true;
             this.entityName = primaryEntityName;
         }
+
+        public void badSelectionCount(String secondaryEntityAmount) {
+            this.badSecondaryCount = true;
+            this.secondaryCount = secondaryEntityAmount;
+        }
     }
 
     public ExpressionErrorDto getExpressionErrorDto() {
@@ -121,5 +133,13 @@ public class ActionErrorDto implements DTO {
 
     public Boolean getNoEntityNamed() {
         return noEntityNamed;
+    }
+
+    public Boolean getBadSecondaryCount() {
+        return badSecondaryCount;
+    }
+
+    public String getSecondaryCount() {
+        return secondaryCount;
     }
 }

@@ -16,6 +16,8 @@ public interface EntityInstanceManager {
 
     void moveEntities();
 
+    void printGrid();
+
     void killEntity(int id);
 
     void replaceEntity(int id, EntityDefinition kill, EntityDefinition create, Boolean derived);

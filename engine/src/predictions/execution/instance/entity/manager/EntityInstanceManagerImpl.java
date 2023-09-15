@@ -19,9 +19,8 @@ import java.util.stream.Stream;
 public class EntityInstanceManagerImpl implements EntityInstanceManager {
 
     private int count;
-    private final List<EntityInstance> instances;
 
-    private final List<Property<Coordinate>> locations;
+    private final Map<EntityInstance,Property<Coordinate>> instaces_locations;
 
     private final Set<Integer> killed_ids;
 
@@ -33,8 +32,7 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
 
     public EntityInstanceManagerImpl(List<String> entities) {
         count = 0;
-        instances = new ArrayList<>();
-        locations = new ArrayList<>();
+        instaces_locations = new HashMap<>();
         grid = null;
         killed_ids = new HashSet<>();
         replaceMap = new HashMap<>();
@@ -54,9 +52,9 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
 
     @Override
     public void moveEntities() {
-        IntStream.range(0, instances.size())
-                .mapToObj(locations::get)
-                .forEach(loc -> loc.setValue(getStepLocation(loc.getValue())));
+        instaces_locations.forEach((k,v) -> {
+            v.setValue(getStepLocation(v.getValue()));
+        });
     }
 
     private Coordinate getStepLocation(Coordinate value) {
@@ -69,7 +67,7 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
                 new Coordinate(value.getX(), (gridHeight + value.getY() - 1)%gridHeight))
                 .filter(c -> grid[c.getX()][c.getY()] == null)
                 .collect(Collectors.toList());
-        possibleMoves.add(value);
+        if (possibleMoves.isEmpty()) possibleMoves.add(value);
         return possibleMoves.get(new Random().nextInt(possibleMoves.size()));
     }
 
@@ -79,10 +77,9 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
         count++;
         Coordinate coordinate = getRandomCoordinate();
         Property<Coordinate> location = new SimpleObjectProperty<>(coordinate);
-        locations.add(location);
         EntityInstance newEntityInstance = new EntityInstanceImpl(entityDefinition, count, location);
-        location.addListener((observable, oldValue, newValue) -> updateGrid(newEntityInstance, newValue));
-        instances.add(newEntityInstance);
+        location.addListener((Observable, oldVal, newVal) -> updateGrid(newEntityInstance, oldVal,newVal));
+        instaces_locations.put(newEntityInstance, location);
 
         entityDefinition.getProps().forEach(prop -> {
             PropertyInstance<?> res;
@@ -111,12 +108,23 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
         return newEntityInstance;
     }
 
-    private void updateGrid(EntityInstance newEntityInstance, Coordinate newValue) {
-        int index = this.instances.indexOf(newEntityInstance);
-        Coordinate oldValue = this.locations.get(index).getValue();
+    private void updateGrid(EntityInstance newEntityInstance, Coordinate oldValue, Coordinate newValue) {
         this.grid[oldValue.getX()][oldValue.getY()] = null;
-        this.grid[newValue.getX()][newValue.getY()] = newEntityInstance;
-        this.locations.get(index).setValue(newValue);
+        if(newEntityInstance!=null && newValue!=null) {
+            this.grid[newValue.getX()][newValue.getY()] = newEntityInstance;
+            newEntityInstance.setLocation(newValue);
+            instaces_locations.get(newEntityInstance).setValue(newValue);
+        }
+    }
+
+    public void  printGrid()
+    {
+        for (int x = 0; x < grid.length; x++) {
+            for (int y = 0; y < grid[0].length; y++) {
+                System.out.print((grid[x][y]!=null?grid[x][y].getEntityTypeName().substring(0,1):"N") + "  ");
+            }
+            System.out.println();
+        }
     }
 
 
@@ -132,7 +140,7 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
 
     @Override
     public List<EntityInstance> getInstances() {
-        return instances;
+        return new ArrayList<>(instaces_locations.keySet());
     }
 
     @Override
@@ -150,17 +158,16 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
     @Override
     public void finishKills() {
         if (!killed_ids.isEmpty()) {
-            List<EntityInstance> temp = new ArrayList<>(instances);
+            List<EntityInstance> temp = new ArrayList<>(getInstances());
             temp.stream()
                     .filter(e -> killed_ids.stream()
                             .anyMatch(id -> e.getId() == id))
                     .forEach(e -> {
                         Coordinate location = e.getLocation();
-                        int idx = instances.indexOf(e);
-                        locations.remove(idx);
-                        instances.remove(idx);
+                        instaces_locations.remove(e);
                         grid[location.getX()][location.getY()] = null;
                         count--;
+                        e.setLocation(null);
                     });
             killed_ids.clear();
         }
@@ -170,7 +177,7 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
     public void finishReplace(int tick) {
         if (!replaceMap.isEmpty()) {
 
-            List<EntityInstance> temp = new ArrayList<>(instances);
+            List<EntityInstance> temp = new ArrayList<>(getInstances());
             temp.stream().filter(e -> replaceMap.getOrDefault(e.getId(), null) != null).forEach(e -> {
                 Map.Entry<EntityDefinition, Map.Entry<EntityDefinition, Boolean>> res = replaceMap.getOrDefault(e.getId(), null);
                 Coordinate location = e.getLocation();
@@ -189,9 +196,7 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
                             );
                     created.setLocation(location);
                 }
-                int idx = instances.indexOf(e);
-                instances.remove(idx);
-                locations.remove(idx);
+                instaces_locations.remove(e);
             });
             replaceMap.clear();
         }
@@ -204,8 +209,10 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
 
     @Override
     public void updateEntityCounts() {
-        instances.stream().map(EntityInstance::getEntityTypeName)
-                .collect(Collectors.groupingBy(name -> name, Collectors.counting()))
-                .forEach((e, v) -> entityCountHistoryMap.get(e).addEntityCount(v.intValue()));
+        entityCountHistoryMap.forEach((ent, countHistory) -> {
+            countHistory.addEntityCount((int)getInstances().stream()
+                    .filter(entity-> entity.getEntityTypeName().equalsIgnoreCase(ent.toLowerCase()))
+                    .count());
+        });
     }
 }

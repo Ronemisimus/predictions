@@ -50,11 +50,11 @@ public class PropertyInstanceImpl<T> implements PropertyInstance<T> {
             }
             if (from!=null)
             {
-                if (from > (Integer) val) {
+                if (from > (Double) val) {
                     this.value = (Comparable<T>) from;
                     this.timeModification = timeModification;
                 }
-                if (to < (Integer) val) {
+                if (to < (Double) val) {
                     this.value = (Comparable<T>) to;
                     this.timeModification = timeModification;
                 }

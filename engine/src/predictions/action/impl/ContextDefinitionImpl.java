@@ -34,13 +34,14 @@ public class ContextDefinitionImpl implements ContextDefinition {
     private final Expression<Boolean> secondaryExpression;
     private final EnvVariablesManager envVariables;
 
-    private final Boolean randomChoice;
+    private final Boolean allSecondary;
 
     private final Collection<EntityDefinition> systemEntityDefinitions;
 
     private ContextDefinitionImpl(EntityDefinition primaryEntityDefinition,
                                  EntityDefinition secondaryEntityDefinition,
                                  Integer secondaryEntityAmount,
+                                 Boolean allSecondary,
                                  Expression<Boolean> secondaryExpression,
                                  EnvVariablesManager envVariables,
                                  Collection<EntityDefinition> systemEntityDefinitions) {
@@ -49,14 +50,13 @@ public class ContextDefinitionImpl implements ContextDefinition {
         this.secondaryEntityAmount = secondaryEntityAmount;
         this.secondaryExpression = secondaryExpression;
         this.envVariables = envVariables;
+        this.allSecondary = allSecondary;
         this.systemEntityDefinitions = systemEntityDefinitions;
-        this.randomChoice = secondaryEntityDefinition != null &&
-                getSecondaryEntityRealAmount() < secondaryEntityDefinition.getPopulation();
     }
 
     public static ContextDefinition getInstance(PRDEntity primaryEntity,
                                                     PRDEntity secondaryEntity,
-                                                    Integer secondaryEntityAmount,
+                                                    String secondaryEntityAmount,
                                                     PRDCondition prdCondition,
                                                     EnvVariablesManager envVariables,
                                                     Collection<EntityDefinition> systemEntityDefinitions,
@@ -82,10 +82,31 @@ public class ContextDefinitionImpl implements ContextDefinition {
         if (secondaryEntity!=null)
             secondary = new EntityDefinitionImpl(secondaryEntity, bigBuilder);
 
+        Integer amount = null;
+        Boolean allSecondary = false;
+        if (secondaryEntity!=null && secondaryEntityAmount!=null) {
+            try {
+                amount = Integer.valueOf(secondaryEntityAmount);
+                if (amount < 0) {
+                    actionBuilder.badSelectionCount(secondaryEntityAmount);
+                    throw new RuntimeException("bad selection count");
+                }
+            } catch (Exception e) {
+                amount = secondaryEntityAmount.equalsIgnoreCase("all") ? -1 : null;
+                if (amount == null) {
+                    actionBuilder.badSelectionCount(secondaryEntityAmount);
+                    throw new RuntimeException("bad selection count");
+                } else {
+                    allSecondary = true;
+                }
+            }
+        }
+
         ContextDefinition contextDefinition = new ContextDefinitionImpl(
                 primary,
                 secondary,
-                secondaryEntityAmount,
+                amount,
+                allSecondary,
                 new BasicBooleanExpression(Boolean.TRUE),
                 envVariables,
                 systemEntityDefinitions
@@ -94,7 +115,8 @@ public class ContextDefinitionImpl implements ContextDefinition {
         try {
             return new ContextDefinitionImpl(primary,
                     secondary,
-                    secondaryEntityAmount,
+                    amount,
+                    allSecondary,
                     prdCondition == null ? null :
                             new BooleanComplexExpression(
                                     prdCondition,
@@ -127,12 +149,20 @@ public class ContextDefinitionImpl implements ContextDefinition {
 
     @Override
     public Integer getSecondaryEntityAmount() {
+        if (allSecondary){
+            return getSecondaryEntityDefinition().getPopulation();
+        }
         return secondaryEntityAmount;
     }
 
     @Override
     public Expression<Boolean> getSecondaryExpression() {
         return secondaryExpression;
+    }
+
+    @Override
+    public Boolean getSecondaryEntityAll() {
+        return allSecondary;
     }
 
     @Override
@@ -149,44 +179,66 @@ public class ContextDefinitionImpl implements ContextDefinition {
 
         List<EntityInstance> secondaryEntities = secondaryEntityDefinition == null? new ArrayList<>():
                 entityInstances.stream()
-                .filter(entity-> entity.getEntityTypeName().equals(secondaryEntityDefinition.getName()))
-                .filter( entity -> secondaryExpression==null || secondaryExpression.evaluate(new ContextImpl(
-                        entityInstance,
-                        entity,
-                        entityInstanceManager,
-                        activeEnvironment,
-                        this,
-                        tick)).equals(true))
-                .collect(Collectors.toList());
+                        .filter(entity-> entity.getId() != entityInstance.getId()) // an instance cannot be both primary and secondary
+                        .filter(entity-> entity.getEntityTypeName().equals(secondaryEntityDefinition.getName()))
+                        .filter( entity -> allSecondary || secondaryExpression==null || secondaryExpression.evaluate(new ContextImpl(
+                            entityInstance,
+                            entity,
+                            entityInstanceManager,
+                            activeEnvironment,
+                            this,
+                            tick)).equals(true))
+                        .collect(Collectors.toList());
 
-        return secondaryEntityDefinition==null? Collections.singletonList(
-                new ContextImpl(entityInstance,
-                        null,
-                        entityInstanceManager,
-                        activeEnvironment,
-                        this,
-                        tick)
-        ) :
-        IntStream.range(0, getSecondaryEntityRealAmount())
-                .mapToObj(i -> new ContextImpl(
-                    entityInstance,
-                    secondaryEntities.isEmpty()?null:
-                            secondaryEntities.get(randomChoice? (int)(Math.random() * secondaryEntities.size()): i),
-                    entityInstanceManager,
-                    activeEnvironment,
-                    this,
-                    tick
-                ))
-                .collect(Collectors.toList());
+        if (secondaryEntityDefinition == null) {
+            return Collections.singletonList(
+                    new ContextImpl(entityInstance,
+                            null,
+                            entityInstanceManager,
+                            activeEnvironment,
+                            this,
+                            tick)
+            );
+        } else {
+            List<Context> list = new ArrayList<>();
+            int bound = getSecondaryEntityRealAmount();
+            if (allSecondary || (bound != getSecondaryEntityAmount() && bound!=0))
+            {
+                list.addAll(secondaryEntities.stream()
+                        .map(entity -> new ContextImpl(
+                                entityInstance,
+                                entity,
+                                entityInstanceManager,
+                                activeEnvironment,
+                                this,
+                                tick
+                        )).collect(Collectors.toList()));
+            }
+            else{
+                for (int i = 0; i < bound; i++) {
+                    ContextImpl context = new ContextImpl(
+                            entityInstance,
+                            secondaryEntities.isEmpty() ? null :
+                                    secondaryEntities.get((int) (Math.random() * secondaryEntities.size())),
+                            entityInstanceManager,
+                            activeEnvironment,
+                            this,
+                            tick
+                    );
+                    list.add(context);
+                }
+            }
+            return list;
+        }
 
     }
 
     private int getSecondaryEntityRealAmount() {
         if(secondaryEntityAmount==null)
         {
-            return secondaryEntityDefinition.getPopulation();
+            return 0;
         }
-        else if (secondaryEntityAmount<secondaryEntityDefinition.getPopulation()){
+        else if (secondaryEntityAmount!=-1 && secondaryEntityAmount<secondaryEntityDefinition.getPopulation()){
             return secondaryEntityAmount;
         }
         else

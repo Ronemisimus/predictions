@@ -2,6 +2,8 @@ package predictions.client.container;
 
 import dto.subdto.show.world.EntityDto;
 import dto.subdto.show.world.PropertyDto;
+import predictions.action.api.Action;
+import predictions.action.api.ContextDefinition;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.property.api.PropertyDefinition;
 import predictions.definition.world.api.World;
@@ -64,7 +66,7 @@ public class ClientDataContainerImpl implements ClientDataContainer {
         if (p != null && value.isPresent()) {
             if (p.isLegal(value.get()))
             {
-                p.setInit(value.get());
+                envValues.put(name, value.get());
             }
         }
     }
@@ -78,13 +80,23 @@ public class ClientDataContainerImpl implements ClientDataContainer {
             if (activeDefinition.getEntityDefinitionByName(name).isPresent())
                 activeDefinition.getEntityDefinitionByName(name).get().setPopulation(entityAmounts.get(name));
         }
+
+        activeDefinition.getRules().forEachRemaining(rule -> {
+            rule.getActionsToPerform().forEach(action -> {
+                ContextDefinition context = action.getContextDefinition();
+                String primary = context.getPrimaryEntityDefinition().getName();
+                String secondary = context.getSecondaryEntityDefinition()==null? null: context.getSecondaryEntityDefinition().getName();
+                context.getPrimaryEntityDefinition().setPopulation(entityAmounts.get(primary));
+                if (secondary!=null) context.getSecondaryEntityDefinition().setPopulation(entityAmounts.get(secondary));
+            });
+        });
     }
 
     @Override
     public List<PropertyDto> getEnv() {
         return propertyDefinitions.values().stream()
                 .map(PropertyDefinition::getDto)
-                .map(dto -> new PropertyDto(dto.getType(), dto.getName(), dto.getFrom(), dto.getTo(), dto.isRandomInit(), dto.getInitValue()))
+                .map(dto -> new PropertyDto(dto.getType(), dto.getName(), dto.getFrom(), dto.getTo(), dto.isRandomInit(), envValues.get(dto.getName())))
                 .collect(Collectors.toList());
     }
 

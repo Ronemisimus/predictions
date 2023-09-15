@@ -125,6 +125,12 @@ public class ReadFileError extends Alert {
                     actionErrorDto.getActionType() + " named " +
                     actionErrorDto.getEntityName();
         }
+        if (actionErrorDto.getBadSecondaryCount())
+        {
+            return "invalid count for secondary entity in action " +
+                    actionErrorDto.getActionType() + " count: " +
+                    actionErrorDto.getSecondaryCount();
+        }
         return "Something went wrong";
     }
 

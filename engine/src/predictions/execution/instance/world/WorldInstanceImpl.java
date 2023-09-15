@@ -51,6 +51,7 @@ public class WorldInstanceImpl implements WorldInstance{
                                 world.getGridWidth() * world.getGridHeight()))
                         .mapToObj(i -> entityDefinition)
                         .forEach(entityInstanceManager::create));
+        entityInstanceManager.printGrid();
     }
 
     @Override
@@ -111,7 +112,6 @@ public class WorldInstanceImpl implements WorldInstance{
             entityInstanceManager.finishKills();
             entityInstanceManager.finishReplace(this.tick);
 
-            System.out.println("done with tick " + this.tick);
             this.tick++;
             s = new SignalImpl(false,this.tick, this.startTime);
         }

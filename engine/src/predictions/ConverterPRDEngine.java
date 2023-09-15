@@ -411,7 +411,7 @@ public class ConverterPRDEngine {
                     ContextDefinition context = ContextDefinitionImpl.getInstance(
                             mainEntityOpt.orElse(null),
                             secondaryEntityOpt.orElse(null),
-                            secondaryEntity.isPresent() ? Integer.parseInt(secondaryEntity.get()) : null,
+                            secondaryEntity.isPresent() ? secondaryEntity.get() : "all",
                             prdCondition.orElse(null),
                             env,
                             entities.getPRDEntity() == null ? new ArrayList<>() :
