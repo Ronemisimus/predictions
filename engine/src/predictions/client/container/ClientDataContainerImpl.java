@@ -47,7 +47,9 @@ public class ClientDataContainerImpl implements ClientDataContainer {
     public void setEntityAmount(String name, int i) {
         if (i < 0) throw new RuntimeException("Negative amount");
         if (entityAmounts.containsKey(name)){
-            if (entityAmounts.values().stream()
+            if (entityAmounts.keySet().stream()
+                    .filter(e -> !e.equals(name))
+                    .map(entityAmounts::get)
                 .mapToInt(Integer::intValue).sum() + i <= gridWidth * gridHeight) {
                 entityAmounts.put(name, i);
             }
