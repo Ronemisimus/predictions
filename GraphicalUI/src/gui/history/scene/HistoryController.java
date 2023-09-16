@@ -43,7 +43,7 @@ public class HistoryController {
                 EndedRuns.getItems().clear();
                 for (String entity : counts.keySet())
                 {
-                    EntityChartLabel entityChart = new EntityChartLabel(entity, newVal.getRunIdentifier());
+                    EntityChartLabel entityChart = new EntityChartLabel(entity, counts);
                     EndedRuns.getItems().add(entityChart);
                 }
 
