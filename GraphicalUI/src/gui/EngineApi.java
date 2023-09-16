@@ -132,6 +132,7 @@ public class EngineApi {
     public List<RunDisplayed> getRunHistory() {
         RunHistoryDto res = api.getRunHistory();
         return res.getRunList().entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .map(RunDisplayed::new)
                 .collect(Collectors.toList());
     }

@@ -66,6 +66,7 @@ public class MainController {
         if (newValue)
             DetailsButton.fire();
         else {
+            EngineApi.getInstance().unload();
             FileLabel.textProperty().set("loaded file will show here");
             centerStage.setCenter(null);
         }
