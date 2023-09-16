@@ -2,6 +2,8 @@ package gui.history.scene;
 
 import dto.subdto.show.world.EntityDto;
 import gui.EngineApi;
+import gui.history.display.ChartAble;
+import gui.history.display.EntityChartLabel;
 import gui.history.display.RunDisplayed;
 import javafx.fxml.FXML;
 
@@ -26,6 +28,7 @@ public class HistoryController {
     private BarChart<String, Integer> chart;
     @FXML
     private void initialize() {
+        chart.setAnimated(false);
         List<RunDisplayed> history = EngineApi.getInstance().getRunHistory();
         HistoryList.getItems().addAll(history);
         HistoryList.getSelectionModel().selectedItemProperty().addListener((Observable, oldVal, newVal) ->{
@@ -33,29 +36,22 @@ public class HistoryController {
             {
                 EndedRuns.getItems().removeAll();
 
+                chart.getData().clear();
+
                 Map<String, Map<Integer,Integer>> counts = EngineApi.getInstance().getSingleRunHistoryEntityAmount(newVal.getRunIdentifier());
 
                 EndedRuns.getItems().clear();
                 for (String entity : counts.keySet())
                 {
-                    Label entityChart = new Label(entity + " Chart");
+                    EntityChartLabel entityChart = new EntityChartLabel(entity, newVal.getRunIdentifier());
                     EndedRuns.getItems().add(entityChart);
                 }
 
                 EndedRuns.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-                    if (newValue!=null && newValue instanceof Label)
+                    if (newValue instanceof ChartAble)
                     {
-                        String entity = ((Label) newValue).getText();
-                        entity = entity.substring(0,entity.indexOf(" Chart"));
-                        Map<String, Map<Integer,Integer>> updated_counts = EngineApi.getInstance().getSingleRunHistoryEntityAmount(newVal.getRunIdentifier());
-                        XYChart.Series<String, Integer> series = new XYChart.Series<>();
-                        updated_counts.get(entity).forEach((k,v) -> series.getData().add(new XYChart.Data<>(k.toString(),v)));
-                        series.setName("Entity Chart");
                         chart.getData().clear();
-                        chart.getData().add(series);
-
-                        chart.getYAxis().setLabel("Entity Amount");
-                        chart.getXAxis().setLabel("Ticks");
+                        ((ChartAble) newValue).chart(chart);
                     }
                 });
 
