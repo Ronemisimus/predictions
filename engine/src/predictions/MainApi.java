@@ -12,7 +12,6 @@ public interface MainApi {
     ShowWorldDto showLoadedWorld();
 
     EnvDto getEnv();
-    void initialize();
     void runSimulation();
 
     RunHistoryDto getRunHistory();
@@ -29,5 +28,5 @@ public interface MainApi {
 
     void setEntityAmount(String name, int i);
 
-    void unload();
+    void unload() throws InterruptedException;
 }

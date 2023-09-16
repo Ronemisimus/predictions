@@ -9,6 +9,8 @@ import dto.subdto.show.world.WorldDto;
 import org.xml.sax.SAXException;
 import predictions.client.container.ClientDataContainer;
 import predictions.client.container.ClientDataContainerImpl;
+import predictions.concurent.SimulationManager;
+import predictions.concurent.SimulationManagerImpl;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.world.api.World;
 import predictions.definition.world.impl.WorldImpl;
@@ -16,7 +18,6 @@ import predictions.execution.EntityCountHistory;
 import predictions.execution.instance.world.WorldInstance;
 import predictions.execution.instance.world.WorldInstanceImpl;
 import predictions.generated.PRDWorld;
-import predictions.termination.api.Termination;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -25,21 +26,20 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
 import java.net.URISyntaxException;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class MainApiImpl implements MainApi {
 
-    private WorldInstance activeWorld;
-
-    private final Map<Integer, WorldInstance> history;
+    //private final Map<Integer, WorldInstance> history;
     private World activeDefinition;
     private ClientDataContainer clientDataContainer;
 
+    private final SimulationManager simulationManager;
+
     public MainApiImpl()
     {
-        this.history = new HashMap<>();
+        simulationManager = SimulationManagerImpl.getInstance();
         clientDataContainer = null;
     }
 
@@ -67,6 +67,7 @@ public class MainApiImpl implements MainApi {
         try {
             activeDefinition = WorldImpl.fromPRD(res, builder);
             clientDataContainer = new ClientDataContainerImpl(activeDefinition);
+            simulationManager.initializeThreadPool(activeDefinition.getThreadCount());
         } catch (Exception e)
         {
             return builder.build();
@@ -111,27 +112,20 @@ public class MainApiImpl implements MainApi {
         return new EnvDto(clientDataContainer.getEnv());
     }
 
-    public void initialize() {
-        clientDataContainer.initialize(activeDefinition);
-        activeWorld = new WorldInstanceImpl(activeDefinition);
-    }
-
     public void runSimulation() {
-        Map.Entry<Integer, Termination> res = activeWorld.run();
-        history.put(res.getKey(), activeWorld);
-        new RunSimulationDto(res.getKey(), res.getValue().getDto());
+        WorldInstance activeWorld = new WorldInstanceImpl(activeDefinition, clientDataContainer);
+        simulationManager.addSimulation(activeWorld);
+        clientDataContainer = new ClientDataContainerImpl((ClientDataContainerImpl) clientDataContainer);
     }
 
     @Override
     public RunHistoryDto getRunHistory() {
-        Map<Integer, LocalDateTime> runNames = new HashMap<>();
-        history.forEach((k,v) -> runNames.put(k, v.getStartTime()));
-        return new RunHistoryDto(runNames);
+        return simulationManager.getRunHistory();
     }
 
     @Override
     public SingleRunHistoryDto getRunEntityCounts(int runId) {
-        Map<String, EntityCountHistory> res = history.get(runId).getEntityCounts();
+        Map<String, EntityCountHistory> res = simulationManager.getEntityCountHistory(runId);
         return createEntityCountHistoryDto(res);
     }
 
@@ -143,17 +137,16 @@ public class MainApiImpl implements MainApi {
 
     @Override
     public EntityListDto getEntityList(int runId) {
-        return new EntityListDto(history.get(runId)
-                .getEntityDefinitions().stream()
+        return new EntityListDto(simulationManager.getEntityList(runId).stream()
                 .map(EntityDefinition::getDto)
                 .collect(Collectors.toList()));
     }
 
     @Override
     public SingleRunHistoryDto getRunPropertyHistogram(int runId, String entityName, String propertyName) {
-        Map<Comparable<?>, Integer> propertyHist = history.get(runId).getEntityPropertyHistogram(entityName,propertyName);
-        Double consistency = history.get(runId).getConsistency(entityName, propertyName);
-        Double average = history.get(runId).getAverage(entityName, propertyName);
+        Map<Comparable<?>, Integer> propertyHist = simulationManager.getEntityPropertyHistogram(runId,entityName,propertyName);
+        Double consistency = simulationManager.getConsistency(runId,entityName, propertyName);
+        Double average = simulationManager.getAverage(runId,entityName, propertyName);
         return new SingleRunHistoryDto(null, null, propertyHist, consistency, average);
     }
 
@@ -173,10 +166,9 @@ public class MainApiImpl implements MainApi {
     }
 
     @Override
-    public void unload() {
+    public void unload() throws InterruptedException {
         activeDefinition = null;
         clientDataContainer = null;
-        history.clear();
-        activeWorld = null;
+        simulationManager.unload();
     }
 }

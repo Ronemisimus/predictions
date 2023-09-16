@@ -3,14 +3,18 @@ package predictions.execution;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class EntityCountHistory {
+public class EntityCountHistory implements Cloneable {
     private final Map<Integer, Integer> entityCount;
 
     public EntityCountHistory() {
         this.entityCount = new HashMap<>();
     }
 
-    public Map<Integer, Integer> getEntityCount() {
+    private EntityCountHistory(Map<Integer, Integer> entityCount) {
+        this.entityCount = new HashMap<>(entityCount);
+    }
+
+    public synchronized Map<Integer, Integer> getEntityCount() {
         if (entityCount.size() <= 10000) {
             return entityCount;
         }
@@ -24,7 +28,12 @@ public class EntityCountHistory {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    public void addEntityCount(int count) {
+    public synchronized void addEntityCount(int count) {
         entityCount.put(entityCount.size(), count);
+    }
+
+    @Override
+    public synchronized EntityCountHistory clone() {
+        return new EntityCountHistory(new HashMap<>(entityCount));
     }
 }

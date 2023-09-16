@@ -2,10 +2,10 @@ package predictions.client.container;
 
 import dto.subdto.show.world.EntityDto;
 import dto.subdto.show.world.PropertyDto;
-import predictions.action.api.ContextDefinition;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.property.api.PropertyDefinition;
 import predictions.definition.world.api.World;
+import predictions.execution.instance.world.WorldInstance;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,6 +43,15 @@ public class ClientDataContainerImpl implements ClientDataContainer {
         }
     }
 
+    public ClientDataContainerImpl(ClientDataContainerImpl clientDataContainer) {
+        gridHeight = clientDataContainer.gridHeight;
+        gridWidth = clientDataContainer.gridWidth;
+        envValues = clientDataContainer.envValues;
+        propertyDefinitions = clientDataContainer.propertyDefinitions;
+        entityAmounts = clientDataContainer.entityAmounts;
+        entityDefinitions = clientDataContainer.entityDefinitions;
+    }
+
     @Override
     public void setEntityAmount(String name, int i) {
         if (i < 0) throw new RuntimeException("Negative amount");
@@ -74,23 +83,11 @@ public class ClientDataContainerImpl implements ClientDataContainer {
     }
 
     @Override
-    public void initialize(World activeDefinition) {
+    public void initialize(WorldInstance activeWorld) {
         for (String name : envValues.keySet()) {
             Optional<Comparable<?>> res = Optional.ofNullable(envValues.get(name));
-            res.ifPresent(comparable -> activeDefinition.getEnvVariablesManager().set(name, comparable));
+            res.ifPresent(comparable -> activeWorld.setEnvironmentVariable(name, comparable));
         }
-        for(String name : entityAmounts.keySet()){
-            if (activeDefinition.getEntityDefinitionByName(name).isPresent())
-                activeDefinition.getEntityDefinitionByName(name).get().setPopulation(entityAmounts.get(name));
-        }
-
-        activeDefinition.getRules().forEachRemaining(rule -> rule.getActionsToPerform().forEach(action -> {
-            ContextDefinition context = action.getContextDefinition();
-            String primary = context.getPrimaryEntityDefinition().getName();
-            String secondary = context.getSecondaryEntityDefinition()==null? null: context.getSecondaryEntityDefinition().getName();
-            context.getPrimaryEntityDefinition().setPopulation(entityAmounts.get(primary));
-            if (secondary!=null) context.getSecondaryEntityDefinition().setPopulation(entityAmounts.get(secondary));
-        }));
     }
 
     @Override

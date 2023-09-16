@@ -24,7 +24,7 @@ public class TimeTermination implements Termination {
 
     @Override
     public boolean isTermination(Signal signal) {
-        return Duration.between(signal.getStartTime(), signal.getClock()).compareTo(terminationDuration) >= 0;
+        return signal.getDuration().compareTo(terminationDuration) >= 0;
     }
 
     @Override

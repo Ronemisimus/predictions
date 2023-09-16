@@ -125,15 +125,14 @@ public class EngineApi {
     }
 
     public void runSimulation() {
-        api.initialize();
         api.runSimulation();
     }
 
     public List<RunDisplayed> getRunHistory() {
         RunHistoryDto res = api.getRunHistory();
         return res.getRunList().entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .map(RunDisplayed::new)
+                .map(e -> new RunDisplayed(e, res.getRunStates().get(e.getKey())))
+                .sorted(Comparator.comparing(RunDisplayed::getRunTime, Comparator.reverseOrder()))
                 .collect(Collectors.toList());
     }
 
@@ -146,7 +145,11 @@ public class EngineApi {
     }
 
     public void unload() {
-        api.unload();
+        try {
+            api.unload();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Map<String, Map<String, PropertyData>> getSingleRunHistoryPropertyData(Integer runIdentifier) {

@@ -200,7 +200,11 @@ public class ContextDefinitionImpl implements ContextDefinition {
             );
         } else {
             List<Context> list = new ArrayList<>();
-            int bound = getSecondaryEntityRealAmount();
+            int secondaryEntityPopulation = (int) entityInstances.stream()
+                    .filter(entity -> entity.getEntityTypeName()
+                            .equals(secondaryEntityDefinition.getName()))
+                    .count();
+            int bound = getSecondaryEntityRealAmount(secondaryEntityPopulation);
             if (allSecondary || (bound != getSecondaryEntityAmount() && bound!=0))
             {
                 list.addAll(secondaryEntities.stream()
@@ -232,17 +236,17 @@ public class ContextDefinitionImpl implements ContextDefinition {
 
     }
 
-    private int getSecondaryEntityRealAmount() {
+    private int getSecondaryEntityRealAmount(int secondaryEntityPopulation) {
         if(secondaryEntityAmount==null)
         {
             return 0;
         }
-        else if (secondaryEntityAmount!=-1 && secondaryEntityAmount<secondaryEntityDefinition.getPopulation()){
+        else if (secondaryEntityAmount!=-1 && secondaryEntityAmount<secondaryEntityPopulation){
             return secondaryEntityAmount;
         }
         else
         {
-            return secondaryEntityDefinition.getPopulation();
+            return secondaryEntityPopulation;
         }
     }
 }

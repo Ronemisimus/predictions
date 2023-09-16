@@ -206,7 +206,10 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
 
     @Override
     public Map<String, EntityCountHistory> getEntityCounts() {
-        return entityCountHistoryMap;
+        Map<String, EntityCountHistory> temp = new HashMap<>(entityCountHistoryMap);
+        Map<String, EntityCountHistory> copy = new HashMap<>();
+        temp.forEach((key, value) -> copy.put(key, value.clone()));
+        return copy;
     }
 
     @Override

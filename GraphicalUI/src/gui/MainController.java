@@ -66,7 +66,9 @@ public class MainController {
         if (newValue)
             DetailsButton.fire();
         else {
-            EngineApi.getInstance().unload();
+            try {
+                EngineApi.getInstance().unload();
+            }catch (Exception ignored){}
             FileLabel.textProperty().set("loaded file will show here");
             centerStage.setCenter(null);
         }
@@ -108,6 +110,5 @@ public class MainController {
 
     public void unload() {
         isLoaded.set(false);
-        EngineApi.getInstance().unload();
     }
 }
