@@ -5,72 +5,73 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<ScrollPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MainController">
-   <content>
-      <BorderPane fx:id="mainScene" prefHeight="900.0">
-         <top>
+<ScrollPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="gui.MainController">
+    <BorderPane fx:id="mainScene" prefHeight="900.0">
+        <top>
             <GridPane style="-fx-border-color: BLACK;">
-              <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
-               <children>
-                  <Button fx:id="LoadFileButton" mnemonicParsing="false" prefHeight="22.0" prefWidth="156.0" text="Load File" textAlignment="CENTER" GridPane.columnSpan="2" GridPane.rowIndex="1">
-                     <font>
-                        <Font size="11.0" />
-                     </font>
-                     <GridPane.margin>
-                        <Insets left="5.0" />
-                     </GridPane.margin>
-                  </Button>
-                  <TextFlow prefHeight="200.0" prefWidth="200.0" textAlignment="CENTER" GridPane.columnIndex="2" GridPane.columnSpan="8" GridPane.rowIndex="1">
-                     <children>
-                        <Label fx:id="FileLabel" prefHeight="22.0" prefWidth="786.0" text="loaded file will show here" />
-                     </children>
-                  </TextFlow>
-                  <Button fx:id="DetailsButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="190.0" text="Details" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="3" />
-                  <Button fx:id="newExecutionButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="164.0" text="New Execution" GridPane.columnIndex="4" GridPane.columnSpan="3" GridPane.rowIndex="3">
-                     <GridPane.margin>
-                        <Insets left="5.0" />
-                     </GridPane.margin>
-                  </Button>
-                  <Button fx:id="resultsButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="228.0" text="Results" GridPane.columnIndex="7" GridPane.columnSpan="3" GridPane.rowIndex="3">
-                     <GridPane.margin>
-                        <Insets left="5.0" />
-                     </GridPane.margin>
-                  </Button>
-                  <Region prefHeight="60.0" prefWidth="165.0" style="-fx-border-color: BLACK;" GridPane.columnIndex="10" GridPane.columnSpan="6" GridPane.rowSpan="5">
-                     <GridPane.margin>
-                        <Insets bottom="5.0" left="20.0" right="5.0" top="5.0" />
-                     </GridPane.margin>
-                  </Region>
-               </children>
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <Button fx:id="LoadFileButton" mnemonicParsing="false" prefHeight="22.0" prefWidth="156.0"
+                        text="Load File" textAlignment="CENTER" GridPane.columnSpan="2" GridPane.rowIndex="1">
+                    <font>
+                        <Font size="11.0"/>
+                    </font>
+                    <GridPane.margin>
+                        <Insets left="5.0"/>
+                    </GridPane.margin>
+                </Button>
+                <TextFlow prefHeight="200.0" prefWidth="200.0" textAlignment="CENTER" GridPane.columnIndex="2"
+                          GridPane.columnSpan="8" GridPane.rowIndex="1">
+                    <Label fx:id="FileLabel" prefHeight="22.0" prefWidth="786.0" text="loaded file will show here"/>
+                </TextFlow>
+                <Button fx:id="DetailsButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="190.0"
+                        text="Details" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="3"/>
+                <Button fx:id="newExecutionButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="164.0"
+                        text="New Execution" GridPane.columnIndex="4" GridPane.columnSpan="3" GridPane.rowIndex="3">
+                    <GridPane.margin>
+                        <Insets left="5.0"/>
+                    </GridPane.margin>
+                </Button>
+                <Button fx:id="resultsButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="228.0"
+                        text="Results" GridPane.columnIndex="7" GridPane.columnSpan="3" GridPane.rowIndex="3">
+                    <GridPane.margin>
+                        <Insets left="5.0"/>
+                    </GridPane.margin>
+                </Button>
+                <Region prefHeight="60.0" prefWidth="165.0" style="-fx-border-color: BLACK;" GridPane.columnIndex="10"
+                        GridPane.columnSpan="6" GridPane.rowSpan="5">
+                    <GridPane.margin>
+                        <Insets bottom="5.0" left="20.0" right="5.0" top="5.0"/>
+                    </GridPane.margin>
+                </Region>
             </GridPane>
-         </top>
-         <center>
-            <BorderPane fx:id="centerStage" BorderPane.alignment="CENTER" />
-         </center>
-      </BorderPane>
-   </content>
+        </top>
+        <center>
+          <BorderPane fx:id="centerStage" BorderPane.alignment="CENTER"/>
+        </center>
+    </BorderPane>
 </ScrollPane>

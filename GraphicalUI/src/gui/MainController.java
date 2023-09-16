@@ -18,8 +18,8 @@ import java.io.IOException;
 
 public class MainController {
 
-
-    // fxml controls
+    @FXML
+    public BorderPane mainScene;
     @FXML
     private Button LoadFileButton;
     @FXML
@@ -41,14 +41,14 @@ public class MainController {
     @FXML
     private void initialize() {
         LoadFileButton.setOnAction(this::handleLoadFileButtonClick);
-        DetailsButton.setOnAction(this::handleDetailsButtonClick);
+        DetailsButton.setOnAction(event1 -> handleDetailsButtonClick());
         isLoaded.addListener(this::handleFileLoaded);
-        newExecutionButton.setOnAction(this::handleNewExecutionButtonClick);
-        resultsButton.setOnAction(this::handleResultsButtonClick);
+        newExecutionButton.setOnAction(event1 -> handleNewExecutionButtonClick());
+        resultsButton.setOnAction(event -> handleResultsButtonClick());
     }
 
-    public void handleResultsButtonClick(ActionEvent actionEvent) {
-        loadSubScene("HistoryScene.fxml", actionEvent, HistoryController.class);
+    public void handleResultsButtonClick() {
+        loadSubScene("HistoryScene.fxml", HistoryController.class);
     }
 
     public static MainController getInstance(MainController mainController){
@@ -79,11 +79,11 @@ public class MainController {
     }
 
     @FXML
-    private void handleDetailsButtonClick(ActionEvent event) {
-        loadSubScene("DetailsScene.fxml", event, DetailsSceneController.class);
+    private void handleDetailsButtonClick() {
+        loadSubScene("DetailsScene.fxml", DetailsSceneController.class);
     }
 
-    private void loadSubScene(String fileName, ActionEvent event, Class<?> loaderClass)
+    private void loadSubScene(String fileName, Class<?> loaderClass)
     {
         if (isLoaded.get()) {
             try {
@@ -101,8 +101,8 @@ public class MainController {
     }
 
     @FXML
-    public void handleNewExecutionButtonClick(ActionEvent event) {
-        loadSubScene("ExecutionScene.fxml", event, ExecutionController.class);
+    public void handleNewExecutionButtonClick() {
+        loadSubScene("ExecutionScene.fxml", ExecutionController.class);
     }
 
 

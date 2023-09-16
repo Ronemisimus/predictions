@@ -114,7 +114,6 @@ public class MainApiImpl implements MainApi {
     public void initialize() {
         clientDataContainer.initialize(activeDefinition);
         activeWorld = new WorldInstanceImpl(activeDefinition);
-        activeWorld.getEnvironmentVariables().getDto();
     }
 
     public void runSimulation() {

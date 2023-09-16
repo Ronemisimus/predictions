@@ -14,11 +14,9 @@
       </ButtonBar>
    </bottom>
    <center>
-      <SplitPane dividerPositions="0.5" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
-        <items>
-            <BorderPane fx:id="leftPane" prefHeight="200.0" prefWidth="200.0" />
-            <BorderPane fx:id="centerPane" prefHeight="200.0" prefWidth="200.0" />
-        </items>
-      </SplitPane>
+       <SplitPane dividerPositions="0.5" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
+           <BorderPane fx:id="leftPane" prefHeight="200.0" prefWidth="200.0"/>
+           <BorderPane fx:id="centerPane" prefHeight="200.0" prefWidth="200.0"/>
+       </SplitPane>
    </center>
 </BorderPane>
