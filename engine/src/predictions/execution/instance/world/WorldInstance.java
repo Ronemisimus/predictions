@@ -20,4 +20,8 @@ public interface WorldInstance {
     Map<Comparable<?>, Integer> getEntityPropertyHistogram(String entityName, String property);
 
     List<EntityDefinition> getEntityDefinitions();
+
+    Double getConsistency(String entityName, String property);
+
+    Double getAverage(String entityName, String property);
 }

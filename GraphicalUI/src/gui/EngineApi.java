@@ -3,11 +3,13 @@ package gui;
 import dto.*;
 import dto.subdto.InitializeDto;
 import dto.subdto.SingleRunHistoryDto;
+import dto.subdto.show.EntityListDto;
 import dto.subdto.show.world.EntityDto;
 import dto.subdto.show.world.PropertyDto;
 import gui.details.tree.WorldDetailsItem;
 import gui.execution.environment.EntityAmountGetter;
 import gui.execution.environment.EnvironmentVariableGetter;
+import gui.history.data.PropertyData;
 import gui.history.display.RunDisplayed;
 import gui.readFileError.ReadFileError;
 import javafx.beans.property.StringProperty;
@@ -147,5 +149,30 @@ public class EngineApi {
 
     public void unload() {
         api.unload();
+    }
+
+    public Map<String, Map<String, PropertyData>> getSingleRunHistoryPropertyData(Integer runIdentifier) {
+        EntityListDto entities = api.getEntityList(runIdentifier);
+
+        return entities.getEntities().stream()
+                .map(e -> new AbstractMap.SimpleEntry<>(e.getName(), e.getProps()))
+                .map(entry -> new AbstractMap.SimpleEntry<>(
+                        entry.getKey(),
+                        entry.getValue().stream()
+                                .map(p-> new AbstractMap.SimpleEntry<String, PropertyData>(
+                                        p.getName(),
+                                        new PropertyData(
+                                                entry.getKey(),
+                                                p,
+                                                api.getRunPropertyHistogram(
+                                                        runIdentifier,
+                                                        entry.getKey(),
+                                                        p.getName()
+                                                )
+                                        )
+                                ))
+                                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))))
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+
     }
 }

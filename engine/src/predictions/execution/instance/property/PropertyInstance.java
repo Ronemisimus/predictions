@@ -10,4 +10,6 @@ public interface PropertyInstance<T> {
     int getTimeModification();
 
     PropertyInstanceDto getDto();
+
+    Double getConsistency(int tick);
 }

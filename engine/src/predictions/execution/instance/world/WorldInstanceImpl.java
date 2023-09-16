@@ -3,12 +3,14 @@ package predictions.execution.instance.world;
 import predictions.action.api.Action;
 import predictions.action.api.ActionType;
 import predictions.definition.entity.EntityDefinition;
+import predictions.definition.property.api.PropertyType;
 import predictions.definition.world.api.World;
 import predictions.execution.EntityCountHistory;
 import predictions.execution.instance.entity.EntityInstance;
 import predictions.execution.instance.entity.manager.EntityInstanceManager;
 import predictions.execution.instance.entity.manager.EntityInstanceManagerImpl;
 import predictions.execution.instance.environment.api.ActiveEnvironment;
+import predictions.execution.instance.property.PropertyInstance;
 import predictions.termination.api.Signal;
 import predictions.termination.api.Termination;
 import predictions.termination.impl.SignalImpl;
@@ -17,7 +19,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class WorldInstanceImpl implements WorldInstance{
 
@@ -84,29 +85,21 @@ public class WorldInstanceImpl implements WorldInstance{
 
             // execute actions phase 1
             List<EntityInstance> tempList = new ArrayList<>(entityInstanceManager.getInstances());
-            tempList.forEach(entityInstance -> {
-                firstPhaseActions.forEach(action -> {
-                    action.getContextDefinition()
-                            .getContextList(entityInstance,
-                                    tempList,
-                                    entityInstanceManager,
-                                    activeEnvironment,
-                                    tick)
-                            .forEach(action::invoke);
-                });
-            });
+            tempList.forEach(entityInstance -> firstPhaseActions.forEach(action -> action.getContextDefinition()
+                    .getContextList(entityInstance,
+                            tempList,
+                            entityInstanceManager,
+                            activeEnvironment,
+                            tick)
+                    .forEach(action::invoke)));
             // execute actions phase 2: kill or replace
-            tempList.forEach(entityInstance -> {
-                lastPhaseActions.forEach(action -> {
-                    action.getContextDefinition()
-                            .getContextList(entityInstance,
-                                    tempList,
-                                    entityInstanceManager,
-                                    activeEnvironment,
-                                    tick)
-                            .forEach(action::invoke);
-                });
-            });
+            tempList.forEach(entityInstance -> lastPhaseActions.forEach(action -> action.getContextDefinition()
+                    .getContextList(entityInstance,
+                            tempList,
+                            entityInstanceManager,
+                            activeEnvironment,
+                            tick)
+                    .forEach(action::invoke)));
 
             entityInstanceManager.finishKills();
             entityInstanceManager.finishReplace(this.tick);
@@ -179,6 +172,46 @@ public class WorldInstanceImpl implements WorldInstance{
         List<EntityDefinition> res = new ArrayList<>();
         world.getEntityDefinitions().forEachRemaining(res::add);
         return res;
+    }
+
+    @Override
+    public Double getConsistency(String entityName, String property) {
+        Double consistency = 0.0;
+        Double count = 0.0;
+        for (EntityInstance entityInstance : entityInstanceManager.getInstances())
+        {
+            if (entityInstance.getEntityTypeName().equals(entityName))
+            {
+                consistency += entityInstance.getPropertyByName(property).getConsistency(tick);
+                count++;
+            }
+        }
+        return count==0?0:consistency/count;
+    }
+
+    @Override
+    public Double getAverage(String entityName, String property) {
+        Double avg = 0.0;
+        Double count = 0.0;
+        for (EntityInstance entityInstance : entityInstanceManager.getInstances())
+        {
+            if (entityInstance.getEntityTypeName().equals(entityName))
+            {
+                count++;
+                PropertyInstance<?> propertyInstance = entityInstance.getPropertyByName(property);
+                if (propertyInstance.getPropertyDefinition().getType().equals(PropertyType.DECIMAL) ||
+                        propertyInstance.getPropertyDefinition().getType().equals(PropertyType.FLOAT))
+                {
+                    Comparable<?> val = propertyInstance.getValue();
+                    if (val instanceof Integer) avg += ((Integer) val).doubleValue();
+                    else avg += ((Double) val);
+                }
+                else{
+                    return null;
+                }
+            }
+        }
+        return count==0?0:avg/count;
     }
 
     @Override

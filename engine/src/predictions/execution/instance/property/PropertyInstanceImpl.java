@@ -3,6 +3,10 @@ package predictions.execution.instance.property;
 import dto.subdto.show.instance.PropertyInstanceDto;
 import predictions.definition.property.api.PropertyDefinition;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
+
 public class PropertyInstanceImpl<T> implements PropertyInstance<T> {
 
     private final PropertyDefinition<T> propertyDefinition;
@@ -10,11 +14,14 @@ public class PropertyInstanceImpl<T> implements PropertyInstance<T> {
 
     private int timeModification;
 
+    private final List<Integer> modificationHistory;
+
     public PropertyInstanceImpl(PropertyDefinition<T> propertyDefinition, Comparable<T> value) {
         this.propertyDefinition = propertyDefinition;
         if (propertyDefinition.isLegal(value)) {
             this.value = value;
-            this.timeModification = 0;
+            modificationHistory = new ArrayList<>();
+            updateModificationHistory(0);
         }
         else {
             throw new IllegalArgumentException("Illegal value for property " + propertyDefinition.getName() + ", value: " + value);
@@ -31,11 +38,13 @@ public class PropertyInstanceImpl<T> implements PropertyInstance<T> {
         return value;
     }
 
+
+    @SuppressWarnings("unchecked")
     @Override
     public void updateValue(Comparable<?> val, int timeModification) {
         if (propertyDefinition.isLegal(val)) {
             this.value = (Comparable<T>) val;
-            this.timeModification = timeModification;
+            updateModificationHistory(timeModification);
         }
         else
         {
@@ -50,16 +59,23 @@ public class PropertyInstanceImpl<T> implements PropertyInstance<T> {
             }
             if (from!=null)
             {
-                if (from > (Double) val) {
+                if (val instanceof Double && from > (Double) val) {
                     this.value = (Comparable<T>) from;
-                    this.timeModification = timeModification;
+                    updateModificationHistory(timeModification);
                 }
-                if (to < (Double) val) {
+                if (val instanceof Double && to < (Double) val) {
                     this.value = (Comparable<T>) to;
-                    this.timeModification = timeModification;
+                    updateModificationHistory(timeModification);
                 }
             }
         }
+    }
+
+    private void updateModificationHistory(int timeModification) {
+        this.timeModification = timeModification;
+        if (modificationHistory.isEmpty() ||
+                !modificationHistory.get(modificationHistory.size()-1).equals(timeModification))
+            modificationHistory.add(timeModification);
     }
 
     @Override
@@ -70,6 +86,27 @@ public class PropertyInstanceImpl<T> implements PropertyInstance<T> {
     @Override
     public PropertyInstanceDto getDto() {
         return new PropertyInstanceDto(propertyDefinition.getDto(), value);
+    }
+
+    @Override
+    public Double getConsistency(int tick) {
+        modificationHistory.add(tick);
+
+        // Calculate the sum of time differences between consecutive changes
+        long totalTimeDifference = IntStream.range(1, modificationHistory.size())
+                .mapToLong(i -> modificationHistory.get(i) - modificationHistory.get(i - 1))
+                .sum();
+
+        int changeCount = modificationHistory.size() - 1;
+        modificationHistory.remove(modificationHistory.size()-1);
+
+        // Calculate the average time between changes
+         // Number of changes
+        if (changeCount > 0) {
+            return (double) totalTimeDifference / changeCount;
+        } else {
+            return null; // Return null if no valid time differences found
+        }
     }
 
 }

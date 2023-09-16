@@ -55,7 +55,7 @@ public class MainApiImpl implements MainApi {
 
         try {
             SchemaFactory schemaFactory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
-            Schema schema = schemaFactory.newSchema(new File(getClass().getResource("predictions-v2.xsd").toURI()));
+            Schema schema = schemaFactory.newSchema(new File(Objects.requireNonNull(getClass().getResource("predictions-v2.xsd")).toURI()));
             JAXBContext context = JAXBContext.newInstance(PRDWorld.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
             unmarshaller.setSchema(schema);
@@ -140,7 +140,7 @@ public class MainApiImpl implements MainApi {
     private SingleRunHistoryDto createEntityCountHistoryDto(Map<String, EntityCountHistory> res) {
         List<String> entities = new ArrayList<>(res.keySet());
         List<Map<Integer, Integer>> counts = entities.stream().map(res::get).map(EntityCountHistory::getEntityCount).collect(Collectors.toList());
-        return new SingleRunHistoryDto(entities, counts, null);
+        return new SingleRunHistoryDto(entities, counts, null, null, null);
     }
 
     @Override
@@ -154,7 +154,9 @@ public class MainApiImpl implements MainApi {
     @Override
     public SingleRunHistoryDto getRunPropertyHistogram(int runId, String entityName, String propertyName) {
         Map<Comparable<?>, Integer> propertyHist = history.get(runId).getEntityPropertyHistogram(entityName,propertyName);
-        return new SingleRunHistoryDto(null, null, propertyHist);
+        Double consistency = history.get(runId).getConsistency(entityName, propertyName);
+        Double average = history.get(runId).getAverage(entityName, propertyName);
+        return new SingleRunHistoryDto(null, null, propertyHist, consistency, average);
     }
 
     @Override
