@@ -1,7 +1,8 @@
 package predictions.execution;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class EntityCountHistory {
     private Map<Integer, Integer> entityCount;
@@ -11,7 +12,17 @@ public class EntityCountHistory {
     }
 
     public Map<Integer, Integer> getEntityCount() {
-        return entityCount;
+        if (entityCount.size() <= 10000) {
+            return entityCount;
+        }
+
+        int targetSampleSize = 10000;
+        int stepSize = entityCount.size() / targetSampleSize;
+
+        return entityCount.entrySet().stream()
+                .filter(entry -> entry.getKey() % stepSize == 0)
+                .limit(targetSampleSize)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public void addEntityCount(int count) {
