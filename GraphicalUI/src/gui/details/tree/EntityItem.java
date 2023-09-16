@@ -9,7 +9,7 @@ import javafx.scene.layout.VBox;
 
 public class EntityItem extends TreeItem<String> implements OpenableItem {
 
-    private EntityDto entity;
+    private final EntityDto entity;
     private Integer entityAmount;
     public EntityItem(EntityDto entity) {
         super(entity.getName(), null);
@@ -21,7 +21,7 @@ public class EntityItem extends TreeItem<String> implements OpenableItem {
     @Override
     public Parent getDetailsView() {
         String entityName = entity.getName();
-        Integer PropertyAmount = entity.getProps().size();
+        int PropertyAmount = entity.getProps().size();
 
         // Create a VBox to hold the details
         VBox detailsBox = new VBox();

@@ -8,20 +8,17 @@ import javafx.scene.layout.VBox;
 
 
 public class WorldDetailsItem extends TreeItem<String> implements OpenableItem {
-    private ShowWorldDto data;
-    private TreeItem<String> env;
-    private TreeItem<String> entities;
-    private TreeItem<String> rules;
-    private TreeItem<String> terminations;
+    private final ShowWorldDto data;
 
     public WorldDetailsItem(ShowWorldDto data) {
         super("world", null);
         this.data = data;
-        env = new EnvItem(data.getWorld().getEnvironment());
-        entities = new EntitiesItem(data.getWorld().getEntities());
-        rules = new RulesItem(data.getWorld().getRules());
-        terminations = new TerminationsItem(data.getWorld().getTicksTermination(), data.getWorld().getTimeTermination(), data.getWorld().isUserTermination());
+        TreeItem<String> env = new EnvItem(data.getWorld().getEnvironment());
+        TreeItem<String> entities = new EntitiesItem(data.getWorld().getEntities());
+        TreeItem<String> rules = new RulesItem(data.getWorld().getRules());
+        TreeItem<String> terminations = new TerminationsItem(data.getWorld().getTicksTermination(), data.getWorld().getTimeTermination(), data.getWorld().isUserTermination());
         setExpanded(true);
+        //noinspection unchecked
         this.getChildren().addAll(env, entities, rules, terminations);
     }
 

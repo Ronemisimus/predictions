@@ -8,7 +8,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.layout.VBox;
 
 public class RuleItem extends TreeItem<String> implements OpenableItem {
-    private RuleDto rule;
+    private final RuleDto rule;
     public RuleItem(RuleDto rule) {
         super(rule.getName(), null);
         this.rule = rule;

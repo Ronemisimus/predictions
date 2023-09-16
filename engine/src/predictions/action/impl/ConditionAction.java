@@ -43,22 +43,10 @@ public class ConditionAction extends AbstractAction {
             throw e;
         }
         this.then_actions = prdThen==null? new ArrayList<>(): prdThen.getPRDAction().stream()
-                .map(def -> {
-                    try {
-                        return ConverterPRDEngine.getActionFromPRD(def, contextDefinition, builder);
-                    } catch (Exception e) {
-                        throw e;
-                    }
-                })
+                .map(def -> ConverterPRDEngine.getActionFromPRD(def, contextDefinition, builder))
                 .collect(Collectors.toList());
         this.else_actions = prdElse==null? new ArrayList<>(): prdElse.getPRDAction().stream()
-                .map(def -> {
-                    try {
-                        return ConverterPRDEngine.getActionFromPRD(def, contextDefinition, builder);
-                    } catch (Exception e) {
-                        throw e;
-                    }
-                })
+                .map(def -> ConverterPRDEngine.getActionFromPRD(def, contextDefinition, builder))
                 .collect(Collectors.toList());
     }
 

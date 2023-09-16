@@ -18,6 +18,7 @@ public enum SingleBooleanOperation {
 
         @Override
         public Boolean evaluate(Comparable<?> a, Comparable<?> b) {
+            //noinspection unchecked
             Comparable<Object> c = (Comparable<Object>) a;
             return c.compareTo(b)> 0;
         }
@@ -25,6 +26,7 @@ public enum SingleBooleanOperation {
     SMALLER("lt") {
         @Override
         public Boolean evaluate(Comparable<?> a, Comparable<?> b) {
+            //noinspection unchecked
             Comparable<Object> c = (Comparable<Object>) a;
             return c.compareTo(b) < 0;
         }

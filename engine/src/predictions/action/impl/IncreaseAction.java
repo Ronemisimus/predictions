@@ -59,11 +59,13 @@ public class IncreaseAction extends AbstractAction {
         int world_time = context.getTick();
 
         if (propertyInstance.getPropertyDefinition().getType() == PropertyType.DECIMAL) {
+            //noinspection unchecked
             PropertyInstance<Integer> prop = (PropertyInstance<Integer>) propertyInstance;
             Comparable<Double> val = Double.valueOf((Integer) prop.getValue());
             Comparable<Double> res = MathOperation.ADD.evaluate(val, expVal);
             prop.updateValue(((Double) res).intValue(), world_time);
         } else if (propertyInstance.getPropertyDefinition().getType() == PropertyType.FLOAT) {
+            //noinspection unchecked
             PropertyInstance<Double> prop = (PropertyInstance<Double>) propertyInstance;
             Comparable<Double> val = prop.getValue();
             Comparable<Double> res = MathOperation.ADD.evaluate(val, expVal);

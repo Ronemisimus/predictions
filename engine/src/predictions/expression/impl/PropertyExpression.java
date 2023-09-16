@@ -17,6 +17,7 @@ public class PropertyExpression<T> implements Expression<T> {
 
     @Override
     public Comparable<T> evaluate(Context context) {
+        //noinspection unchecked
         return (Comparable<T>) context.getPrimaryEntityInstance().getPropertyByName(property).getValue();
     }
 

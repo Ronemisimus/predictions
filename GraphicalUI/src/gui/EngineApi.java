@@ -1,7 +1,6 @@
 package gui;
 
 import dto.*;
-import dto.subdto.InitializeDto;
 import dto.subdto.SingleRunHistoryDto;
 import dto.subdto.show.EntityListDto;
 import dto.subdto.show.world.EntityDto;
@@ -13,7 +12,6 @@ import gui.history.data.PropertyData;
 import gui.history.display.RunDisplayed;
 import gui.readFileError.ReadFileError;
 import javafx.beans.property.StringProperty;
-import javafx.scene.Parent;
 import javafx.scene.control.TreeItem;
 import javafx.stage.FileChooser;
 import predictions.MainApi;
@@ -100,7 +98,7 @@ public class EngineApi {
             {
                 Double from = (Double) property.get().getFrom();
                 Double to = (Double) property.get().getTo();
-                Double val = Double.parseDouble(text);
+                double val = Double.parseDouble(text);
                 if (val<from || val>to)
                 {
                     throw new RuntimeException("Invalid value");
@@ -109,26 +107,26 @@ public class EngineApi {
             switch (property.get().getType().toLowerCase())
             {
                 case "decimal":
-                    api.setEnv(name, Optional.of(Integer.parseInt(text)));
+                    Optional.of(Integer.parseInt(text)).ifPresent( val -> api.setEnv(name, val));
                     break;
                 case "float":
-                    api.setEnv(name, Optional.of(Double.parseDouble(text)));
+                    Optional.of(Double.parseDouble(text)).ifPresent( val -> api.setEnv(name, val));
                     break;
                 case "boolean":
-                    Boolean val = text.equals("true")? true : text.equals("false")? false : null;
+                    Boolean val = text.equals("true")? Boolean.TRUE : text.equals("false")? Boolean.FALSE : null;
                     if (val==null) throw new RuntimeException("Invalid boolean value");
-                    api.setEnv(name, Optional.of(val));
+                    Optional.of(val).ifPresent(v -> api.setEnv(name, v));
                     break;
                 case "string":
-                    api.setEnv(name, Optional.of(text));
+                    Optional.of(text).ifPresent(v-> api.setEnv(name, v));
                     break;
             }
         }
     }
 
     public void runSimulation() {
-        InitializeDto init = api.initialize();
-        RunSimulationDto run = api.runSimulation();
+        api.initialize();
+        api.runSimulation();
     }
 
     public List<RunDisplayed> getRunHistory() {
@@ -159,7 +157,7 @@ public class EngineApi {
                 .map(entry -> new AbstractMap.SimpleEntry<>(
                         entry.getKey(),
                         entry.getValue().stream()
-                                .map(p-> new AbstractMap.SimpleEntry<String, PropertyData>(
+                                .map(p-> new AbstractMap.SimpleEntry<>(
                                         p.getName(),
                                         new PropertyData(
                                                 entry.getKey(),

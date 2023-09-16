@@ -8,9 +8,9 @@ import javafx.scene.layout.VBox;
 
 public class TerminationsItem extends TreeItem<String> implements OpenableItem {
 
-    private Integer ticksTermination;
-    private Integer timeTermination;
-    private boolean userTermination;
+    private final Integer ticksTermination;
+    private final Integer timeTermination;
+    private final boolean userTermination;
     public TerminationsItem(Integer ticksTermination,
                             Integer timeTermination,
                             boolean userTermination) {

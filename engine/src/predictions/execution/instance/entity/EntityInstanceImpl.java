@@ -16,7 +16,7 @@ public class EntityInstanceImpl implements EntityInstance {
     private final int id;
     private final Map<String, PropertyInstance<?>> properties;
 
-    private Property<Coordinate> location;
+    private final Property<Coordinate> location;
 
     public EntityInstanceImpl(EntityDefinition entityDefinition, int id, Property<Coordinate> location) {
         this.entityDefinition = entityDefinition;

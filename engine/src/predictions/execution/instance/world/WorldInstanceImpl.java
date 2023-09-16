@@ -177,7 +177,7 @@ public class WorldInstanceImpl implements WorldInstance{
     @Override
     public Double getConsistency(String entityName, String property) {
         Double consistency = 0.0;
-        Double count = 0.0;
+        double count = 0.0;
         for (EntityInstance entityInstance : entityInstanceManager.getInstances())
         {
             if (entityInstance.getEntityTypeName().equals(entityName))
@@ -192,7 +192,7 @@ public class WorldInstanceImpl implements WorldInstance{
     @Override
     public Double getAverage(String entityName, String property) {
         Double avg = 0.0;
-        Double count = 0.0;
+        double count = 0.0;
         for (EntityInstance entityInstance : entityInstanceManager.getInstances())
         {
             if (entityInstance.getEntityTypeName().equals(entityName))

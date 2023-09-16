@@ -42,11 +42,6 @@ public class EnvVariableManagerImpl implements EnvVariablesManager {
     }
 
     @Override
-    public void addEnvironmentVariable(PropertyDefinition<?> propertyDefinition) {
-        propNameToPropDefinition.put(propertyDefinition.getName(), propertyDefinition);
-    }
-
-    @Override
     public ActiveEnvironment createActiveEnvironment() {
         ActiveEnvironment res = new ActiveEnvironmentImpl();
         getEnvVariables().forEach(def -> res.addPropertyInstance(PropertyDefinition.instantiate(def)));
@@ -59,21 +54,25 @@ public class EnvVariableManagerImpl implements EnvVariablesManager {
     }
 
     @Override
-    public void set(String name, Optional<Comparable<?>> value) {
+    public void set(String name, Comparable<?> value) {
         Optional<PropertyDefinition<?>> def = Optional.ofNullable(propNameToPropDefinition.get(name));
-        if (value.isPresent() && def.isPresent()) {
-            if(value.get() instanceof String) {
+        if (def.isPresent()) {
+            if(value instanceof String) {
+                //noinspection unchecked
                 PropertyDefinition<String> stringDef = (PropertyDefinition<String>) def.get();
-                stringDef.setInit((String)value.get());
-            } else if(value.get() instanceof Integer) {
+                stringDef.setInit((String)value);
+            } else if(value instanceof Integer) {
+                //noinspection unchecked
                 PropertyDefinition<Integer> intDef = (PropertyDefinition<Integer>) def.get();
-                intDef.setInit((Integer) value.get());
-            } else if (value.get() instanceof Double) {
+                intDef.setInit((Integer) value);
+            } else if (value instanceof Double) {
+                //noinspection unchecked
                 PropertyDefinition<Double> doubleDef = (PropertyDefinition<Double>) def.get();
-                doubleDef.setInit((Double) value.get());
-            } else if (value.get() instanceof Boolean) {
+                doubleDef.setInit((Double) value);
+            } else if (value instanceof Boolean) {
+                //noinspection unchecked
                 PropertyDefinition<Boolean> booleanDef = (PropertyDefinition<Boolean>) def.get();
-                booleanDef.setInit((Boolean) value.get());
+                booleanDef.setInit((Boolean) value);
             }
         }
     }

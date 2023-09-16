@@ -46,7 +46,7 @@ public class ConverterPRDEngine {
                                                                            ReadFileDto.Builder builder) {
         PropertyDefinition<?> res = null;
         Double from=null, to=null;
-        Comparable<?> defaultValue = null;
+        Comparable<?> defaultValue;
 
         propertyValidation(propertyName, random, range, propertyType, value, environmentProp,builder);
 
@@ -67,7 +67,7 @@ public class ConverterPRDEngine {
                         to != null ? to.intValue() : null);
                 break;
             case "float":
-                defaultValue = from == null? 0. : from.doubleValue();
+                defaultValue = from == null? 0. : from;
                 ValueGenerator<Double> vgd = value==null? (random?ValueGeneratorFactory.createRandomDouble(from,to): ValueGeneratorFactory.createFixed((Double)defaultValue)):
                         ValueGeneratorFactory.createFixed((Double)value);
                 res = new DoublePropertyDefinition(propertyName,
@@ -202,7 +202,7 @@ public class ConverterPRDEngine {
 
     public static PropertyDefinition<?> getPropertyDefinitionFromPRDEntity(PRDProperty def, ReadFileDto.Builder builder) {
         Comparable<?> res = null;
-        boolean random = false;
+        boolean random;
         random = def.getPRDValue()!=null && def.getPRDValue().isRandomInitialize();
         if (def.getPRDValue()!=null && def.getPRDValue().getInit()!=null) {
             try {
@@ -411,7 +411,7 @@ public class ConverterPRDEngine {
                     ContextDefinition context = ContextDefinitionImpl.getInstance(
                             mainEntityOpt.orElse(null),
                             secondaryEntityOpt.orElse(null),
-                            secondaryEntity.isPresent() ? secondaryEntity.get() : "all",
+                            secondaryEntity.orElse("all"),
                             prdCondition.orElse(null),
                             env,
                             entities.getPRDEntity() == null ? new ArrayList<>() :

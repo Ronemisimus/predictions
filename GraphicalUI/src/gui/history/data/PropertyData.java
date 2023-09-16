@@ -6,12 +6,12 @@ import dto.subdto.show.world.PropertyDto;
 import java.util.Map;
 
 public class PropertyData {
-    private Map<Comparable<?>, Integer> histogram;
-    private String entity;
-    private String property;
-    private Boolean number;
-    private Double average;
-    private Double consistency;
+    private final Map<Comparable<?>, Integer> histogram;
+    private final String entity;
+    private final String property;
+    private final Boolean number;
+    private final Double average;
+    private final Double consistency;
 
     public PropertyData(String entity, PropertyDto p, SingleRunHistoryDto run) {
         property = p.getName();

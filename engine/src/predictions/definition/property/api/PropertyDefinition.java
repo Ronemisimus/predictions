@@ -12,6 +12,7 @@ public interface PropertyDefinition<T> {
     boolean isLegal(Comparable<?> value);
 
     static PropertyInstance<?> instantiate(PropertyDefinition<?> def) {
+        //noinspection unchecked
         return new PropertyInstanceImpl<>((PropertyDefinition<Object>) def, (Comparable<Object>) def.generateValue());
     }
 

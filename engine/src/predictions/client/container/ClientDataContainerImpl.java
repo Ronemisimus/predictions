@@ -2,7 +2,6 @@ package predictions.client.container;
 
 import dto.subdto.show.world.EntityDto;
 import dto.subdto.show.world.PropertyDto;
-import predictions.action.api.Action;
 import predictions.action.api.ContextDefinition;
 import predictions.definition.entity.EntityDefinition;
 import predictions.definition.property.api.PropertyDefinition;
@@ -13,12 +12,13 @@ import java.util.stream.Collectors;
 
 public class ClientDataContainerImpl implements ClientDataContainer {
 
-    private Map<String,Comparable<?>> envValues;
-    private Map<String, PropertyDefinition> propertyDefinitions;
-    private Integer gridWidth, gridHeight;
-    private Map<String, Integer> entityAmounts;
+    private final Map<String,Comparable<?>> envValues;
+    private final Map<String, PropertyDefinition<?>> propertyDefinitions;
+    private final Integer gridWidth;
+    private final Integer gridHeight;
+    private final Map<String, Integer> entityAmounts;
 
-    private Map<String, EntityDefinition> entityDefinitions;
+    private final Map<String, EntityDefinition> entityDefinitions;
 
     public ClientDataContainerImpl(World world) {
         gridHeight = world.getGridHeight();
@@ -29,7 +29,7 @@ public class ClientDataContainerImpl implements ClientDataContainer {
         this.entityDefinitions = new HashMap<>();
         this.entityAmounts = new HashMap<>();
 
-        for (PropertyDefinition p : world.getEnvVariablesManager().getEnvVariables()){
+        for (PropertyDefinition<?> p : world.getEnvVariablesManager().getEnvVariables()){
             PropertyDto pDto = p.getDto();
             envValues.put(pDto.getName(), pDto.getInitValue());
             propertyDefinitions.put(pDto.getName(), p);
@@ -63,12 +63,12 @@ public class ClientDataContainerImpl implements ClientDataContainer {
     }
 
     @Override
-    public void setEnv(String name, Optional<Comparable<?>> value) {
-        PropertyDefinition p = propertyDefinitions.get(name);
-        if (p != null && value.isPresent()) {
-            if (p.isLegal(value.get()))
+    public void setEnv(String name, Comparable<?> value) {
+        PropertyDefinition<?> p = propertyDefinitions.get(name);
+        if (p != null) {
+            if (p.isLegal(value))
             {
-                envValues.put(name, value.get());
+                envValues.put(name, value);
             }
         }
     }
@@ -76,22 +76,21 @@ public class ClientDataContainerImpl implements ClientDataContainer {
     @Override
     public void initialize(World activeDefinition) {
         for (String name : envValues.keySet()) {
-            activeDefinition.getEnvVariablesManager().set(name, Optional.ofNullable(envValues.get(name)));
+            Optional<Comparable<?>> res = Optional.ofNullable(envValues.get(name));
+            res.ifPresent(comparable -> activeDefinition.getEnvVariablesManager().set(name, comparable));
         }
         for(String name : entityAmounts.keySet()){
             if (activeDefinition.getEntityDefinitionByName(name).isPresent())
                 activeDefinition.getEntityDefinitionByName(name).get().setPopulation(entityAmounts.get(name));
         }
 
-        activeDefinition.getRules().forEachRemaining(rule -> {
-            rule.getActionsToPerform().forEach(action -> {
-                ContextDefinition context = action.getContextDefinition();
-                String primary = context.getPrimaryEntityDefinition().getName();
-                String secondary = context.getSecondaryEntityDefinition()==null? null: context.getSecondaryEntityDefinition().getName();
-                context.getPrimaryEntityDefinition().setPopulation(entityAmounts.get(primary));
-                if (secondary!=null) context.getSecondaryEntityDefinition().setPopulation(entityAmounts.get(secondary));
-            });
-        });
+        activeDefinition.getRules().forEachRemaining(rule -> rule.getActionsToPerform().forEach(action -> {
+            ContextDefinition context = action.getContextDefinition();
+            String primary = context.getPrimaryEntityDefinition().getName();
+            String secondary = context.getSecondaryEntityDefinition()==null? null: context.getSecondaryEntityDefinition().getName();
+            context.getPrimaryEntityDefinition().setPopulation(entityAmounts.get(primary));
+            if (secondary!=null) context.getSecondaryEntityDefinition().setPopulation(entityAmounts.get(secondary));
+        }));
     }
 
     @Override

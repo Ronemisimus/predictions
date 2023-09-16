@@ -2,18 +2,11 @@ package gui.details.scene;
 
 import gui.EngineApi;
 import gui.details.tree.OpenableItem;
-import javafx.beans.Observable;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
-
-import java.awt.event.MouseEvent;
-import java.beans.EventHandler;
 
 public class DetailsSceneController {
     @FXML

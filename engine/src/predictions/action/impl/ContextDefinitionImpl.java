@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class ContextDefinitionImpl implements ContextDefinition {
 
@@ -83,7 +82,7 @@ public class ContextDefinitionImpl implements ContextDefinition {
             secondary = new EntityDefinitionImpl(secondaryEntity, bigBuilder);
 
         Integer amount = null;
-        Boolean allSecondary = false;
+        boolean allSecondary = false;
         if (secondaryEntity!=null && secondaryEntityAmount!=null) {
             try {
                 amount = Integer.valueOf(secondaryEntityAmount);

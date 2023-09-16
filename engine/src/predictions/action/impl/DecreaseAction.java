@@ -60,11 +60,13 @@ public class DecreaseAction extends AbstractAction {
         int world_time = context.getTick();
 
         if (propertyInstance.getPropertyDefinition().getType() == PropertyType.DECIMAL) {
+            //noinspection unchecked
             PropertyInstance<Integer> prop = (PropertyInstance<Integer>) propertyInstance;
             Comparable<Double> val = (double) (int) prop.getValue();
             Comparable<Double> res = MathOperation.SUBTRACT.evaluate(val, expVal);
             prop.updateValue((int)(double)res, world_time);
         } else if (propertyInstance.getPropertyDefinition().getType() == PropertyType.FLOAT) {
+            //noinspection unchecked
             PropertyInstance<Double> prop = (PropertyInstance<Double>) propertyInstance;
             Comparable<Double> val = prop.getValue();
             Comparable<Double> res = MathOperation.SUBTRACT.evaluate(val, expVal);

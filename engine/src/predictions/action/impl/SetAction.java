@@ -37,25 +37,29 @@ public class SetAction extends AbstractAction {
 
         Optional<PropertyDefinition<?>> prop = ConverterPRDEngine.checkEntityAndPropertyInContext(entityName, property, contextDefinition, builder);
         try{
-        switch (prop.get().getType())
-        {
-            case DECIMAL:
-            case FLOAT:
-                this.valueExpression = ExpressionBuilder.buildDoubleExpression(valueExpression, contextDefinition, expressionBuilder);
-                break;
-            case STRING:
-                this.valueExpression = ExpressionBuilder.buildStringExpression(valueExpression, contextDefinition, expressionBuilder);
-                break;
-            case BOOLEAN:
-                this.valueExpression = ExpressionBuilder.buildBooleanExpression(valueExpression, contextDefinition, expressionBuilder);
-                break;
-        }
+            if (prop.isPresent())
+            {
+                switch (prop.get().getType())
+                {
+                    case DECIMAL:
+                    case FLOAT:
+                        this.valueExpression = ExpressionBuilder.buildDoubleExpression(valueExpression, contextDefinition, expressionBuilder);
+                        break;
+                    case STRING:
+                        this.valueExpression = ExpressionBuilder.buildStringExpression(valueExpression, contextDefinition, expressionBuilder);
+                        break;
+                    case BOOLEAN:
+                        this.valueExpression = ExpressionBuilder.buildBooleanExpression(valueExpression, contextDefinition, expressionBuilder);
+                        break;
+                }
+            }
         }catch (Exception e)
         {
             builder.expressionError(expressionBuilder.build());
             throw e;
         }
     }
+    @SuppressWarnings("unchecked")
     @Override
     public void invoke(Context context) {
         PropertyInstance<?> propertyInstance = propInSecondary? context.getSecondaryEntityInstance().getPropertyByName(property):

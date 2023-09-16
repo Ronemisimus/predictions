@@ -7,7 +7,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.layout.VBox;
 
 public class PropertyItem extends TreeItem<String> implements OpenableItem {
-    private PropertyDto prop;
+    private final PropertyDto prop;
     public PropertyItem(PropertyDto e) {
         super(e.getName(), null);
         this.prop = e;

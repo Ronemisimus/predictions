@@ -10,7 +10,7 @@ import java.util.List;
 
 public class RulesItem extends TreeItem<String> implements OpenableItem{
 
-    private Integer ruleNumber;
+    private final Integer ruleNumber;
     public RulesItem(List<RuleDto> rules) {
         super("rules");
         ruleNumber = rules.size();

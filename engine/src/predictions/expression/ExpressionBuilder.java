@@ -29,8 +29,10 @@ public class ExpressionBuilder {
     public static Expression<Double> buildDoubleExpression(String expression,
                                                            ContextDefinition contextDefinition,
                                                             ExpressionErrorDto.Builder builder) {
+        //noinspection unchecked
         Expression<Double> funcExpression = (Expression<Double>) buildFunctionExpression(expression, contextDefinition, PropertyType.FLOAT, builder);
         if (funcExpression != null) return funcExpression;
+        //noinspection unchecked
         Expression<Double> entPropertyExpression = (Expression<Double>) buildEntityPropertyExpression(expression, contextDefinition);
         if (entPropertyExpression != null) return entPropertyExpression;
         return buildSimpleDoubleExpression(expression, builder);
@@ -96,7 +98,7 @@ public class ExpressionBuilder {
                 contextDefinition.getEnvVariables()
                         .getEnvVariables().stream()
                         .filter(p -> p.getType() == type)
-                        .map(p->p.getName())
+                        .map(PropertyDefinition::getName)
                         .filter(name -> name.equals(finalExpression1))
                         .findFirst()
                         .orElseThrow(() -> {
@@ -104,7 +106,7 @@ public class ExpressionBuilder {
                                     .environmentError(finalExpression1, type.name());
                             return new RuntimeException("bad environment expression");
                         });
-                return new EnviromentExpression(expression);
+                return new EnviromentExpression<>(expression);
             case "random":
                 if (type != PropertyType.FLOAT && type != PropertyType.DECIMAL) {
                     builder.withExpression(finalExpression)
@@ -207,8 +209,10 @@ public class ExpressionBuilder {
     public static Expression<String> buildStringExpression(String valueExpression,
                                                            ContextDefinition contextDefinition,
                                                            ExpressionErrorDto.Builder builder) {
+        //noinspection unchecked
         Expression<String> funcExpression = (Expression<String>) buildFunctionExpression(valueExpression, contextDefinition, PropertyType.STRING, builder);
         if (funcExpression != null) return funcExpression;
+        //noinspection unchecked
         Expression<String> entPropertyExpression = (Expression<String>) buildEntityPropertyExpression(valueExpression, contextDefinition);
         if (entPropertyExpression != null) return entPropertyExpression;
         return buildSimpleStringExpression(valueExpression);
@@ -230,8 +234,10 @@ public class ExpressionBuilder {
     public static Expression<Boolean> buildBooleanExpression(String valueExpression,
                                                              ContextDefinition contextDefinition,
                                                              ExpressionErrorDto.Builder builder) {
+        //noinspection unchecked
         Expression<Boolean> funcExpression = (Expression<Boolean>) buildFunctionExpression(valueExpression, contextDefinition, PropertyType.BOOLEAN, builder);
         if (funcExpression != null) return funcExpression;
+        //noinspection unchecked
         Expression<Boolean> entPropertyExpression = (Expression<Boolean>) buildEntityPropertyExpression(valueExpression, contextDefinition);
         if (entPropertyExpression != null) return entPropertyExpression;
         return buildSimpleBooleanExpression(valueExpression);
@@ -247,12 +253,7 @@ public class ExpressionBuilder {
             try {
                 return buildBooleanExpression(valueExpression, contextDefinition, builder);
             }catch (Exception e1) {
-                try {
-                    return buildStringExpression(valueExpression, contextDefinition, builder);
-                }catch (Exception e2)
-                {
-                    throw e2;
-                }
+                return buildStringExpression(valueExpression, contextDefinition, builder);
             }
         }
     }

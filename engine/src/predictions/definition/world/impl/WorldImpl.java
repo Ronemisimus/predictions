@@ -91,7 +91,9 @@ public class WorldImpl implements World {
 
                         res.add(prdBySecondOrPRDByTicks instanceof PRDByTicks?
                                         new TicksTermination((PRDByTicks)prdBySecondOrPRDByTicks):
-                                        new TimeTermination((PRDBySecond)prdBySecondOrPRDByTicks));
+                                prdBySecondOrPRDByTicks instanceof PRDBySecond?
+                                        new TimeTermination((PRDBySecond)prdBySecondOrPRDByTicks):
+                                null);
                     });
         }
         return res;

@@ -1,21 +1,19 @@
 package predictions;
 
 import dto.*;
-import dto.subdto.InitializeDto;
 import dto.subdto.SingleRunHistoryDto;
 import dto.subdto.show.EntityListDto;
 import dto.subdto.show.world.EntityDto;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface MainApi {
     ReadFileDto readFile(String file);
     ShowWorldDto showLoadedWorld();
 
     EnvDto getEnv();
-    InitializeDto initialize();
-    RunSimulationDto runSimulation();
+    void initialize();
+    void runSimulation();
 
     RunHistoryDto getRunHistory();
 
@@ -25,7 +23,7 @@ public interface MainApi {
     
     SingleRunHistoryDto getRunPropertyHistogram(int runId, String entityName, String propertyName);
 
-    void setEnv(String name, Optional<Comparable<?>> value);
+    void setEnv(String name, Comparable<?> value);
 
     List<EntityDto> getEntityDefinitionCounts();
 

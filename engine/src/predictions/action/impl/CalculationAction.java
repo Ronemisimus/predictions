@@ -82,10 +82,12 @@ public class CalculationAction extends AbstractAction {
         int world_time = context.getTick();
 
         if (propertyInstance.getPropertyDefinition().getType() == PropertyType.FLOAT) {
+            //noinspection unchecked
             PropertyInstance<Double> property = (PropertyInstance<Double>) propertyInstance;
             exps.forEach(t -> property.updateValue(t.evaluate(context), world_time));
         }
         else if (propertyInstance.getPropertyDefinition().getType() == PropertyType.DECIMAL) {
+            //noinspection unchecked
             PropertyInstance<Integer> property = (PropertyInstance<Integer>) propertyInstance;
             exps.stream().map(t -> t.evaluate(context)).forEach(res -> property.updateValue(res, world_time));
         }

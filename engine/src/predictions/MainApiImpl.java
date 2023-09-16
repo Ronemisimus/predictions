@@ -1,7 +1,6 @@
 package predictions;
 
 import dto.*;
-import dto.subdto.InitializeDto;
 import dto.subdto.SingleRunHistoryDto;
 import dto.subdto.read.dto.FileSelectionDto;
 import dto.subdto.show.EntityListDto;
@@ -112,16 +111,16 @@ public class MainApiImpl implements MainApi {
         return new EnvDto(clientDataContainer.getEnv());
     }
 
-    public InitializeDto initialize() {
+    public void initialize() {
         clientDataContainer.initialize(activeDefinition);
         activeWorld = new WorldInstanceImpl(activeDefinition);
-        return activeWorld.getEnvironmentVariables().getDto();
+        activeWorld.getEnvironmentVariables().getDto();
     }
 
-    public RunSimulationDto runSimulation() {
+    public void runSimulation() {
         Map.Entry<Integer, Termination> res = activeWorld.run();
         history.put(res.getKey(), activeWorld);
-        return new RunSimulationDto(res.getKey(), res.getValue().getDto());
+        new RunSimulationDto(res.getKey(), res.getValue().getDto());
     }
 
     @Override
@@ -160,7 +159,7 @@ public class MainApiImpl implements MainApi {
     }
 
     @Override
-    public void setEnv(String name, Optional<Comparable<?>> value) {
+    public void setEnv(String name, Comparable<?> value) {
         clientDataContainer.setEnv(name, value);
     }
 

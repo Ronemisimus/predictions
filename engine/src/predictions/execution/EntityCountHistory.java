@@ -2,10 +2,9 @@ package predictions.execution;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class EntityCountHistory {
-    private Map<Integer, Integer> entityCount;
+    private final Map<Integer, Integer> entityCount;
 
     public EntityCountHistory() {
         this.entityCount = new HashMap<>();

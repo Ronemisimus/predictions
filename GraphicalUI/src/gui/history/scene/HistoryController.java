@@ -1,6 +1,5 @@
 package gui.history.scene;
 
-import dto.subdto.show.world.EntityDto;
 import gui.EngineApi;
 import gui.history.data.PropertyData;
 import gui.history.display.ChartAble;
@@ -10,11 +9,6 @@ import gui.history.display.RunDisplayed;
 import javafx.fxml.FXML;
 
 import javafx.scene.Parent;
-import javafx.scene.chart.Axis;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.XYChart;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
 
@@ -25,7 +19,8 @@ public class HistoryController {
     @FXML
     private ListView<RunDisplayed> HistoryList;
     @FXML
-    private ListView CurrentRuns;
+    @SuppressWarnings("unused")
+    private VBox CurrentRuns; // TODO: fill with running simulation data
     @FXML
     private ListView<Parent> EndedRuns;
     @FXML

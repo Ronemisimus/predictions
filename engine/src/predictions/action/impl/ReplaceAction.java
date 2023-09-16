@@ -7,9 +7,7 @@ import predictions.action.api.AbstractAction;
 import predictions.action.api.ActionType;
 import predictions.action.api.ContextDefinition;
 import predictions.definition.entity.EntityDefinition;
-import predictions.definition.property.api.PropertyDefinition;
 import predictions.execution.context.Context;
-import predictions.execution.grid.Coordinate;
 import predictions.execution.instance.entity.EntityInstance;
 
 public class ReplaceAction extends AbstractAction {

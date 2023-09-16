@@ -20,7 +20,7 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
 
     private int count;
 
-    private final Map<EntityInstance,Property<Coordinate>> instaces_locations;
+    private final Map<EntityInstance,Property<Coordinate>> instance_locations;
 
     private final Set<Integer> killed_ids;
 
@@ -32,7 +32,7 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
 
     public EntityInstanceManagerImpl(List<String> entities) {
         count = 0;
-        instaces_locations = new HashMap<>();
+        instance_locations = new HashMap<>();
         grid = null;
         killed_ids = new HashSet<>();
         replaceMap = new HashMap<>();
@@ -52,9 +52,7 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
 
     @Override
     public void moveEntities() {
-        instaces_locations.forEach((k,v) -> {
-            v.setValue(getStepLocation(v.getValue()));
-        });
+        instance_locations.forEach((k, v) -> v.setValue(getStepLocation(v.getValue())));
     }
 
     private Coordinate getStepLocation(Coordinate value) {
@@ -79,22 +77,26 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
         Property<Coordinate> location = new SimpleObjectProperty<>(coordinate);
         EntityInstance newEntityInstance = new EntityInstanceImpl(entityDefinition, count, location);
         location.addListener((Observable, oldVal, newVal) -> updateGrid(newEntityInstance, oldVal,newVal));
-        instaces_locations.put(newEntityInstance, location);
+        instance_locations.put(newEntityInstance, location);
 
         entityDefinition.getProps().forEach(prop -> {
             PropertyInstance<?> res;
 
             switch (prop.getType()) {
                 case STRING:
+                    //noinspection unchecked
                     res = new PropertyInstanceImpl<>((PropertyDefinition<String>) prop, (String) prop.generateValue());
                     break;
                 case DECIMAL:
+                    //noinspection unchecked
                     res = new PropertyInstanceImpl<>((PropertyDefinition<Integer>) prop, (Integer) prop.generateValue());
                     break;
                 case FLOAT:
+                    //noinspection unchecked
                     res = new PropertyInstanceImpl<>((PropertyDefinition<Double>) prop, (Double) prop.generateValue());
                     break;
                 case BOOLEAN:
+                    //noinspection unchecked
                     res = new PropertyInstanceImpl<>((PropertyDefinition<Boolean>) prop, (Boolean) prop.generateValue());
                     break;
                 default:
@@ -113,15 +115,15 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
         if(newEntityInstance!=null && newValue!=null) {
             this.grid[newValue.getX()][newValue.getY()] = newEntityInstance;
             newEntityInstance.setLocation(newValue);
-            instaces_locations.get(newEntityInstance).setValue(newValue);
+            instance_locations.get(newEntityInstance).setValue(newValue);
         }
     }
 
     public void  printGrid()
     {
-        for (int x = 0; x < grid.length; x++) {
+        for (EntityInstance[] entityInstances : grid) {
             for (int y = 0; y < grid[0].length; y++) {
-                System.out.print((grid[x][y]!=null?grid[x][y].getEntityTypeName().substring(0,1):"N") + "  ");
+                System.out.print((entityInstances[y] != null ? entityInstances[y].getEntityTypeName().substring(0, 1) : "N") + "  ");
             }
             System.out.println();
         }
@@ -140,7 +142,7 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
 
     @Override
     public List<EntityInstance> getInstances() {
-        return new ArrayList<>(instaces_locations.keySet());
+        return new ArrayList<>(instance_locations.keySet());
     }
 
     @Override
@@ -164,7 +166,7 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
                             .anyMatch(id -> e.getId() == id))
                     .forEach(e -> {
                         Coordinate location = e.getLocation();
-                        instaces_locations.remove(e);
+                        instance_locations.remove(e);
                         grid[location.getX()][location.getY()] = null;
                         count--;
                         e.setLocation(null);
@@ -196,7 +198,7 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
                             );
                     created.setLocation(location);
                 }
-                instaces_locations.remove(e);
+                instance_locations.remove(e);
             });
             replaceMap.clear();
         }
@@ -209,10 +211,8 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
 
     @Override
     public void updateEntityCounts() {
-        entityCountHistoryMap.forEach((ent, countHistory) -> {
-            countHistory.addEntityCount((int)getInstances().stream()
-                    .filter(entity-> entity.getEntityTypeName().equalsIgnoreCase(ent.toLowerCase()))
-                    .count());
-        });
+        entityCountHistoryMap.forEach((ent, countHistory) -> countHistory.addEntityCount((int)getInstances().stream()
+                .filter(entity-> entity.getEntityTypeName().equalsIgnoreCase(ent.toLowerCase()))
+                .count()));
     }
 }

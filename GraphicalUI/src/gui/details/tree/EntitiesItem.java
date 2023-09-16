@@ -7,10 +7,8 @@ import java.util.List;
 
 public class EntitiesItem extends TreeItem<String> {
 
-    private List<EntityDto> entities;
     public EntitiesItem(List<EntityDto> entities) {
         super("entities", null);
-        this.entities = entities;
         entities.forEach(this::accept);
     }
 

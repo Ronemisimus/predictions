@@ -10,7 +10,7 @@
    <center>
       <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0"
                  BorderPane.alignment="CENTER">
-         <ListView fx:id="CurrentRuns" prefHeight="200.0" prefWidth="200.0"/>
+         <VBox fx:id="CurrentRuns" prefHeight="200.0" prefWidth="200.0"/>
          <SplitPane dividerPositions="0.5">
             <ListView fx:id="EndedRuns" prefHeight="200.0" prefWidth="200.0"/>
             <VBox fx:id="chart" prefWidth="101.0"/>
