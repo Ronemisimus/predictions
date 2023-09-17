@@ -7,7 +7,6 @@ import dto.subdto.read.dto.rule.ActivationErrorDto;
 import dto.subdto.read.dto.rule.ExpressionErrorDto;
 import dto.subdto.read.dto.rule.RuleErrorDto;
 import javafx.scene.control.*;
-import javafx.scene.layout.Region;
 
 public class ReadFileError extends Alert {
     private ReadFileError(String readFileDto) {
@@ -19,19 +18,6 @@ public class ReadFileError extends Alert {
 
     public static ReadFileError build(ReadFileDto readFileDto) {
         return new ReadFileError(buildMessage(readFileDto));
-    }
-
-    protected DialogPane createDialogPane() {
-        DialogPane dialogPane = super.getDialogPane();
-
-        // Calculate the preferred width based on the text content
-        double textWidth = dialogPane.getScene().getWindow().getWidth(); // Adjust this as needed
-        dialogPane.setPrefWidth(textWidth);
-
-        // Ensure that the dialog can be resized vertically to fit the content
-        dialogPane.setMaxHeight(Region.USE_PREF_SIZE);
-
-        return dialogPane;
     }
 
     private static String buildMessage(ReadFileDto readFileDto) {
@@ -208,6 +194,10 @@ public class ReadFileError extends Alert {
                     expressionErrorDto.getExpression() +
                     " expected type of expression is: " +
                     expressionErrorDto.getExpectedType();
+        }
+        if (expressionErrorDto.getNullExpressionError())
+        {
+            return "null expression in action";
         }
         return "Something went wrong";
     }

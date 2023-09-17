@@ -43,7 +43,7 @@ public class ExpressionBuilder {
         try {
             Double res = Double.parseDouble(expression);
             return new NumberExpression(res);
-        }catch (NumberFormatException e)
+        }catch (NumberFormatException | NullPointerException e)
         {
             builder.withExpression(expression)
                     .badExpressionType("float");
@@ -72,7 +72,7 @@ public class ExpressionBuilder {
                                                         PropertyType type,
                                                         ExpressionErrorDto.Builder builder) {
         String finalExpression = expression;
-        Optional<String> func = functions.stream().filter(f -> finalExpression.toLowerCase().startsWith(f)).findFirst();
+        Optional<String> func = finalExpression==null ? Optional.empty() : functions.stream().filter(f -> finalExpression.toLowerCase().startsWith(f)).findFirst();
         if(!func.isPresent()) return null;
         String funcName = func.get();
         expression = expression.substring(funcName.length());
@@ -215,10 +215,14 @@ public class ExpressionBuilder {
         //noinspection unchecked
         Expression<String> entPropertyExpression = (Expression<String>) buildEntityPropertyExpression(valueExpression, contextDefinition);
         if (entPropertyExpression != null) return entPropertyExpression;
-        return buildSimpleStringExpression(valueExpression);
+        return buildSimpleStringExpression(valueExpression, builder);
     }
 
-    private static Expression<String> buildSimpleStringExpression(String valueExpression) {
+    private static Expression<String> buildSimpleStringExpression(String valueExpression, ExpressionErrorDto.Builder builder) {
+        if (valueExpression == null) {
+            builder.nullExpression();
+            throw new RuntimeException("expression is null");
+        }
         return new Expression<String>() {
             @Override
             public Comparable<String> evaluate(Context context) {
@@ -259,8 +263,8 @@ public class ExpressionBuilder {
     }
 
     private static Expression<Boolean> buildSimpleBooleanExpression(String valueExpression) {
-        Boolean val = valueExpression.equalsIgnoreCase("true");
-        if (!val && !valueExpression.equalsIgnoreCase("false"))
+        Boolean val = valueExpression!= null && valueExpression.equalsIgnoreCase("true");
+        if (valueExpression == null || !val && !valueExpression.equalsIgnoreCase("false"))
             throw new RuntimeException("not a boolean: " + valueExpression);
         return new BasicBooleanExpression(val);
     }

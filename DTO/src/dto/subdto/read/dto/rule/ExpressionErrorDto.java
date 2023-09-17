@@ -49,6 +49,9 @@ public class ExpressionErrorDto implements DTO {
     private final Boolean badExpressionType;
     private final String expectedType;
 
+    // error type 12
+    private final Boolean nullExpressionError;
+
     private ExpressionErrorDto(Builder builder) {
         this.expression = builder.expression;
         this.functionError = builder.functionError;
@@ -72,6 +75,7 @@ public class ExpressionErrorDto implements DTO {
         this.ticksError = builder.ticksError;
         this.badExpressionType = builder.badExpressionType;
         this.expectedType = builder.expectedType;
+        this.nullExpressionError = builder.nullExpressionError;
     }
 
     public static class Builder {
@@ -97,6 +101,7 @@ public class ExpressionErrorDto implements DTO {
         private Boolean ticksError = false;
         private Boolean badExpressionType = false;
         private String expectedType = null;
+        private Boolean nullExpressionError = false;
         public Builder() {}
 
         public Builder withExpression(String expression) {
@@ -104,76 +109,70 @@ public class ExpressionErrorDto implements DTO {
             return this;
         }
 
-        public Builder withFunctionName(String functionName) {
+        public void withFunctionName(String functionName) {
             this.functionName = functionName;
             this.functionError = true;
-            return this;
         }
         public ExpressionErrorDto build()
         {
             return new ExpressionErrorDto(this);
         }
 
-        public Builder environmentError(String finalExpression1, String type) {
+        public void environmentError(String finalExpression1, String type) {
             this.environmentError = true;
             this.notFoundVariable = finalExpression1;
             this.propertyType = type;
-            return this;
         }
 
-        public Builder randomTypeError(String type) {
+        public void randomTypeError(String type) {
             this.randomTypeError = true;
             this.randomType = type;
-            return this;
         }
 
-        public Builder randomParameterError(String expression) {
+        public void randomParameterError(String expression) {
             this.randomParameterError = true;
             this.randomParameter = expression;
-            return this;
         }
 
-        public Builder evaluateError(String expression) {
+        public void evaluateError(String expression) {
             this.evaluateError = true;
             this.evaluateExpression = expression;
-            return this;
         }
 
-        public Builder missingEntityInContextError(String entity) {
+        public void missingEntityInContextError(String entity) {
             this.missingEntityInContextError = true;
             this.missingEntityInContext = entity;
-            return this;
         }
 
-        public Builder missingPropertyInEntityError(String entity, String prop, String type) {
+        public void missingPropertyInEntityError(String entity, String prop, String type) {
             this.missingPropertyInEntityError = true;
             this.missingPropertyInEntity = prop;
             this.propertyType = type;
             this.entity = entity;
-            return this;
         }
 
-        public Builder percentTypeError(String name) {
+        public void percentTypeError(String name) {
             this.percentTypeError = true;
             this.randomType = name;
-            return this;
         }
 
-        public Builder ticksTypeError(String name) {
+        public void ticksTypeError(String name) {
             this.ticksTypeError = true;
             this.randomType = name;
-            return this;
         }
 
-        public Builder ticksError(String expression) {
+        public void ticksError(String expression) {
             this.ticksError = true;
             this.evaluateExpression = expression;
-            return this;
         }
 
         public void badExpressionType(String type) {
             this.badExpressionType = true;
             this.expectedType = type;
+        }
+
+        public void nullExpression() {
+            this.nullExpressionError = true;
         }
     }
 
@@ -263,5 +262,9 @@ public class ExpressionErrorDto implements DTO {
 
     public String getExpectedType() {
         return expectedType;
+    }
+
+    public Boolean getNullExpressionError() {
+        return nullExpressionError;
     }
 }
