@@ -7,6 +7,8 @@ import java.util.stream.IntStream;
 public class EntityCountHistory implements Cloneable {
     private final List<Integer> entityCount;
 
+    private static final int MAX_HISTORY_SIZE = 4000;
+
     private int latestTick;
 
     public EntityCountHistory() {
@@ -25,15 +27,14 @@ public class EntityCountHistory implements Cloneable {
             snapshot = new ArrayList<>(entityCount);
         }
 
-        if (snapshot.size() <= 10000) {
+        if (snapshot.size() <= MAX_HISTORY_SIZE) {
             return IntStream.range(0, snapshot.size())
                     .boxed()
                     .collect(Collectors.toMap(i -> i, snapshot::get, (a, b) -> b));
         }
 
-        int targetSampleSize = 10000;
         Map<Integer, Integer> res = new HashMap<>();
-        int stepSize = snapshot.size() / targetSampleSize;
+        int stepSize = snapshot.size() / MAX_HISTORY_SIZE;
         for (int i = 0; i < snapshot.size(); i += stepSize) {
             res.put(i, snapshot.get(i));
         }

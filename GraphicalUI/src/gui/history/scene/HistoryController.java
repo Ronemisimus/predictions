@@ -83,8 +83,7 @@ public class HistoryController {
     private void handleRunSelection(ObservableValue<? extends RunDisplayed> Observable, RunDisplayed oldVal, RunDisplayed newVal) {
         if (newVal != null && Stream.of(RunState.FINISHED, RunState.STOPPED).anyMatch(e -> e.equals(newVal.getRunState()))) {
 
-            Thread handler = new Thread(() -> endedRunGetter(newVal));
-            handler.start();
+            new Thread(() -> endedRunGetter(newVal)).start();
         }
     }
 
@@ -101,10 +100,13 @@ public class HistoryController {
                 .map(entity -> new EntityChartLabel(entity, counts, chart))
                 .collect(Collectors.toList());
 
-        Platform.runLater(() -> {
-            EndedRuns.getItems().clear();
-            EndedRuns.getItems().addAll(entityLabels);
-        });
+        List<Parent>  entitiesAdded = entityLabels.stream()
+                .filter(e -> !run.getEntityChartLabels().contains(e))
+                .collect(Collectors.toList());
+        List<Parent> entitiesRemoved = run.getEntityChartLabels().stream()
+                .filter(e -> !entityLabels.contains(e))
+                .collect(Collectors.toList());
+
         Map<String, Map<String, PropertyData>> histograms = EngineApi.getInstance()
                 .getSingleRunHistoryPropertyData(run.getRunIdentifier());
         List<PropertyChartLabel> propertyLabels = histograms.keySet().stream()
@@ -115,7 +117,20 @@ public class HistoryController {
                                 ).collect(Collectors.toList()))
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
-        Platform.runLater(() -> EndedRuns.getItems().addAll(propertyLabels));
+
+        List<Parent> propertiesAdded = propertyLabels.stream()
+                .filter(e -> !run.getEntityChartLabels().contains(e))
+                .collect(Collectors.toList());
+        List<Parent> propertiesRemoved = run.getEntityChartLabels().stream()
+                .filter(e -> !propertyLabels.contains(e))
+                .collect(Collectors.toList());
+
+        run.removeEntityChartLabels(entitiesRemoved);
+        run.addEntityChartLabels(entitiesAdded);
+        run.addEntityChartLabels(propertiesAdded);
+        run.removeEntityChartLabels(propertiesRemoved);
+
+        Platform.runLater(() -> EndedRuns.setItems(run.getEntityChartLabels()));
     }
 
 }

@@ -2,6 +2,9 @@ package gui.history.display;
 
 import dto.subdto.show.instance.RunStateDto;
 import gui.history.data.RunState;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.Parent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
@@ -9,12 +12,15 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class RunDisplayed extends HBox {
 
     private final Map.Entry<Integer, LocalDateTime> entry;
+
+    private final ObservableList<Parent> entityChartLabels = FXCollections.observableArrayList();
 
     private final RunStateDto runStateDto;
     public RunDisplayed(Map.Entry<Integer, LocalDateTime> entry, RunStateDto runStateDto) {
@@ -24,7 +30,6 @@ public class RunDisplayed extends HBox {
         setBackground(new Background(new BackgroundFill(Paint.valueOf(getColor()), null, null)));
         Text text = new Text(entry.getKey() + " " + entry.getValue());
         this.getChildren().add(text);
-
     }
 
     private String getColor() {
@@ -80,6 +85,18 @@ public class RunDisplayed extends HBox {
                 Objects.equals(runStateDto.getFinished(), that.runStateDto.getFinished()) &&
                 Objects.equals(runStateDto.getStopped(), that.runStateDto.getStopped()) &&
                 Objects.equals(runStateDto.getPaused(), that.runStateDto.getPaused());
+    }
+
+    public ObservableList<Parent> getEntityChartLabels() {
+        return entityChartLabels;
+    }
+
+    public void removeEntityChartLabels(List<Parent> entityChartLabel) {
+        entityChartLabels.removeAll(entityChartLabel);
+    }
+
+    public void addEntityChartLabels(List<Parent> entityChartLabel) {
+        entityChartLabels.addAll(entityChartLabel);
     }
 
     @Override

@@ -18,6 +18,12 @@ public class EntityChartLabel extends Label implements ChartAble{
 
     private final ImageView chartImageView;
 
+    private final VBox parent;
+
+    private final Object lock;
+
+    private final BarChart<String, Number> barChart;
+
     /**
      * Creates an empty label
      */
@@ -26,23 +32,24 @@ public class EntityChartLabel extends Label implements ChartAble{
         series = new XYChart.Series<>();
         counts.get(entity).forEach((k,v) -> series.getData().add(new XYChart.Data<>(k.toString(),v)));
         series.setName("Entity Chart");
-        BarChart<String, Number> barChart = new BarChart<>(new CategoryAxis(), new NumberAxis());
+        barChart = new BarChart<>(new CategoryAxis(), new NumberAxis());
         barChart.getData().add(series);
         barChart.setTitle(entity);
         barChart.getXAxis().setLabel("tick");
         barChart.getYAxis().setLabel("amount");
         barChart.setAnimated(false);
         chartImageView = new ImageView();
-        Object lock = new Object();
-        new Thread(() -> sideLoadRender(barChart, parent, lock)).start();
+        this.lock = new Object();
+        this.parent = parent;
+
     }
 
     private void sideLoadRender(BarChart<String, Number> barChart,
                                          VBox parent,
-                                         Object lock) {
+                                         Object lock,
+                                Object chartLock) {
         Future<WritableImage> res = ChartRenderer.renderToImage(barChart, parent, lock);
         while(!res.isDone()) {
-            //noinspection SynchronizationOnLocalVariableOrMethodParameter
             synchronized (lock) {
                 try {
                     lock.wait(50);
@@ -52,9 +59,10 @@ public class EntityChartLabel extends Label implements ChartAble{
         }
 
         Platform.runLater(() -> {
-            synchronized (this) {
+            synchronized (chartLock) {
                 try {
-                    chartImageView.setImage(res.get());
+                        chartImageView.setImage(res.get());
+                        chartLock.notifyAll();
                 } catch (InterruptedException | ExecutionException e) {
                     throw new RuntimeException(e);
                 }
@@ -64,7 +72,7 @@ public class EntityChartLabel extends Label implements ChartAble{
 
 
     @Override
-    public synchronized void chart(VBox barChart) {
+    public void chart(VBox barChart) {
         if (chartImageView.getImage()!=null) {
             // Calculate the maxWidth and maxHeight based on the dimensions of the VBox
             double maxWidth = barChart.getWidth();
@@ -82,6 +90,22 @@ public class EntityChartLabel extends Label implements ChartAble{
 
             barChart.getChildren().clear();
             barChart.getChildren().add(chartImageView);
+        }
+        else
+        {
+            Object chartLock = new Object();
+            new Thread(() -> sideLoadRender(this.barChart, parent, lock, chartLock)).start();
+            new Thread(() -> {
+                synchronized (chartLock) {
+                    while (chartImageView.getImage() == null) {
+                        try {
+                            chartLock.wait(1);
+                        } catch (InterruptedException ignored) {
+                        }
+                    }
+                    Platform.runLater(() -> this.chart(barChart));
+                }
+            }).start();
         }
     }
 }
