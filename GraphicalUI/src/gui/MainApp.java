@@ -17,6 +17,10 @@ public class MainApp extends Application {
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
             primaryStage.setTitle("Predictions");
+            primaryStage.setOnCloseRequest(e -> {
+                EngineApi.getInstance().unload();
+                System.exit(0);
+            });
             primaryStage.show();
         }catch (Exception e)
         {

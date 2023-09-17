@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 
@@ -27,27 +28,27 @@ public class RunDisplayed extends HBox {
         super();
         this.entry = entry;
         this.runStateDto = runStateDto;
-        setBackground(new Background(new BackgroundFill(Paint.valueOf(getColor()), null, null)));
+        setBackground(new Background(new BackgroundFill(getColor(), null, null)));
         Text text = new Text(entry.getKey() + " " + entry.getValue());
         this.getChildren().add(text);
     }
 
-    private String getColor() {
+    private Color getColor() {
         if (runStateDto.getRunning())
         {
-            return "green";
+            return Color.color(0.0, 1.0, 0.0, 0.2);
         }
         if (runStateDto.getFinished())
         {
-            return "blue";
+            return Color.color(0.0, 0.0, 1.0, 0.2);
         }
         if (runStateDto.getStopped())
         {
-            return "red";
+            return Color.color(1.0, 0.0, 0.0, 0.2);
         }
         if(runStateDto.getPaused())
         {
-            return "yellow";
+            return Color.color(1.0, 1.0, 0.0, 0.2);
         }
         throw new RuntimeException("Unknown state");
     }

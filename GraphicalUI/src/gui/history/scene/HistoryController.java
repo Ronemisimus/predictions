@@ -48,7 +48,6 @@ public class HistoryController {
         EndedRuns.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue instanceof ChartAble) {
                 Platform.runLater(() -> {
-                    System.out.println("selected: " + newValue);
                     chart.getChildren().clear();
                     chart.getChildren().add(new Label("loading..."));
                 });

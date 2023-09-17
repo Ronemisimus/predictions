@@ -131,14 +131,16 @@ public class SimulationManagerImpl implements SimulationManager{
 
     @Override
     public synchronized void unload() throws InterruptedException {
+        worlds.values()
+                .forEach(WorldInstance::stopWorld);
         executorService.shutdownNow();
         //noinspection ResultOfMethodCallIgnored
-        executorService.awaitTermination(1, TimeUnit.MINUTES);
+        executorService.awaitTermination(5, TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public synchronized void updateStopped(int runId) {
-        simulationStates.put(runId, SimulationState.STOPPED);
+    public synchronized void updateState(int runId, SimulationState simulationState) {
+        simulationStates.put(runId, simulationState);
     }
 
     @Override

@@ -71,7 +71,6 @@ public class WorldInstanceImpl implements WorldInstance{
 
     @Override
     public void run() {
-        System.out.println("starting");
         duration = Duration.ZERO;
         Termination resTermination;
         Signal s = new SignalImpl(checkStop(), tick, this.startTime, duration);
@@ -89,7 +88,10 @@ public class WorldInstanceImpl implements WorldInstance{
         this.reason = resTermination;
         if(state != SimulationState.STOPPED) {
             state = SimulationState.FINISHED;
-            SimulationManagerImpl.getInstance().updateStopped(this.hashCode());
+            SimulationManagerImpl.getInstance().updateState(this.hashCode(), SimulationState.FINISHED);
+        }
+        else{
+            SimulationManagerImpl.getInstance().updateState(this.hashCode(), SimulationState.STOPPED);
         }
     }
 

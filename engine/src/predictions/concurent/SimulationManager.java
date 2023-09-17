@@ -36,7 +36,7 @@ public interface SimulationManager {
 
     void unload() throws InterruptedException;
 
-    void updateStopped(int runId);
+    void updateState(int runId, SimulationState simulationState);
 
     int getSimulationTick(int runId);
 }
