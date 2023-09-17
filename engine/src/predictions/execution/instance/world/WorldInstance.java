@@ -36,6 +36,6 @@ public interface WorldInstance extends Runnable {
     void resumeWorld();
 
     void rerunWorld();
-
+    int getCurrentTick();
     Map.Entry<Integer, Termination> getRunIdentifiers();
 }

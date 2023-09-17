@@ -140,7 +140,12 @@ public class EngineApi {
         SingleRunHistoryDto res = api.getRunEntityCounts(key);
         Map<String, Map<Integer, Integer>> map = new HashMap<>();
         IntStream.range(0, res.getEntity().size())
-                .forEach(i -> map.put(res.getEntity().get(i), res.getCounts().get(i)));
+                .forEach(i -> {
+                    Map<Integer, Integer> entityCounts = res.getCounts().get(i);
+                    int max = entityCounts.keySet().stream().max(Comparator.naturalOrder()).orElse(0);
+                    entityCounts.put(res.getLatestTick(), entityCounts.get(max));
+                    map.put(res.getEntity().get(i), entityCounts);
+                });
         return map;
     }
 

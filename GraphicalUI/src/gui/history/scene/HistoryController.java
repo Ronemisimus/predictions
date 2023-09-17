@@ -103,6 +103,7 @@ public class HistoryController {
         List<Parent>  entitiesAdded = entityLabels.stream()
                 .filter(e -> !run.getEntityChartLabels().contains(e))
                 .collect(Collectors.toList());
+        //noinspection SuspiciousMethodCalls
         List<Parent> entitiesRemoved = run.getEntityChartLabels().stream()
                 .filter(e -> !entityLabels.contains(e))
                 .collect(Collectors.toList());
@@ -121,6 +122,7 @@ public class HistoryController {
         List<Parent> propertiesAdded = propertyLabels.stream()
                 .filter(e -> !run.getEntityChartLabels().contains(e))
                 .collect(Collectors.toList());
+        //noinspection SuspiciousMethodCalls
         List<Parent> propertiesRemoved = run.getEntityChartLabels().stream()
                 .filter(e -> !propertyLabels.contains(e))
                 .collect(Collectors.toList());

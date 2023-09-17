@@ -126,13 +126,17 @@ public class MainApiImpl implements MainApi {
     @Override
     public SingleRunHistoryDto getRunEntityCounts(int runId) {
         Map<String, EntityCountHistory> res = simulationManager.getEntityCountHistory(runId);
-        return createEntityCountHistoryDto(res);
+        int tick = simulationManager.getSimulationTick(runId);
+        return createEntityCountHistoryDto(res, tick);
     }
 
-    private SingleRunHistoryDto createEntityCountHistoryDto(Map<String, EntityCountHistory> res) {
+    private SingleRunHistoryDto createEntityCountHistoryDto(Map<String, EntityCountHistory> res, int tick) {
         List<String> entities = new ArrayList<>(res.keySet());
-        List<Map<Integer, Integer>> counts = entities.stream().map(res::get).map(EntityCountHistory::getEntityCount).collect(Collectors.toList());
-        return new SingleRunHistoryDto(entities, counts, null, null, null);
+        List<Map<Integer, Integer>> counts = entities.stream()
+                .map(res::get)
+                .map(ech -> ech.getEntityCount(tick))
+                .collect(Collectors.toList());
+        return new SingleRunHistoryDto(entities, counts, tick,null, null, null);
     }
 
     @Override
@@ -147,7 +151,7 @@ public class MainApiImpl implements MainApi {
         Map<Comparable<?>, Integer> propertyHist = simulationManager.getEntityPropertyHistogram(runId,entityName,propertyName);
         Double consistency = simulationManager.getConsistency(runId,entityName, propertyName);
         Double average = simulationManager.getAverage(runId,entityName, propertyName);
-        return new SingleRunHistoryDto(null, null, propertyHist, consistency, average);
+        return new SingleRunHistoryDto(null, null, null,propertyHist, consistency, average);
     }
 
     @Override

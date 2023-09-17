@@ -21,7 +21,7 @@ public class EntityCountHistory implements Cloneable {
         this.latestTick = latestTick;
     }
 
-    public Map<Integer, Integer> getEntityCount() {
+    public Map<Integer, Integer> getEntityCount(int tick) {
         List<Integer> snapshot;
         synchronized (this) {
             snapshot = new ArrayList<>(entityCount);
@@ -38,11 +38,12 @@ public class EntityCountHistory implements Cloneable {
         for (int i = 0; i < snapshot.size(); i += stepSize) {
             res.put(i, snapshot.get(i));
         }
+        res.put(tick, res.get(res.size()-1));
         return res;
     }
 
     public synchronized void addEntityCount(int count, int tick) {
-        if (entityCount.isEmpty() || entityCount.get(entityCount.size() - 1) != count || tick > latestTick + 1000) {
+        if (entityCount.isEmpty() || entityCount.get(entityCount.size() - 1) != count) {
             entityCount.add(count);
             latestTick = tick;
         }

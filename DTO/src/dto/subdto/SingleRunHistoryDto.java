@@ -8,6 +8,7 @@ import java.util.Map;
 public class SingleRunHistoryDto implements DTO {
     private final List<String> entity;
     private final List<Map<Integer, Integer>> counts;
+    private final Integer latestTick;
 
     private final Map<Comparable<?>, Integer> propertyHist;
     private final Double consistency;
@@ -15,6 +16,7 @@ public class SingleRunHistoryDto implements DTO {
 
     public SingleRunHistoryDto(List<String> entity,
                                List<Map<Integer, Integer>> counts,
+                               Integer latestTick,
                                Map<Comparable<?>, Integer> propertyHist,
                                Double consistency,
                                Double average) {
@@ -23,6 +25,7 @@ public class SingleRunHistoryDto implements DTO {
         this.counts = counts;
         this.consistency = consistency;
         this.average = average;
+        this.latestTick = latestTick;
     }
 
     public List<String> getEntity() {
@@ -43,5 +46,9 @@ public class SingleRunHistoryDto implements DTO {
 
     public Double getAverage() {
         return average;
+    }
+
+    public int getLatestTick() {
+        return latestTick;
     }
 }

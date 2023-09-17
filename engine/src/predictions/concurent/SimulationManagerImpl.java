@@ -140,4 +140,9 @@ public class SimulationManagerImpl implements SimulationManager{
     public synchronized void updateStopped(int runId) {
         simulationStates.put(runId, SimulationState.STOPPED);
     }
+
+    @Override
+    public int getSimulationTick(int runId) {
+        return worlds.get(runId).getCurrentTick();
+    }
 }

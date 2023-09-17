@@ -275,7 +275,7 @@ public class WorldInstanceImpl implements WorldInstance{
     }
 
     @Override
-    public void rerunWorld() {
+    public synchronized void rerunWorld() {
         this.activeEnvironment = world.getEnvVariablesManager().createActiveEnvironment();
         List<String> entities = new ArrayList<>();
         world.getEntityDefinitions().forEachRemaining(entityDefinition -> entities.add(entityDefinition.getName()));
@@ -297,6 +297,11 @@ public class WorldInstanceImpl implements WorldInstance{
                         .forEach(entityInstanceManager::create));
         state = SimulationState.READY;
         clientDataContainer.initialize(this);
+    }
+
+    @Override
+    public synchronized int getCurrentTick() {
+        return this.tick;
     }
 
     @Override
