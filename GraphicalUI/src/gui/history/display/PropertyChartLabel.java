@@ -17,6 +17,8 @@ public class PropertyChartLabel extends Label implements ChartAble {
 
     private final BarChart<String, Number> histogram;
 
+    private final String name;
+
     public PropertyChartLabel(String entity, String property, PropertyData propertyData) {
         super(entity + "." + property);
         series = new XYChart.Series<>();
@@ -32,10 +34,19 @@ public class PropertyChartLabel extends Label implements ChartAble {
         histogram.setTitle(entity + "." + property);
         histogram.getXAxis().setLabel("value");
         histogram.getYAxis().setLabel("count");
+        this.name = entity + "." + property;
     }
 
     @Override
     public void chart(VBox barChart) {
+        barChart.getChildren().clear();
         barChart.getChildren().addAll(histogram, legend);
+    }
+
+    @Override
+    public String toString() {
+        return "PropertyChartLabel{" +
+                "name='" + name + '\'' +
+                '}';
     }
 }

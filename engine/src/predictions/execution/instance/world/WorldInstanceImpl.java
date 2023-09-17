@@ -40,7 +40,7 @@ public class WorldInstanceImpl implements WorldInstance{
     );
 
     private int tick;
-    private Instant startTime;
+    private final Instant startTime;
     private Duration duration;
 
     public WorldInstanceImpl(World world, ClientDataContainer clientDataContainer) {
@@ -71,6 +71,7 @@ public class WorldInstanceImpl implements WorldInstance{
 
     @Override
     public void run() {
+        System.out.println("starting");
         duration = Duration.ZERO;
         Termination resTermination;
         Signal s = new SignalImpl(checkStop(), tick, this.startTime, duration);
@@ -107,7 +108,7 @@ public class WorldInstanceImpl implements WorldInstance{
     }
 
     private void doTick() {
-        entityInstanceManager.updateEntityCounts();
+        entityInstanceManager.updateEntityCounts(tick);
         // move entities
         entityInstanceManager.moveEntities();
 

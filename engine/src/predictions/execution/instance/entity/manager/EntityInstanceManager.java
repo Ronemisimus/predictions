@@ -28,5 +28,5 @@ public interface EntityInstanceManager {
 
     Map<String, EntityCountHistory> getEntityCounts();
 
-    void updateEntityCounts();
+    void updateEntityCounts(int tick);
 }

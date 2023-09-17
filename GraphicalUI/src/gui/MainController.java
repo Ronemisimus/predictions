@@ -90,6 +90,7 @@ public class MainController {
         if (isLoaded.get()) {
             try {
                 FXMLLoader loader = new FXMLLoader(loaderClass.getResource(fileName));
+                centerStage.setCenter(null);
                 Parent root = loader.load();
                 centerStage.setCenter(root);
             } catch (IOException e) {
@@ -100,6 +101,10 @@ public class MainController {
         {
             centerStage.setCenter(null);
         }
+    }
+
+    public BorderPane getCenterStage() {
+        return centerStage;
     }
 
     @FXML

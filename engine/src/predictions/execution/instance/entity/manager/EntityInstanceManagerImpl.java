@@ -213,9 +213,13 @@ public class EntityInstanceManagerImpl implements EntityInstanceManager {
     }
 
     @Override
-    public void updateEntityCounts() {
-        entityCountHistoryMap.forEach((ent, countHistory) -> countHistory.addEntityCount((int)getInstances().stream()
-                .filter(entity-> entity.getEntityTypeName().equalsIgnoreCase(ent.toLowerCase()))
-                .count()));
+    public void updateEntityCounts(int tick) {
+
+        entityCountHistoryMap.forEach((ent, countHistory) -> {
+            int count = (int)getInstances().stream()
+                    .filter(entity-> entity.getEntityTypeName().equalsIgnoreCase(ent.toLowerCase()))
+                    .count();
+            countHistory.addEntityCount(count, tick);
+        });
     }
 }
