@@ -20,9 +20,8 @@ public class SimulationManagerImpl implements SimulationManager{
 
     private final Map<Integer, SimulationState> simulationStates;
 
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final Map<Integer, Future<Void>> worldFutures;
-
-    private static SimulationManagerImpl instance;
 
     private SimulationManagerImpl(){
         worlds = new HashMap<>();
@@ -30,15 +29,12 @@ public class SimulationManagerImpl implements SimulationManager{
         worldFutures = new HashMap<>();
     }
 
+    private static final class InstanceHolder {
+        static final SimulationManagerImpl instance = new SimulationManagerImpl();
+    }
+
     public static SimulationManager getInstance() {
-        if (instance == null) {  // First if
-            synchronized (SimulationManagerImpl.class) {
-                if (instance == null) {  // Second if
-                    instance = new SimulationManagerImpl();
-                }
-            }
-        }
-        return instance;
+        return InstanceHolder.instance;
     }
 
     @Override
@@ -133,9 +129,11 @@ public class SimulationManagerImpl implements SimulationManager{
     public synchronized void unload() throws InterruptedException {
         worlds.values()
                 .forEach(WorldInstance::stopWorld);
-        executorService.shutdownNow();
-        //noinspection ResultOfMethodCallIgnored
-        executorService.awaitTermination(5, TimeUnit.MILLISECONDS);
+        if (executorService!=null) {
+            executorService.shutdownNow();
+            //noinspection ResultOfMethodCallIgnored
+            executorService.awaitTermination(5, TimeUnit.MILLISECONDS);
+        }
     }
 
     @Override

@@ -38,6 +38,15 @@ public enum SimulationState {
                     true,
                     false);
         }
+    },
+    WAITING {
+        @Override
+        public RunStateDto getDto() {
+            return new RunStateDto(false,
+                    false,
+                    false,
+                    false);
+        }
     };
 
     public abstract RunStateDto getDto();

@@ -3,19 +3,17 @@ package predictions.execution.instance.world;
 import predictions.concurent.SimulationState;
 import predictions.definition.entity.EntityDefinition;
 import predictions.execution.EntityCountHistory;
-import predictions.execution.instance.environment.api.ActiveEnvironment;
 import predictions.termination.api.Termination;
 
 import java.time.LocalDateTime;
-import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 
 
 public interface WorldInstance extends Runnable {
     void run();
-    boolean setEnvironmentVariable(String name, Comparable<?> value);
-    ActiveEnvironment getEnvironmentVariables();
+    void setEnvironmentVariable(String name, Comparable<?> value);
+
     LocalDateTime getStartTime();
     Map<String, EntityCountHistory> getEntityCounts();
 

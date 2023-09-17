@@ -3,18 +3,26 @@ package gui;
 import gui.details.scene.DetailsSceneController;
 import gui.execution.scene.ExecutionController;
 import gui.history.scene.HistoryController;
+import gui.util.display.RunStateRow;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class MainController {
 
@@ -32,7 +40,10 @@ public class MainController {
     private Button newExecutionButton;
     @FXML
     private Button resultsButton;
-
+    @FXML
+    private ScrollPane QueueList;
+    @FXML
+    private ScrollPane mainRoot;
 
     // flags
     private final BooleanProperty isLoaded = new SimpleBooleanProperty(false);
@@ -40,11 +51,39 @@ public class MainController {
     private static MainController mainController = null;
     @FXML
     private void initialize() {
+        mainScene.prefWidthProperty().bind(Bindings.max(mainRoot.widthProperty().subtract(20), 1200.0));
+        mainScene.prefHeightProperty().bind(Bindings.max(mainRoot.heightProperty().subtract(20), 600.0));
         LoadFileButton.setOnAction(this::handleLoadFileButtonClick);
         DetailsButton.setOnAction(event1 -> handleDetailsButtonClick());
         isLoaded.addListener(this::handleFileLoaded);
         newExecutionButton.setOnAction(event1 -> handleNewExecutionButtonClick());
         resultsButton.setOnAction(event -> handleResultsButtonClick());
+        TableView<RunStateRow> table = new TableView<>();
+        QueueList.setContent(table);
+        table.prefHeightProperty().bind(QueueList.heightProperty().subtract(5));
+        table.prefWidthProperty().bind(QueueList.widthProperty().subtract(5));
+        TableColumn<RunStateRow,String> stateColumn = new TableColumn<>("State");
+        stateColumn.prefWidthProperty().bind(table.widthProperty().multiply(0.5));
+        TableColumn<RunStateRow,Integer> countColumn = new TableColumn<>("Count");
+        countColumn.prefWidthProperty().bind(table.widthProperty().multiply(0.5));
+        stateColumn.setCellValueFactory(cellData -> cellData.getValue().stateProperty());
+        countColumn.setCellValueFactory(cellData -> cellData.getValue().countProperty());
+        //noinspection unchecked
+        table.getColumns().addAll(stateColumn, countColumn);
+        ScheduledExecutorService runStateGetter = Executors.newScheduledThreadPool(1);
+        final ObservableList<RunStateRow> rows = FXCollections.observableArrayList();
+        table.setItems(rows);
+        runStateGetter.scheduleAtFixedRate(() -> {
+            List<RunStateRow> res = EngineApi.getInstance().getRunStates();
+            List<RunStateRow> added = res.stream()
+                    .filter(row -> !rows.contains(row))
+                    .collect(Collectors.toList());
+            List<RunStateRow> removed = rows.stream()
+                    .filter(row -> !res.contains(row))
+                    .collect(Collectors.toList());
+            rows.addAll(added);
+            rows.removeAll(removed);
+        }, 0, 500, TimeUnit.MILLISECONDS);
     }
 
     public void handleResultsButtonClick() {

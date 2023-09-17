@@ -65,12 +65,13 @@ public class WorldInstanceImpl implements WorldInstance{
                                 world.getGridWidth() * world.getGridHeight()))
                         .mapToObj(i -> entityDefinition)
                         .forEach(entityInstanceManager::create));
-        state = SimulationState.READY;
+        state = SimulationState.WAITING;
         clientDataContainer.initialize(this);
     }
 
     @Override
     public void run() {
+        SimulationManagerImpl.getInstance().updateState(this.hashCode(), SimulationState.READY);
         duration = Duration.ZERO;
         Termination resTermination;
         Signal s = new SignalImpl(checkStop(), tick, this.startTime, duration);
@@ -170,20 +171,13 @@ public class WorldInstanceImpl implements WorldInstance{
     }
 
     @Override
-    public boolean setEnvironmentVariable(String name, Comparable<?> value) {
+    public void setEnvironmentVariable(String name, Comparable<?> value) {
         if (tick ==0) {
             try {
                 this.activeEnvironment.getProperty(name).updateValue(value, this.tick);
-                return true;
             }
             catch (Exception ignored) {}
         }
-        return false;
-    }
-
-    @Override
-    public ActiveEnvironment getEnvironmentVariables() {
-        return activeEnvironment;
     }
 
     @Override

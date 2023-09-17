@@ -3,14 +3,17 @@ package gui;
 import dto.*;
 import dto.subdto.SingleRunHistoryDto;
 import dto.subdto.show.EntityListDto;
+import dto.subdto.show.instance.RunStateDto;
 import dto.subdto.show.world.EntityDto;
 import dto.subdto.show.world.PropertyDto;
 import gui.details.tree.WorldDetailsItem;
 import gui.execution.environment.EntityAmountGetter;
 import gui.execution.environment.EnvironmentVariableGetter;
 import gui.history.data.PropertyData;
+import gui.history.data.RunState;
 import gui.history.display.RunDisplayed;
 import gui.readFileError.ReadFileError;
+import gui.util.display.RunStateRow;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.TreeItem;
 import javafx.stage.FileChooser;
@@ -180,5 +183,14 @@ public class EngineApi {
                                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))))
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
 
+    }
+
+    public List<RunStateRow> getRunStates() {
+        RunHistoryDto res = api.getRunHistory();
+        List<RunStateDto> states = new ArrayList<>(res.getRunStates().values());
+        return Arrays.stream(RunState.values())
+                .map(run -> new RunStateRow(run.name(), (int) states.stream()
+                        .filter(s -> RunState.getRunState(s).equals(run)).count()))
+                .collect(Collectors.toList());
     }
 }

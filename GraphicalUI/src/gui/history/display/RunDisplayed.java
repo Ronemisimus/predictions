@@ -50,7 +50,10 @@ public class RunDisplayed extends HBox {
         {
             return Color.color(1.0, 1.0, 0.0, 0.2);
         }
-        throw new RuntimeException("Unknown state");
+        else
+        {
+            return Color.color(1.0, 0.0, 1.0, 0.2);
+        }
     }
 
     public Integer getRunIdentifier() {
@@ -66,7 +69,7 @@ public class RunDisplayed extends HBox {
         if (runStateDto.getStopped()) return RunState.STOPPED;
         if (runStateDto.getFinished()) return RunState.FINISHED;
         if (runStateDto.getRunning()) return RunState.RUNNING;
-        throw new RuntimeException("Unknown state");
+        else return RunState.WAITING;
     }
 
     @Override
