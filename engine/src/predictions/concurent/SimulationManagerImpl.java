@@ -134,6 +134,9 @@ public class SimulationManagerImpl implements SimulationManager{
             //noinspection ResultOfMethodCallIgnored
             executorService.awaitTermination(5, TimeUnit.MILLISECONDS);
         }
+        worlds.clear();
+        simulationStates.clear();
+        worldFutures.clear();
     }
 
     @Override

@@ -19,8 +19,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -44,7 +46,6 @@ public class HistoryController {
     @FXML
     private void initialize() {
         HistoryList.getSelectionModel().selectedItemProperty().addListener(this::handleRunSelection);
-
         EndedRuns.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue instanceof ChartAble) {
                 Platform.runLater(() -> {
@@ -75,13 +76,23 @@ public class HistoryController {
     }
 
     private void updateUI(List<RunDisplayed> replacedItems, List<RunDisplayed> addedItems) {
-        runs.removeAll(replacedItems);
+        runs.replaceAll(item -> {
+            RunDisplayed replaced = replacedItems.stream().filter(e -> e.getRunTime().equals(item.getRunTime())).findFirst().orElse(null);
+            if (replaced!=null) {
+                replacedItems.remove(replaced);
+                RunDisplayed added = addedItems.stream().filter(e -> e.getRunTime().equals(item.getRunTime())).findFirst().orElse(null);
+                if (added!=null) {
+                    addedItems.remove(added);
+                    return added;
+                }
+            }
+            return item;
+        });
         runs.addAll(addedItems);
     }
 
     private void handleRunSelection(ObservableValue<? extends RunDisplayed> Observable, RunDisplayed oldVal, RunDisplayed newVal) {
         if (newVal != null && Stream.of(RunState.FINISHED, RunState.STOPPED).anyMatch(e -> e.equals(newVal.getRunState()))) {
-
             new Thread(() -> endedRunGetter(newVal)).start();
         }
     }

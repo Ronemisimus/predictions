@@ -13,6 +13,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -23,13 +24,14 @@ public class RunDisplayed extends HBox {
 
     private final ObservableList<Parent> entityChartLabels = FXCollections.observableArrayList();
 
+    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final RunStateDto runStateDto;
     public RunDisplayed(Map.Entry<Integer, LocalDateTime> entry, RunStateDto runStateDto) {
         super();
         this.entry = entry;
         this.runStateDto = runStateDto;
         setBackground(new Background(new BackgroundFill(getColor(), null, null)));
-        Text text = new Text(entry.getKey() + " " + entry.getValue());
+        Text text = new Text(formatter.format(entry.getValue()));
         this.getChildren().add(text);
     }
 
