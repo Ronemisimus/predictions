@@ -1,6 +1,6 @@
 package gui.history.display;
 
-import javafx.embed.swing.SwingFXUtils;
+import javafx.application.Platform;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
@@ -10,21 +10,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.VBox;
 
-import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 public class EntityChartLabel extends Label implements ChartAble{
     private final XYChart.Series<String, Number> series;
 
     private final ImageView chartImageView;
-
-    private final BarChart<String,Number> barChart;
-    private final VBox parent;
 
     /**
      * Creates an empty label
@@ -34,25 +26,46 @@ public class EntityChartLabel extends Label implements ChartAble{
         series = new XYChart.Series<>();
         counts.get(entity).forEach((k,v) -> series.getData().add(new XYChart.Data<>(k.toString(),v)));
         series.setName("Entity Chart");
-        barChart = new BarChart<>(new CategoryAxis(), new NumberAxis());
+        BarChart<String, Number> barChart = new BarChart<>(new CategoryAxis(), new NumberAxis());
         barChart.getData().add(series);
         barChart.setTitle(entity);
         barChart.getXAxis().setLabel("tick");
         barChart.getYAxis().setLabel("amount");
         barChart.setAnimated(false);
-        this.parent = parent;
         chartImageView = new ImageView();
+        Object lock = new Object();
+        new Thread(() -> sideLoadRender(barChart, parent, lock)).start();
+    }
+
+    private void sideLoadRender(BarChart<String, Number> barChart,
+                                         VBox parent,
+                                         Object lock) {
+        Future<WritableImage> res = ChartRenderer.renderToImage(barChart, parent, lock);
+        while(!res.isDone()) {
+            //noinspection SynchronizationOnLocalVariableOrMethodParameter
+            synchronized (lock) {
+                try {
+                    lock.wait(50);
+                } catch (InterruptedException ignored) {
+                }
+            }
+        }
+
+        Platform.runLater(() -> {
+            synchronized (this) {
+                try {
+                    chartImageView.setImage(res.get());
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
 
     @Override
     public synchronized void chart(VBox barChart) {
-        if (chartImageView.getImage()==null){
-            barChart.getChildren().clear();
-            barChart.getChildren().add(this.barChart);
-            new Thread(this::renderBarChart).start();
-        }
-        else {
+        if (chartImageView.getImage()!=null) {
             // Calculate the maxWidth and maxHeight based on the dimensions of the VBox
             double maxWidth = barChart.getWidth();
             double maxHeight = barChart.getHeight();
@@ -69,25 +82,6 @@ public class EntityChartLabel extends Label implements ChartAble{
 
             barChart.getChildren().clear();
             barChart.getChildren().add(chartImageView);
-        }
-    }
-
-    private void renderBarChart() {
-        Future<WritableImage> res = ChartRenderer.renderToImage(this.barChart, this.parent);
-        while(!res.isDone())
-        {
-            try {
-                Thread.sleep(5);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        try {
-            synchronized (this) {
-                chartImageView.setImage(res.get());
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
         }
     }
 }
