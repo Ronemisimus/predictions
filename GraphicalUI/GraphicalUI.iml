@@ -12,7 +12,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../predictions/jfreechart-1.5.2/target/jfreechart-1.5.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../jfreechart-1.5.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
