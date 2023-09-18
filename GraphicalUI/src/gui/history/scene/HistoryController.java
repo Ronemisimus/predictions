@@ -33,9 +33,6 @@ public class HistoryController {
     @FXML
     private ListView<RunDisplayed> HistoryList;
     @FXML
-    @SuppressWarnings("unused")
-    private VBox CurrentRuns; // TODO: fill with running simulation data
-    @FXML
     private ListView<Parent> EndedRuns;
     @FXML
     private VBox chart;
@@ -100,6 +97,9 @@ public class HistoryController {
         if (newVal != null) {
             if (Stream.of(RunState.FINISHED, RunState.STOPPED).anyMatch(e -> e.equals(newVal.getRunState()))) {
                 new Thread(() -> endedRunGetter(newVal)).start();
+            }
+            else {
+                EndedRuns.getItems().clear();
             }
             new Thread(() -> progressRunGetter(oldVal,newVal)).start();
         }

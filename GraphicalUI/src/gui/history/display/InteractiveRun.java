@@ -48,15 +48,19 @@ public class InteractiveRun {
         this.resumeButton = new Button("Resume");
         this.pauseButton = new Button("Pause");
         stopButton.setOnAction(e->{
-            boolean stoppable = EngineApi.getInstance().stopSimulation(identifier);
-            if (!stoppable) {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "this simulation is not able to stop by the user");
-                alert.show();
-            }
+            new Thread(() -> {
+                boolean stoppable = EngineApi.getInstance().stopSimulation(identifier);
+                if (!stoppable) {
+                    Platform.runLater(()->{
+                        Alert alert = new Alert(Alert.AlertType.ERROR, "this simulation is not able to stop by the user");
+                        alert.show();
+                    });
+                }
+            }).start();
         });
-        pauseButton.setOnAction(e->EngineApi.getInstance().pauseSimulation(identifier));
-        resumeButton.setOnAction(e->EngineApi.getInstance().resumeSimulation(identifier));
-        rerunButton.setOnAction(e->EngineApi.getInstance().reRunSimulation(identifier));
+        pauseButton.setOnAction(e->new Thread(() -> EngineApi.getInstance().pauseSimulation(identifier)).start());
+        resumeButton.setOnAction(e->new Thread(()->EngineApi.getInstance().resumeSimulation(identifier)).start());
+        rerunButton.setOnAction(e->new Thread(()->EngineApi.getInstance().reRunSimulation(identifier)).start());
         this.stateGetter = Executors.newScheduledThreadPool(1);
         task = null;
     }

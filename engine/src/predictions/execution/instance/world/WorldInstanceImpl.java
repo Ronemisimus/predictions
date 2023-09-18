@@ -81,9 +81,9 @@ public class WorldInstanceImpl implements WorldInstance{
     @Override
     public void run() {
         synchronized (this) {
+            checkPause();
             state = SimulationState.READY;
             SimulationManagerImpl.getInstance().updateState(this.hashCode(), state);
-            duration = Duration.ZERO;
         }
         Termination resTermination;
         Signal s = new SignalImpl(checkStop(), tick, duration);
@@ -91,14 +91,14 @@ public class WorldInstanceImpl implements WorldInstance{
         {
 
             Instant tickStart = Instant.now();
+            doTick();
             synchronized (this) {
-                doTick();
                 duration = duration.plus(Duration.between(tickStart, Instant.now()));
                 checkPause();
                 tickStart = Instant.now();
                 s = new SignalImpl(checkStop(), this.tick, duration);
+                duration = duration.plus(Duration.between(tickStart, Instant.now()));
             }
-            duration = duration.plus(Duration.between(tickStart, Instant.now()));
 
         }
         this.reason = resTermination;
@@ -169,7 +169,9 @@ public class WorldInstanceImpl implements WorldInstance{
 
         entityInstanceManager.finishKills();
         entityInstanceManager.finishReplace(this.tick);
-        this.tick++;
+        synchronized (this) {
+            this.tick++;
+        }
     }
 
     private Termination isTerminated(Signal signal) {
@@ -273,13 +275,15 @@ public class WorldInstanceImpl implements WorldInstance{
 
     @Override
     public synchronized void stopWorld() {
-        if (state != SimulationState.FINISHED)
+        if (state != SimulationState.FINISHED) {
+            if (state == SimulationState.PAUSED) this.notifyAll();
             this.state = SimulationState.STOPPED;
+        }
     }
 
     @Override
     public synchronized void pauseWorld() {
-        if (state == SimulationState.READY)
+        if (state == SimulationState.READY || state == SimulationState.WAITING)
             this.state = SimulationState.PAUSED;
     }
 
