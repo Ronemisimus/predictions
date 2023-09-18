@@ -17,8 +17,16 @@ public class PropertyExpression<T> implements Expression<T> {
 
     @Override
     public Comparable<T> evaluate(Context context) {
-        //noinspection unchecked
-        return (Comparable<T>) context.getPrimaryEntityInstance().getPropertyByName(property).getValue();
+        if (context.getPrimaryEntityInstance().getEntityTypeName().equals(containingEntity.getName())) {
+            //noinspection unchecked
+            return (Comparable<T>) context.getPrimaryEntityInstance().getPropertyByName(property).getValue();
+        }else if (context.getSecondaryEntityInstance()!=null){
+            //noinspection unchecked
+            return (Comparable<T>) context.getSecondaryEntityInstance().getPropertyByName(property).getValue();
+        }
+        else{
+            throw new RuntimeException("entity not in context");
+        }
     }
 
     @Override

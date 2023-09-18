@@ -206,4 +206,9 @@ public class MainApiImpl implements MainApi {
     public void reRunSimulation(Integer identifier) {
         simulationManager.reRunWorld(identifier);
     }
+
+    @Override
+    public EntityListDto getCurrentEntityAmounts(Integer identifier) {
+        return simulationManager.getCurrentEntityAmounts(identifier);
+    }
 }

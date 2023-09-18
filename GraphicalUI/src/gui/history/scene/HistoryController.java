@@ -102,7 +102,17 @@ public class HistoryController {
                 EndedRuns.getItems().clear();
             }
             new Thread(() -> progressRunGetter(oldVal,newVal)).start();
+            new Thread(() -> entityCountGetter(oldVal, newVal)).start();
         }
+    }
+
+    private void entityCountGetter(RunDisplayed oldVal, RunDisplayed newVal) {
+        Platform.runLater(() -> {
+            currentRunEntityCount.getChildren().clear();
+            currentRunEntityCount.getChildren().add(new Label("loading..."));
+        });
+        if(oldVal!=null) oldVal.getEntityCount().hide();
+        newVal.getEntityCount().Display(currentRunEntityCount);
     }
 
     private void progressRunGetter(RunDisplayed oldVal, RunDisplayed newVal) {

@@ -1,5 +1,7 @@
 package predictions.execution.instance.world;
 
+import dto.subdto.show.EntityListDto;
+import dto.subdto.show.world.EntityDto;
 import predictions.action.api.Action;
 import predictions.action.api.ActionType;
 import predictions.client.container.ClientDataContainer;
@@ -26,6 +28,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class WorldInstanceImpl implements WorldInstance{
@@ -127,9 +131,11 @@ public class WorldInstanceImpl implements WorldInstance{
     }
 
     private void doTick() {
-        entityInstanceManager.updateEntityCounts(tick);
-        // move entities
-        entityInstanceManager.moveEntities();
+        synchronized (entityInstanceManager) {
+            entityInstanceManager.updateEntityCounts(tick);
+            // move entities
+            entityInstanceManager.moveEntities();
+        }
 
         // get runnable actions
         List<Action> firstPhaseActions = new ArrayList<>();
@@ -167,8 +173,10 @@ public class WorldInstanceImpl implements WorldInstance{
                         tick)
                 .forEach(action::invoke)));
 
-        entityInstanceManager.finishKills();
-        entityInstanceManager.finishReplace(this.tick);
+        synchronized (entityInstanceManager) {
+            entityInstanceManager.finishKills();
+            entityInstanceManager.finishReplace(this.tick);
+        }
         synchronized (this) {
             this.tick++;
         }
@@ -205,16 +213,22 @@ public class WorldInstanceImpl implements WorldInstance{
 
     @Override
     public Map<String, EntityCountHistory> getEntityCounts() {
-        return entityInstanceManager.getEntityCounts();
+        synchronized (entityInstanceManager) {
+            return entityInstanceManager.getEntityCounts();
+        }
     }
 
     @Override
     public Map<Comparable<?>, Integer> getEntityPropertyHistogram(String entityName, String property) {
+        List<EntityInstance> temp;
+        synchronized (entityInstanceManager) {
+            temp = new ArrayList<>(entityInstanceManager.getInstances());
+        }
         Map<Comparable<?>, Integer> res = new HashMap<>();
         Optional<EntityDefinition> ent = world.getEntityDefinitionByName(entityName);
         if (!ent.isPresent()) return null;
         EntityDefinition entityDefinition = ent.get();
-        entityInstanceManager.getInstances().stream().filter(entityDefinition::isInstance).forEach(entityInstance -> {
+        temp.stream().filter(entityDefinition::isInstance).forEach(entityInstance -> {
             Comparable<?> val = entityInstance.getPropertyByName(property).getValue();
             res.put(val, res.getOrDefault(val, 0) + 1);
         });
@@ -232,7 +246,11 @@ public class WorldInstanceImpl implements WorldInstance{
     public Double getConsistency(String entityName, String property) {
         Double consistency = 0.0;
         double count = 0.0;
-        for (EntityInstance entityInstance : entityInstanceManager.getInstances())
+        List<EntityInstance> temp;
+        synchronized (entityInstanceManager) {
+            temp = new ArrayList<>(entityInstanceManager.getInstances());
+        }
+        for (EntityInstance entityInstance : temp)
         {
             if (entityInstance.getEntityTypeName().equals(entityName))
             {
@@ -247,7 +265,11 @@ public class WorldInstanceImpl implements WorldInstance{
     public Double getAverage(String entityName, String property) {
         Double avg = 0.0;
         double count = 0.0;
-        for (EntityInstance entityInstance : entityInstanceManager.getInstances())
+        List<EntityInstance> temp;
+        synchronized (entityInstanceManager) {
+            temp = new ArrayList<>(entityInstanceManager.getInstances());
+        }
+        for (EntityInstance entityInstance : temp)
         {
             if (entityInstance.getEntityTypeName().equals(entityName))
             {
@@ -332,6 +354,22 @@ public class WorldInstanceImpl implements WorldInstance{
             }
         });
         return res.get();
+    }
+
+    @Override
+    public EntityListDto getCurrentEntityCounts() {
+        List<EntityInstance> instances;
+        synchronized (entityInstanceManager){
+            instances = new ArrayList<>(entityInstanceManager.getInstances());
+        }
+        // count instances of same type
+        Map<String, Long> counts = instances.stream().map(EntityInstance::getEntityTypeName)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        List<String> allEntities = getEntityDefinitions().stream().map(EntityDefinition::getName).collect(Collectors.toList());
+        allEntities.forEach(entityName -> counts.putIfAbsent(entityName, 0L));
+        return new EntityListDto(counts.entrySet().stream()
+                .map(e -> new EntityDto(null, e.getKey(), Math.toIntExact(e.getValue())))
+                .collect(Collectors.toList()));
     }
 
     @Override

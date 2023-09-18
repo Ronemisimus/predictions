@@ -1,6 +1,7 @@
 package predictions.concurent;
 
 import dto.RunHistoryDto;
+import dto.subdto.show.EntityListDto;
 import dto.subdto.show.interactive.RunProgressDto;
 import predictions.definition.entity.EntityDefinition;
 import predictions.execution.EntityCountHistory;
@@ -126,6 +127,7 @@ public class SimulationManagerImpl implements SimulationManager{
     public synchronized void unload() throws InterruptedException {
         worlds.values()
                 .forEach(WorldInstance::stopWorld);
+        worldFutures.values().forEach(future -> future.cancel(true));
         if (executorService!=null) {
             executorService.shutdownNow();
             //noinspection ResultOfMethodCallIgnored
@@ -154,5 +156,10 @@ public class SimulationManagerImpl implements SimulationManager{
         Duration duration = checked.getRunningTime();
         Duration maxDuration = checked.getMaxTime();
         return new RunProgressDto(tick,tickMax, duration,maxDuration);
+    }
+
+    @Override
+    public EntityListDto getCurrentEntityAmounts(Integer identifier) {
+        return worlds.get(identifier).getCurrentEntityCounts();
     }
 }

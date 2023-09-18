@@ -28,6 +28,8 @@ public class RunDisplayed extends HBox {
     private final RunStateDto runStateDto;
 
     private final InteractiveRun interactiveRun;
+
+    private final EntityCountDisplay entityCount;
     public RunDisplayed(Map.Entry<Integer, LocalDateTime> entry, RunStateDto runStateDto) {
         super();
         this.entry = entry;
@@ -36,6 +38,7 @@ public class RunDisplayed extends HBox {
         Text text = new Text(formatter.format(entry.getValue()));
         this.getChildren().add(text);
         this.interactiveRun = new InteractiveRun(entry.getKey(), entry.getValue());
+        this.entityCount = new EntityCountDisplay(entry.getKey());
     }
 
     private Color getColor() {
@@ -115,5 +118,9 @@ public class RunDisplayed extends HBox {
 
     public InteractiveRun getInteractiveRun() {
         return interactiveRun;
+    }
+
+    public EntityCountDisplay getEntityCount() {
+        return entityCount;
     }
 }

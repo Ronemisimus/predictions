@@ -100,8 +100,17 @@ public class EngineApi {
         {
             if (property.get().getFrom()!=null)
             {
-                Double from = (Double) property.get().getFrom();
-                Double to = (Double) property.get().getTo();
+                double from, to;
+                Comparable<?> value = property.get().getFrom();
+                if (value instanceof Integer)
+                {
+                    from = (double)(int)(Integer)property.get().getFrom();
+                    to = (double)(int)(Integer)property.get().getTo();
+                }
+                else{
+                    from = (double)(Double)property.get().getFrom();
+                    to = (double)(Double)property.get().getTo();
+                }
                 double val = Double.parseDouble(text);
                 if (val<from || val>to)
                 {
@@ -213,5 +222,10 @@ public class EngineApi {
 
     public void reRunSimulation(Integer identifier) {
         api.reRunSimulation(identifier);
+    }
+
+    public List<EntityDto> getCurrentEntityAmounts(Integer identifier) {
+        EntityListDto res = api.getCurrentEntityAmounts(identifier);
+        return res.getEntities();
     }
 }

@@ -395,7 +395,7 @@ public class ConverterPRDEngine {
                         Optional.empty() :
                         prdAction.getPRDSecondaryEntity().getPRDSelection() == null ?
                                 Optional.empty() :
-                                Optional.of(prdAction.getPRDSecondaryEntity().getPRDSelection().getPRDCondition());
+                                Optional.ofNullable(prdAction.getPRDSecondaryEntity().getPRDSelection().getPRDCondition());
                 ActionErrorDto.Builder builderAction = new ActionErrorDto.Builder();
                 builderAction.actionType(prdAction.getType().toLowerCase());
                 try {

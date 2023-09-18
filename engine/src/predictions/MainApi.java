@@ -40,4 +40,6 @@ public interface MainApi {
     void resumeSimulation(Integer identifier);
 
     void reRunSimulation(Integer identifier);
+
+    EntityListDto getCurrentEntityAmounts(Integer identifier);
 }
