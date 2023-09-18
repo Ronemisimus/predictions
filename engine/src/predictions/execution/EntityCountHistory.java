@@ -5,46 +5,45 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class EntityCountHistory implements Cloneable {
-    private final List<Integer> entityCount;
+    private final Map<Integer,Integer> entityCount;
 
-    private static final int MAX_HISTORY_SIZE = 4000;
+    private static final int MAX_HISTORY_SIZE = 100;
 
     private int latestTick;
 
     public EntityCountHistory() {
-        this.entityCount = new ArrayList<>();
+        this.entityCount = new HashMap<>();
         this.latestTick = -1;
     }
 
-    private EntityCountHistory(List<Integer> entityCount, int latestTick) {
-        this.entityCount = new ArrayList<>(entityCount);
+    private EntityCountHistory(Map<Integer,Integer> entityCount, int latestTick) {
+        this.entityCount = new HashMap<>(entityCount);
         this.latestTick = latestTick;
     }
 
     public Map<Integer, Integer> getEntityCount(int tick) {
-        List<Integer> snapshot;
+        Map<Integer,Integer> snapshot;
         synchronized (this) {
-            snapshot = new ArrayList<>(entityCount);
+            snapshot = new HashMap<>(entityCount);
         }
 
         if (snapshot.size() <= MAX_HISTORY_SIZE) {
-            return IntStream.range(0, snapshot.size())
-                    .boxed()
-                    .collect(Collectors.toMap(i -> i, snapshot::get, (a, b) -> b));
+            return snapshot;
         }
 
         Map<Integer, Integer> res = new HashMap<>();
         int stepSize = snapshot.size() / MAX_HISTORY_SIZE;
-        for (int i = 0; i < snapshot.size(); i += stepSize) {
-            res.put(i, snapshot.get(i));
+        List<Integer> availableTicks = snapshot.keySet().stream().sorted().collect(Collectors.toList());
+        for(int i=0;i<snapshot.size();i+=stepSize){
+            res.put(availableTicks.get(i), snapshot.get(availableTicks.get(i)));
         }
-        res.put(tick, res.get(res.size()-1));
+
         return res;
     }
 
     public synchronized void addEntityCount(int count, int tick) {
-        if (entityCount.isEmpty() || entityCount.get(entityCount.size() - 1) != count) {
-            entityCount.add(count);
+        if (entityCount.isEmpty() || entityCount.get(this.latestTick) != count) {
+            entityCount.put(tick,count);
             latestTick = tick;
         }
     }
@@ -52,12 +51,12 @@ public class EntityCountHistory implements Cloneable {
     @SuppressWarnings("MethodDoesntCallSuperMethod")
     @Override
     public EntityCountHistory clone() {
-        List<Integer> entityCount;
+        Map<Integer,Integer> entityCount;
         int latestTick;
         synchronized (this) {
-            entityCount = new ArrayList<>(this.entityCount);
+            entityCount = new HashMap<>(this.entityCount);
             latestTick = this.latestTick;
         }
-        return new EntityCountHistory(new ArrayList<>(entityCount), latestTick);
+        return new EntityCountHistory(entityCount, latestTick);
     }
 }

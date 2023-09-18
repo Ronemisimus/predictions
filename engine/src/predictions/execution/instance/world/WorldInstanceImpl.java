@@ -84,33 +84,37 @@ public class WorldInstanceImpl implements WorldInstance{
 
     @Override
     public void run() {
-        synchronized (this) {
-            checkPause();
-            state = SimulationState.READY;
-            SimulationManagerImpl.getInstance().updateState(this.hashCode(), state);
-        }
-        Termination resTermination;
-        Signal s = new SignalImpl(checkStop(), tick, duration);
-        while((resTermination = isTerminated(s))==null)
-        {
-
-            Instant tickStart = Instant.now();
-            doTick();
+        try {
             synchronized (this) {
-                duration = duration.plus(Duration.between(tickStart, Instant.now()));
                 checkPause();
-                tickStart = Instant.now();
-                s = new SignalImpl(checkStop(), this.tick, duration);
-                duration = duration.plus(Duration.between(tickStart, Instant.now()));
+                state = SimulationState.READY;
+                SimulationManagerImpl.getInstance().updateState(this.hashCode(), state);
             }
+            Termination resTermination;
+            Signal s = new SignalImpl(checkStop(), tick, duration);
+            while ((resTermination = isTerminated(s)) == null) {
 
-        }
-        this.reason = resTermination;
-        synchronized (this) {
-            if (state != SimulationState.STOPPED) {
-                state = SimulationState.FINISHED;
+                Instant tickStart = Instant.now();
+                doTick();
+                synchronized (this) {
+                    duration = duration.plus(Duration.between(tickStart, Instant.now()));
+                    checkPause();
+                    tickStart = Instant.now();
+                    s = new SignalImpl(checkStop(), this.tick, duration);
+                    duration = duration.plus(Duration.between(tickStart, Instant.now()));
+                }
+
             }
-            SimulationManagerImpl.getInstance().updateState(this.hashCode(), state);
+            this.reason = resTermination;
+            synchronized (this) {
+                if (state != SimulationState.STOPPED) {
+                    state = SimulationState.FINISHED;
+                }
+                SimulationManagerImpl.getInstance().updateState(this.hashCode(), state);
+            }
+        }catch (Exception e){
+            System.out.println("thread " + Thread.currentThread() + "exception");
+            e.printStackTrace();
         }
     }
 
