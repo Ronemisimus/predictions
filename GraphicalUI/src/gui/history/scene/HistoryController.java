@@ -17,12 +17,12 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SplitPane;
 import javafx.scene.layout.VBox;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -39,6 +39,11 @@ public class HistoryController {
     private ListView<Parent> EndedRuns;
     @FXML
     private VBox chart;
+    @SuppressWarnings("unused")
+    @FXML
+    private VBox currentRunEntityCount; // TODO: fill with running simulation data
+    @FXML
+    private ScrollPane CurrentRunProgress;
 
     private final ObservableList<RunDisplayed> runs = FXCollections.observableArrayList();
 
@@ -92,9 +97,20 @@ public class HistoryController {
     }
 
     private void handleRunSelection(ObservableValue<? extends RunDisplayed> Observable, RunDisplayed oldVal, RunDisplayed newVal) {
-        if (newVal != null && Stream.of(RunState.FINISHED, RunState.STOPPED).anyMatch(e -> e.equals(newVal.getRunState()))) {
-            new Thread(() -> endedRunGetter(newVal)).start();
+        if (newVal != null) {
+            if (Stream.of(RunState.FINISHED, RunState.STOPPED).anyMatch(e -> e.equals(newVal.getRunState()))) {
+                new Thread(() -> endedRunGetter(newVal)).start();
+            }
+            new Thread(() -> progressRunGetter(oldVal,newVal)).start();
         }
+    }
+
+    private void progressRunGetter(RunDisplayed oldVal, RunDisplayed newVal) {
+        if (oldVal!=null) oldVal.getInteractiveRun().hide();
+        SplitPane node = newVal.getInteractiveRun().display();
+        node.prefWidthProperty().bind(CurrentRunProgress.widthProperty());
+        node.prefHeightProperty().bind(CurrentRunProgress.heightProperty());
+        Platform.runLater(() -> CurrentRunProgress.setContent(node));
     }
 
     private void endedRunGetter(RunDisplayed run) {

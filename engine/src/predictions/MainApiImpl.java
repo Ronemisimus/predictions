@@ -4,6 +4,7 @@ import dto.*;
 import dto.subdto.SingleRunHistoryDto;
 import dto.subdto.read.dto.FileSelectionDto;
 import dto.subdto.show.EntityListDto;
+import dto.subdto.show.interactive.RunProgressDto;
 import dto.subdto.show.world.EntityDto;
 import dto.subdto.show.world.WorldDto;
 import org.xml.sax.SAXException;
@@ -18,6 +19,7 @@ import predictions.execution.EntityCountHistory;
 import predictions.execution.instance.world.WorldInstance;
 import predictions.execution.instance.world.WorldInstanceImpl;
 import predictions.generated.PRDWorld;
+import predictions.termination.api.TerminationType;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -27,6 +29,7 @@ import javax.xml.validation.SchemaFactory;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class MainApiImpl implements MainApi {
@@ -174,5 +177,33 @@ public class MainApiImpl implements MainApi {
         activeDefinition = null;
         clientDataContainer = null;
         simulationManager.unload();
+    }
+
+    @Override
+    public RunProgressDto getRunProgress(Integer identifier) {
+        return simulationManager.getRunProgress(identifier);
+    }
+
+    @Override
+    public boolean stopSimulation(Integer identifier) {
+        AtomicBoolean userCanTerminate = new AtomicBoolean(false);
+        activeDefinition.getTerminations().forEachRemaining(t -> userCanTerminate.set(userCanTerminate.get() || t.getTerminationType().equals(TerminationType.USER)));
+        if (userCanTerminate.get()) simulationManager.stopWorld(identifier);
+        return userCanTerminate.get();
+    }
+
+    @Override
+    public void pauseSimulation(Integer identifier) {
+        simulationManager.pauseWorld(identifier);
+    }
+
+    @Override
+    public void resumeSimulation(Integer identifier) {
+        simulationManager.resumeWorld(identifier);
+    }
+
+    @Override
+    public void reRunSimulation(Integer identifier) {
+        simulationManager.reRunWorld(identifier);
     }
 }

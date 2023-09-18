@@ -5,6 +5,7 @@ import predictions.definition.entity.EntityDefinition;
 import predictions.execution.EntityCountHistory;
 import predictions.termination.api.Termination;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -32,8 +33,9 @@ public interface WorldInstance extends Runnable {
     void pauseWorld();
 
     void resumeWorld();
-
-    void rerunWorld();
     int getCurrentTick();
     Map.Entry<Integer, Termination> getRunIdentifiers();
+    Integer getMaxTick();
+    Duration getRunningTime();
+    Duration getMaxTime();
 }

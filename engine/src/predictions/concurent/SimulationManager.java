@@ -1,6 +1,7 @@
 package predictions.concurent;
 
 import dto.RunHistoryDto;
+import dto.subdto.show.interactive.RunProgressDto;
 import predictions.definition.entity.EntityDefinition;
 import predictions.execution.EntityCountHistory;
 import predictions.execution.instance.world.WorldInstance;
@@ -39,4 +40,6 @@ public interface SimulationManager {
     void updateState(int runId, SimulationState simulationState);
 
     int getSimulationTick(int runId);
+
+    RunProgressDto getRunProgress(Integer identifier);
 }

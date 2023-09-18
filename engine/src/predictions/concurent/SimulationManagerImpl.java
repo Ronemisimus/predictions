@@ -1,10 +1,13 @@
 package predictions.concurent;
 
 import dto.RunHistoryDto;
+import dto.subdto.show.interactive.RunProgressDto;
 import predictions.definition.entity.EntityDefinition;
 import predictions.execution.EntityCountHistory;
 import predictions.execution.instance.world.WorldInstance;
+import predictions.execution.instance.world.WorldInstanceImpl;
 
+import java.time.Duration;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.HashMap;
@@ -91,7 +94,6 @@ public class SimulationManagerImpl implements SimulationManager{
     public synchronized void stopWorld(int runId) {
         if (simulationStates.containsKey(runId)) {
             worlds.get(runId).stopWorld();
-            simulationStates.put(runId, SimulationState.STOPPED);
         }
     }
 
@@ -99,7 +101,6 @@ public class SimulationManagerImpl implements SimulationManager{
     public synchronized void pauseWorld(int runId) {
         if (simulationStates.containsKey(runId)) {
             worlds.get(runId).pauseWorld();
-            simulationStates.put(runId, SimulationState.PAUSED);
         }
     }
 
@@ -107,21 +108,17 @@ public class SimulationManagerImpl implements SimulationManager{
     public synchronized void resumeWorld(int runId) {
         if (simulationStates.containsKey(runId)) {
             worlds.get(runId).resumeWorld();
-            simulationStates.put(runId, SimulationState.READY);
         }
     }
 
     @Override
     public synchronized void reRunWorld(int runId) {
         if (simulationStates.containsKey(runId)) {
-            worlds.get(runId).stopWorld();
+            WorldInstance newRun;
             synchronized (worlds.get(runId)) {
-                worlds.get(runId).rerunWorld();
-                //noinspection unchecked
-                Future<Void> runIdFuture = (Future<Void>) executorService.submit(worlds.get(runId));
-                worldFutures.put(runId, runIdFuture);
+                 newRun = new WorldInstanceImpl((WorldInstanceImpl) worlds.get(runId));
             }
-            simulationStates.put(runId, SimulationState.READY);
+            addSimulation(newRun);
         }
     }
 
@@ -147,5 +144,15 @@ public class SimulationManagerImpl implements SimulationManager{
     @Override
     public int getSimulationTick(int runId) {
         return worlds.get(runId).getCurrentTick();
+    }
+
+    @Override
+    public RunProgressDto getRunProgress(Integer identifier) {
+        WorldInstance checked = worlds.get(identifier);
+        Integer tick = checked.getCurrentTick();
+        Integer tickMax = checked.getMaxTick();
+        Duration duration = checked.getRunningTime();
+        Duration maxDuration = checked.getMaxTime();
+        return new RunProgressDto(tick,tickMax, duration,maxDuration);
     }
 }

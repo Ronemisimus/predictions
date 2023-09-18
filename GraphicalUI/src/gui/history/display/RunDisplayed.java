@@ -2,6 +2,7 @@ package gui.history.display;
 
 import dto.subdto.show.instance.RunStateDto;
 import gui.history.data.RunState;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Parent;
@@ -9,7 +10,6 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 
 import java.time.LocalDateTime;
@@ -26,6 +26,8 @@ public class RunDisplayed extends HBox {
 
     private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final RunStateDto runStateDto;
+
+    private final InteractiveRun interactiveRun;
     public RunDisplayed(Map.Entry<Integer, LocalDateTime> entry, RunStateDto runStateDto) {
         super();
         this.entry = entry;
@@ -33,6 +35,7 @@ public class RunDisplayed extends HBox {
         setBackground(new Background(new BackgroundFill(getColor(), null, null)));
         Text text = new Text(formatter.format(entry.getValue()));
         this.getChildren().add(text);
+        this.interactiveRun = new InteractiveRun(entry.getKey(), entry.getValue());
     }
 
     private Color getColor() {
@@ -98,15 +101,19 @@ public class RunDisplayed extends HBox {
     }
 
     public void removeEntityChartLabels(List<Parent> entityChartLabel) {
-        entityChartLabels.removeAll(entityChartLabel);
+        Platform.runLater(() -> entityChartLabels.removeAll(entityChartLabel));
     }
 
     public void addEntityChartLabels(List<Parent> entityChartLabel) {
-        entityChartLabels.addAll(entityChartLabel);
+        Platform.runLater(() -> entityChartLabels.addAll(entityChartLabel));
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(entry, runStateDto);
+    }
+
+    public InteractiveRun getInteractiveRun() {
+        return interactiveRun;
     }
 }

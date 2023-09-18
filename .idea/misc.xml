@@ -1,4 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="EntryPointsManager">
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDAction" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDActionPRDBetween" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDActionPRDEnvDepth" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDActionPRDSecondaryEntity" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDActionPRDSecondaryEntityPRDSelection" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDActions" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDActivation" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDBySecond" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDByTicks" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDCondition" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDDivide" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDElse" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDEntities" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDEntity" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDEnvironment" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDEnvProperty" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDMultiply" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDName" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDPopulation" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDProperties" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDProperty" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDRange" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDRule" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDRules" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDTermination" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDThen" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDValue" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDWorld" />
+    <pattern value="predictions.generated.ObjectFactory" method="createPRDWorldPRDGrid" />
+    <pattern value="predictions.generated.PRDWorld.PRDGrid" method="getColumns" />
+    <pattern value="predictions.generated.PRDAction.PRDSecondaryEntity.PRDSelection" method="getCount" />
+    <pattern value="predictions.generated.PRDAction.PRDSecondaryEntity" method="getEntity" />
+    <pattern value="predictions.generated.PRDValue" method="getInit" />
+    <pattern value="predictions.generated.PRDAction.PRDEnvDepth" method="getOf" />
+    <pattern value="predictions.generated.PRDAction.PRDSecondaryEntity.PRDSelection" method="getPRDCondition" />
+    <pattern value="predictions.generated.PRDProperties" method="getPRDProperty" />
+    <pattern value="predictions.generated.PRDRules" method="getPRDRule" />
+    <pattern value="predictions.generated.PRDAction.PRDSecondaryEntity" method="getPRDSelection" />
+    <pattern value="predictions.generated.PRDWorld.PRDGrid" method="getRows" />
+    <pattern value="predictions.generated.PRDAction.PRDBetween" method="getSourceEntity" />
+    <pattern value="predictions.generated.PRDAction.PRDBetween" method="getTargetEntity" />
+    <pattern value="predictions.generated.PRDAction.PRDBetween" />
+    <pattern value="predictions.generated.PRDAction.PRDEnvDepth" />
+    <pattern value="predictions.generated.PRDWorld.PRDGrid" />
+    <pattern value="predictions.generated.PRDProperties" />
+    <pattern value="predictions.generated.PRDRules" />
+    <pattern value="predictions.generated.PRDAction.PRDSecondaryEntity" />
+    <pattern value="predictions.generated.PRDAction.PRDSecondaryEntity.PRDSelection" />
+    <pattern value="predictions.generated.PRDValue" />
+    <pattern value="predictions.generated.PRDValue" method="isRandomInitialize" />
+    <pattern value="predictions.generated.ObjectFactory" />
+    <pattern value="predictions.generated.ObjectFactory" method="ObjectFactory" />
+    <pattern value="predictions.generated.PRDAction" />
+    <pattern value="predictions.generated.PRDActivation" />
+    <pattern value="predictions.generated.PRDBySecond" />
+    <pattern value="predictions.generated.PRDByTicks" />
+    <pattern value="predictions.generated.PRDCondition" />
+    <pattern value="predictions.generated.PRDDivide" />
+    <pattern value="predictions.generated.PRDEntity" />
+    <pattern value="predictions.generated.PRDEnvProperty" />
+    <pattern value="predictions.generated.PRDMultiply" />
+    <pattern value="predictions.generated.PRDProperty" />
+    <pattern value="predictions.generated.PRDRange" />
+    <pattern value="predictions.generated.PRDRule" />
+    <pattern value="predictions.generated.PRDTermination" />
+    <pattern value="predictions.generated.PRDWorld" />
+    <pattern value="predictions.generated.PRDDivide" method="setArg1" />
+    <pattern value="predictions.generated.PRDMultiply" method="setArg1" />
+    <pattern value="predictions.generated.PRDDivide" method="setArg2" />
+    <pattern value="predictions.generated.PRDMultiply" method="setArg2" />
+    <pattern value="predictions.generated.PRDAction" method="setBy" />
+    <pattern value="predictions.generated.PRDWorld.PRDGrid" method="setColumns" />
+    <pattern value="predictions.generated.PRDBySecond" method="setCount" />
+    <pattern value="predictions.generated.PRDByTicks" method="setCount" />
+    <pattern value="predictions.generated.PRDAction.PRDSecondaryEntity.PRDSelection" method="setCount" />
+    <pattern value="predictions.generated.PRDAction" method="setCreate" />
+    <pattern value="predictions.generated.PRDAction" method="setEntity" />
+    <pattern value="predictions.generated.PRDAction.PRDSecondaryEntity" method="setEntity" />
+    <pattern value="predictions.generated.PRDCondition" method="setEntity" />
+    <pattern value="predictions.generated.PRDRange" method="setFrom" />
+    <pattern value="predictions.generated.PRDValue" method="setInit" />
+    <pattern value="predictions.generated.PRDAction" method="setKill" />
+    <pattern value="predictions.generated.PRDAction" method="setMode" />
+    <pattern value="predictions.generated.PRDEntity" method="setName" />
+    <pattern value="predictions.generated.PRDRule" method="setName" />
+    <pattern value="predictions.generated.PRDAction.PRDEnvDepth" method="setOf" />
+    <pattern value="predictions.generated.PRDCondition" method="setOperator" />
+    <pattern value="predictions.generated.PRDAction" method="setPRDActions" />
+    <pattern value="predictions.generated.PRDRule" method="setPRDActions" />
+    <pattern value="predictions.generated.PRDRule" method="setPRDActivation" />
+    <pattern value="predictions.generated.PRDAction" method="setPRDBetween" />
+    <pattern value="predictions.generated.PRDTermination" method="setPRDByUser" />
+    <pattern value="predictions.generated.PRDAction" method="setPRDCondition" />
+    <pattern value="predictions.generated.PRDAction.PRDSecondaryEntity.PRDSelection" method="setPRDCondition" />
+    <pattern value="predictions.generated.PRDAction" method="setPRDDivide" />
+    <pattern value="predictions.generated.PRDAction" method="setPRDElse" />
+    <pattern value="predictions.generated.PRDWorld" method="setPRDEntities" />
+    <pattern value="predictions.generated.PRDAction" method="setPRDEnvDepth" />
+    <pattern value="predictions.generated.PRDWorld" method="setPRDEnvironment" />
+    <pattern value="predictions.generated.PRDWorld" method="setPRDGrid" />
+    <pattern value="predictions.generated.PRDAction" method="setPRDMultiply" />
+    <pattern value="predictions.generated.PRDEnvProperty" method="setPRDName" />
+    <pattern value="predictions.generated.PRDProperty" method="setPRDName" />
+    <pattern value="predictions.generated.PRDEntity" method="setPRDProperties" />
+    <pattern value="predictions.generated.PRDEnvProperty" method="setPRDRange" />
+    <pattern value="predictions.generated.PRDProperty" method="setPRDRange" />
+    <pattern value="predictions.generated.PRDWorld" method="setPRDRules" />
+    <pattern value="predictions.generated.PRDAction" method="setPRDSecondaryEntity" />
+    <pattern value="predictions.generated.PRDAction.PRDSecondaryEntity" method="setPRDSelection" />
+    <pattern value="predictions.generated.PRDWorld" method="setPRDTermination" />
+    <pattern value="predictions.generated.PRDAction" method="setPRDThen" />
+    <pattern value="predictions.generated.PRDWorld" method="setPRDThreadCount" />
+    <pattern value="predictions.generated.PRDProperty" method="setPRDValue" />
+    <pattern value="predictions.generated.PRDActivation" method="setProbability" />
+    <pattern value="predictions.generated.PRDAction" method="setProperty" />
+    <pattern value="predictions.generated.PRDCondition" method="setProperty" />
+    <pattern value="predictions.generated.PRDValue" method="setRandomInitialize" />
+    <pattern value="predictions.generated.PRDAction" method="setResultProp" />
+    <pattern value="predictions.generated.PRDWorld.PRDGrid" method="setRows" />
+    <pattern value="predictions.generated.PRDAction.PRDBetween" method="setSourceEntity" />
+    <pattern value="predictions.generated.PRDAction.PRDBetween" method="setTargetEntity" />
+    <pattern value="predictions.generated.PRDActivation" method="setTicks" />
+    <pattern value="predictions.generated.PRDRange" method="setTo" />
+    <pattern value="predictions.generated.PRDAction" method="setType" />
+    <pattern value="predictions.generated.PRDEnvProperty" method="setType" />
+    <pattern value="predictions.generated.PRDProperty" method="setType" />
+    <pattern value="predictions.generated.PRDAction" method="setValue" />
+    <pattern value="predictions.generated.PRDCondition" method="setValue" />
+  </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="1.8 (2)" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>

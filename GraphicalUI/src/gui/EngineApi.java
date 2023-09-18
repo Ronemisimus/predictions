@@ -4,6 +4,7 @@ import dto.*;
 import dto.subdto.SingleRunHistoryDto;
 import dto.subdto.show.EntityListDto;
 import dto.subdto.show.instance.RunStateDto;
+import dto.subdto.show.interactive.RunProgressDto;
 import dto.subdto.show.world.EntityDto;
 import dto.subdto.show.world.PropertyDto;
 import gui.details.tree.WorldDetailsItem;
@@ -192,5 +193,25 @@ public class EngineApi {
                 .map(run -> new RunStateRow(run.name(), (int) states.stream()
                         .filter(s -> RunState.getRunState(s).equals(run)).count()))
                 .collect(Collectors.toList());
+    }
+
+    public RunProgressDto getRunProgress(Integer identifier) {
+        return api.getRunProgress(identifier);
+    }
+
+    public boolean stopSimulation(Integer identifier) {
+        return api.stopSimulation(identifier);
+    }
+
+    public void pauseSimulation(Integer identifier) {
+        api.pauseSimulation(identifier);
+    }
+
+    public void resumeSimulation(Integer identifier) {
+        api.resumeSimulation(identifier);
+    }
+
+    public void reRunSimulation(Integer identifier) {
+        api.reRunSimulation(identifier);
     }
 }

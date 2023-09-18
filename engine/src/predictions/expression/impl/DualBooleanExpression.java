@@ -19,7 +19,7 @@ public class DualBooleanExpression extends DualExpression<Boolean> {
         super(
                 new BooleanComplexExpression(prdCondition.getPRDCondition().get(0), contextDefinition, builder),
                 new BooleanComplexExpression(Objects.requireNonNull(subCondition(prdCondition)), contextDefinition, builder));
-        this.booleanOperation = BooleanOperation.valueOf(prdCondition.getLogical().toUpperCase());
+        this.booleanOperation = BooleanOperation.getInstance(prdCondition.getLogical().toUpperCase());
     }
 
     private static PRDCondition subCondition(PRDCondition prdCondition) {

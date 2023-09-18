@@ -16,18 +16,22 @@ import predictions.execution.instance.environment.api.ActiveEnvironment;
 import predictions.execution.instance.property.PropertyInstance;
 import predictions.termination.api.Signal;
 import predictions.termination.api.Termination;
+import predictions.termination.api.TerminationType;
 import predictions.termination.impl.SignalImpl;
+import predictions.termination.impl.TicksTermination;
+import predictions.termination.impl.TimeTermination;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
 public class WorldInstanceImpl implements WorldInstance{
 
-    private ActiveEnvironment activeEnvironment;
-    private EntityInstanceManager entityInstanceManager;
+    private final ActiveEnvironment activeEnvironment;
+    private final EntityInstanceManager entityInstanceManager;
     private final World world;
     private final ClientDataContainer clientDataContainer;
     private Termination reason;
@@ -54,6 +58,7 @@ public class WorldInstanceImpl implements WorldInstance{
         this.startTime = Instant.now();
         this.reason = null;
         this.entityInstanceManager.initializeGrid(world.getGridWidth(), world.getGridHeight());
+        duration = Duration.ZERO;
 
         world.getEntityDefinitions()
                 .forEachRemaining(entityDefinition -> IntStream.range(0,
@@ -69,30 +74,39 @@ public class WorldInstanceImpl implements WorldInstance{
         clientDataContainer.initialize(this);
     }
 
+    public WorldInstanceImpl(final WorldInstanceImpl worldInstance) {
+        this(worldInstance.world, worldInstance.clientDataContainer);
+    }
+
     @Override
     public void run() {
-        SimulationManagerImpl.getInstance().updateState(this.hashCode(), SimulationState.READY);
-        duration = Duration.ZERO;
+        synchronized (this) {
+            state = SimulationState.READY;
+            SimulationManagerImpl.getInstance().updateState(this.hashCode(), state);
+            duration = Duration.ZERO;
+        }
         Termination resTermination;
-        Signal s = new SignalImpl(checkStop(), tick, this.startTime, duration);
+        Signal s = new SignalImpl(checkStop(), tick, duration);
         while((resTermination = isTerminated(s))==null)
         {
 
             Instant tickStart = Instant.now();
             synchronized (this) {
                 doTick();
+                duration = duration.plus(Duration.between(tickStart, Instant.now()));
                 checkPause();
-                s = new SignalImpl(checkStop(), this.tick, this.startTime, duration);
+                tickStart = Instant.now();
+                s = new SignalImpl(checkStop(), this.tick, duration);
             }
             duration = duration.plus(Duration.between(tickStart, Instant.now()));
+
         }
         this.reason = resTermination;
-        if(state != SimulationState.STOPPED) {
-            state = SimulationState.FINISHED;
-            SimulationManagerImpl.getInstance().updateState(this.hashCode(), SimulationState.FINISHED);
-        }
-        else{
-            SimulationManagerImpl.getInstance().updateState(this.hashCode(), SimulationState.STOPPED);
+        synchronized (this) {
+            if (state != SimulationState.STOPPED) {
+                state = SimulationState.FINISHED;
+            }
+            SimulationManagerImpl.getInstance().updateState(this.hashCode(), state);
         }
     }
 
@@ -103,7 +117,9 @@ public class WorldInstanceImpl implements WorldInstance{
     private synchronized void checkPause() {
         if (state == SimulationState.PAUSED) {
             try {
+                SimulationManagerImpl.getInstance().updateState(this.hashCode(), state);
                 wait();
+                SimulationManagerImpl.getInstance().updateState(this.hashCode(), state);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -251,48 +267,28 @@ public class WorldInstanceImpl implements WorldInstance{
     }
 
     @Override
-    public SimulationState getSimulationState() {
+    public synchronized SimulationState getSimulationState() {
         return state;
     }
 
     @Override
-    public void stopWorld() {
-        this.state = SimulationState.STOPPED;
+    public synchronized void stopWorld() {
+        if (state != SimulationState.FINISHED)
+            this.state = SimulationState.STOPPED;
     }
 
     @Override
-    public void pauseWorld() {
-        this.state = SimulationState.PAUSED;
+    public synchronized void pauseWorld() {
+        if (state == SimulationState.READY)
+            this.state = SimulationState.PAUSED;
     }
 
     @Override
-    public void resumeWorld() {
-        this.notifyAll();
-    }
-
-    @Override
-    public synchronized void rerunWorld() {
-        this.activeEnvironment = world.getEnvVariablesManager().createActiveEnvironment();
-        List<String> entities = new ArrayList<>();
-        world.getEntityDefinitions().forEachRemaining(entityDefinition -> entities.add(entityDefinition.getName()));
-        this.entityInstanceManager = new EntityInstanceManagerImpl(entities);
-        this.tick = 0;
-        this.duration = Duration.ZERO;
-        this.reason = null;
-        this.entityInstanceManager.initializeGrid(world.getGridWidth(), world.getGridHeight());
-
-        world.getEntityDefinitions()
-                .forEachRemaining(entityDefinition -> IntStream.range(0,
-                                Math.min(
-                                        clientDataContainer.getEntityCounts().stream()
-                                                .filter(e -> e.getName().equals(entityDefinition.getName()))
-                                                .findFirst().orElseThrow(() -> new RuntimeException("missing entity amount: " + entityDefinition.getName()))
-                                                .getAmount(),
-                                        world.getGridWidth() * world.getGridHeight()))
-                        .mapToObj(i -> entityDefinition)
-                        .forEach(entityInstanceManager::create));
-        state = SimulationState.READY;
-        clientDataContainer.initialize(this);
+    public synchronized void resumeWorld() {
+        if (state == SimulationState.PAUSED) {
+            state = SimulationState.READY;
+            this.notifyAll();
+        }
     }
 
     @Override
@@ -303,6 +299,35 @@ public class WorldInstanceImpl implements WorldInstance{
     @Override
     public Map.Entry<Integer, Termination> getRunIdentifiers() {
         return new AbstractMap.SimpleEntry<>(this.hashCode(), this.reason);
+    }
+
+    @Override
+    public Integer getMaxTick() {
+        AtomicReference<Integer> res = new AtomicReference<>(null);
+        world.getTerminations().forEachRemaining(t -> {
+            if (t.getTerminationType().equals(TerminationType.TICKS))
+            {
+                res.set(((TicksTermination) t).getTicks());
+            }
+        });
+        return res.get();
+    }
+
+    @Override
+    public synchronized Duration getRunningTime() {
+        return duration;
+    }
+
+    @Override
+    public Duration getMaxTime() {
+        AtomicReference<Duration> res = new AtomicReference<>(null);
+        world.getTerminations().forEachRemaining(t ->{
+            if (t.getTerminationType().equals(TerminationType.TIME))
+            {
+                res.set(((TimeTermination) t).getTerminationDuration());
+            }
+        });
+        return res.get();
     }
 
     @Override

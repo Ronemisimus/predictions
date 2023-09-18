@@ -3,6 +3,7 @@ package predictions;
 import dto.*;
 import dto.subdto.SingleRunHistoryDto;
 import dto.subdto.show.EntityListDto;
+import dto.subdto.show.interactive.RunProgressDto;
 import dto.subdto.show.world.EntityDto;
 
 import java.util.List;
@@ -29,4 +30,14 @@ public interface MainApi {
     void setEntityAmount(String name, int i);
 
     void unload() throws InterruptedException;
+
+    RunProgressDto getRunProgress(Integer identifier);
+
+    boolean stopSimulation(Integer identifier);
+
+    void pauseSimulation(Integer identifier);
+
+    void resumeSimulation(Integer identifier);
+
+    void reRunSimulation(Integer identifier);
 }
