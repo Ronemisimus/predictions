@@ -15,6 +15,7 @@ import predictions.execution.instance.property.PropertyInstance;
 import predictions.expression.ExpressionBuilder;
 import predictions.expression.api.Expression;
 import predictions.expression.api.MathOperation;
+import predictions.expression.impl.IntegerWrapExpression;
 
 import java.util.Optional;
 
@@ -43,8 +44,7 @@ public class IncreaseAction extends AbstractAction {
 
         Expression<Double> res;
         try {
-            Expression<Integer> temp = ExpressionBuilder.buildDecimalExpression(byExpression, contextDefinition, expBuilder);
-            res = context -> ((Integer)temp.evaluate(context)).doubleValue();
+            res = new IntegerWrapExpression(ExpressionBuilder.buildDecimalExpression(byExpression, contextDefinition, expBuilder));
         }catch (Exception e) {
             try {
                 res = ExpressionBuilder.buildDoubleExpression(byExpression, contextDefinition, expBuilder);

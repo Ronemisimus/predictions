@@ -13,6 +13,7 @@ import predictions.execution.context.Context;
 import predictions.execution.instance.entity.EntityInstance;
 import predictions.expression.ExpressionBuilder;
 import predictions.expression.api.Expression;
+import predictions.expression.impl.IntegerWrapExpression;
 import predictions.generated.PRDActions;
 
 import java.util.List;
@@ -35,8 +36,7 @@ public class ProximityAction extends AbstractAction {
         ExpressionErrorDto.Builder expressionBuilder = new ExpressionErrorDto.Builder();
         Expression<Double> res;
         try {
-            Expression<Integer> temp = ExpressionBuilder.buildDecimalExpression(s, contextDefinition, expressionBuilder);
-            res = context -> ((Integer)temp.evaluate(context)).doubleValue();
+            res = new IntegerWrapExpression(ExpressionBuilder.buildDecimalExpression(s, contextDefinition, expressionBuilder));
         }catch (Exception e1)
         {
             try {
@@ -60,14 +60,6 @@ public class ProximityAction extends AbstractAction {
         Integer distance = primary.getLocation().distance(secondary.getLocation());
         if (distance <= distMax)
             actions.forEach(a->a.invoke(context));
-    }
-
-    public List<Action> getActions() {
-        return actions;
-    }
-
-    public Expression<Double> getDistanceOf1() {
-        return distanceOf1;
     }
 
     @Override

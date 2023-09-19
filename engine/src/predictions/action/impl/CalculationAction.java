@@ -16,6 +16,7 @@ import predictions.expression.ExpressionBuilder;
 import predictions.expression.api.Expression;
 import predictions.expression.api.MathOperation;
 import predictions.expression.impl.DualMathExpression;
+import predictions.expression.impl.IntegerWrapExpression;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,8 +54,8 @@ public class CalculationAction extends AbstractAction {
         List<Expression<Double>> args1Exp = Arrays.stream(args1)
                 .map(exp -> {
                     try {
-                        Expression<Integer> temp = ExpressionBuilder.buildDecimalExpression(exp, contextDefinition, expBuilder);
-                        return (Expression<Double>) context -> ((Integer)temp.evaluate(context)).doubleValue();
+
+                        return new IntegerWrapExpression(ExpressionBuilder.buildDecimalExpression(exp, contextDefinition, expBuilder));
                     } catch (Exception e) {
                         try {
                             return ExpressionBuilder.buildDoubleExpression(exp, contextDefinition, expBuilder);
@@ -67,8 +68,7 @@ public class CalculationAction extends AbstractAction {
         List<Expression<Double>> args2Exp = Arrays.stream(args2)
                 .map(exp -> {
                     try {
-                        Expression<Integer> temp = ExpressionBuilder.buildDecimalExpression(exp, contextDefinition, expBuilder);
-                        return (Expression<Double>) context -> ((Integer)temp.evaluate(context)).doubleValue();
+                        return new IntegerWrapExpression(ExpressionBuilder.buildDecimalExpression(exp, contextDefinition, expBuilder));
                     } catch (Exception e) {
                         try {
                             return ExpressionBuilder.buildDoubleExpression(exp, contextDefinition, expBuilder);

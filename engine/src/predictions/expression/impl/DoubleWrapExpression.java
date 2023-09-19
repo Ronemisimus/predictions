@@ -13,4 +13,9 @@ public class DoubleWrapExpression implements Expression<Integer> {
     public Comparable<Integer> evaluate(Context context) {
         return ((Double)innerExpression.evaluate(context)).intValue();
     }
+
+    @Override
+    public String toString() {
+        return innerExpression.toString();
+    }
 }

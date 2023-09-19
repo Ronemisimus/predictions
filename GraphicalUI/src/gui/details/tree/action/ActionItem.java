@@ -157,7 +157,7 @@ public class ActionItem extends TreeItem<String> implements OpenableItem {
         Label primaryEntityLabel = new Label("Primary Entity: " + action.getPrimaryEntity().getName());
         Label secondaryEntityLabel = new Label("Secondary Entity: " + (action.getSecondaryEntity()==null? null:
                 action.getSecondaryEntity().getName()));
-        Label propertyLabel = new Label("Property: " + action.getPropertyName() + " = " + action.getPropertyName() + " - 1");
+        Label propertyLabel = new Label("Property: " + action.getPropertyName() + " = " + action.getPropertyName() + " - " + action.getByExpression());
 
         VBox detailsBox = new VBox();
         detailsBox.getChildren().addAll(typeLabel, primaryEntityLabel, secondaryEntityLabel, propertyLabel);
@@ -170,7 +170,7 @@ public class ActionItem extends TreeItem<String> implements OpenableItem {
         Label primaryEntityLabel = new Label("Primary Entity: " + action.getPrimaryEntity().getName());
         Label secondaryEntityLabel = new Label("Secondary Entity: " + (action.getSecondaryEntity()==null? "" :
                 action.getSecondaryEntity().getName()));
-        Label propertyLabel = new Label("Property: " + action.getPropertyName() + " = " + action.getPropertyName() + " + 1");
+        Label propertyLabel = new Label("Property: " + action.getPropertyName() + " = " + action.getPropertyName() + " + " + action.getByExpression());
 
         VBox detailsBox = new VBox();
         detailsBox.getChildren().addAll(typeLabel, primaryEntityLabel, secondaryEntityLabel, propertyLabel);
