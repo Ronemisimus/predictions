@@ -27,7 +27,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
-import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -57,12 +56,12 @@ public class MainApiImpl implements MainApi {
 
         try {
             SchemaFactory schemaFactory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
-            Schema schema = schemaFactory.newSchema(new File(Objects.requireNonNull(getClass().getResource("predictions-v2.xsd")).toURI()));
+            Schema schema = schemaFactory.newSchema(getClass().getResource("predictions-v2.xsd"));
             JAXBContext context = JAXBContext.newInstance(PRDWorld.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
             unmarshaller.setSchema(schema);
             res = (PRDWorld) unmarshaller.unmarshal(f);
-        } catch (JAXBException | SAXException | URISyntaxException e) {
+        } catch (JAXBException | SAXException e) {
             return new ReadFileDto.Builder().matchesSchema(false).build();
         }
 
