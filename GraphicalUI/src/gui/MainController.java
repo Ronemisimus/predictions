@@ -4,6 +4,7 @@ import gui.details.scene.DetailsSceneController;
 import gui.execution.scene.ExecutionController;
 import gui.history.scene.HistoryController;
 import gui.util.display.RunStateRow;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -154,5 +155,10 @@ public class MainController {
 
     public void unload() {
         isLoaded.set(false);
+    }
+
+    public void copyEnvironment(Integer identifier) {
+        EngineApi.getInstance().copyEnvironment(identifier);
+        Platform.runLater(() -> this.newExecutionButton.fire());
     }
 }

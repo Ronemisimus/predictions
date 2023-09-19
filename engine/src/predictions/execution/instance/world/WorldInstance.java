@@ -1,6 +1,7 @@
 package predictions.execution.instance.world;
 
 import dto.subdto.show.EntityListDto;
+import predictions.client.container.ClientDataContainerImpl;
 import predictions.concurent.SimulationState;
 import predictions.definition.entity.EntityDefinition;
 import predictions.execution.EntityCountHistory;
@@ -40,4 +41,6 @@ public interface WorldInstance extends Runnable {
     Duration getRunningTime();
     Duration getMaxTime();
     EntityListDto getCurrentEntityCounts();
+
+    ClientDataContainerImpl getClientContainer();
 }

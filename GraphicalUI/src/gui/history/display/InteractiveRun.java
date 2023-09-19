@@ -2,6 +2,8 @@ package gui.history.display;
 
 import dto.subdto.show.interactive.RunProgressDto;
 import gui.EngineApi;
+import gui.MainController;
+import gui.history.data.RunState;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -27,7 +29,7 @@ public class InteractiveRun {
     private final Property<Integer> simulationTickMax;
     private final Property<Duration> simulationSecond, simulationSecondMax;
 
-    private final Button stopButton, rerunButton, resumeButton, pauseButton;
+    private final Button stopButton, rerunButton, resumeButton, pauseButton, copyEnvironmentButton;
 
     private final Property<ProgressBar> tickProgress, secondProgress;
 
@@ -47,20 +49,20 @@ public class InteractiveRun {
         this.rerunButton = new Button("Rerun");
         this.resumeButton = new Button("Resume");
         this.pauseButton = new Button("Pause");
-        stopButton.setOnAction(e->{
-            new Thread(() -> {
-                boolean stoppable = EngineApi.getInstance().stopSimulation(identifier);
-                if (!stoppable) {
-                    Platform.runLater(()->{
-                        Alert alert = new Alert(Alert.AlertType.ERROR, "this simulation is not able to stop by the user");
-                        alert.show();
-                    });
-                }
-            }).start();
-        });
+        this.copyEnvironmentButton = new Button("Copy");
+        stopButton.setOnAction(e-> new Thread(() -> {
+            boolean stoppable = EngineApi.getInstance().stopSimulation(identifier);
+            if (!stoppable) {
+                Platform.runLater(()->{
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "this simulation is not able to stop by the user");
+                    alert.show();
+                });
+            }
+        }).start());
         pauseButton.setOnAction(e->new Thread(() -> EngineApi.getInstance().pauseSimulation(identifier)).start());
         resumeButton.setOnAction(e->new Thread(()->EngineApi.getInstance().resumeSimulation(identifier)).start());
         rerunButton.setOnAction(e->new Thread(()->EngineApi.getInstance().reRunSimulation(identifier)).start());
+        copyEnvironmentButton.setOnAction(e->new Thread(()-> MainController.getInstance(null).copyEnvironment(identifier)).start());
         this.stateGetter = Executors.newScheduledThreadPool(1);
         task = null;
     }
@@ -94,7 +96,8 @@ public class InteractiveRun {
         resumeButton.prefWidthProperty().bind(controls.widthProperty().divide(2));
         stopButton.prefWidthProperty().bind(controls.widthProperty().divide(2));
         rerunButton.prefWidthProperty().bind(controls.widthProperty().divide(2));
-        Platform.runLater(() -> controls.getChildren().addAll(pauseButton, resumeButton, stopButton, rerunButton));
+        copyEnvironmentButton.prefWidthProperty().bind(controls.widthProperty().divide(2));
+        Platform.runLater(() -> controls.getChildren().addAll(pauseButton, resumeButton, stopButton, rerunButton, copyEnvironmentButton));
 
         progress.setSpacing(5);
         progress.setPadding(new Insets(10,10,10,10));
@@ -112,11 +115,29 @@ public class InteractiveRun {
 
     private void updateTask() {
         RunProgressDto res = EngineApi.getInstance().getRunProgress(identifier);
+        boolean showControlButtons = !res.getStatus().equals(RunState.FINISHED.name()) && !res.getStatus().equals(RunState.STOPPED.name());
+        boolean showPause = showControlButtons && res.getStatus().equalsIgnoreCase("READY");
         Platform.runLater(() -> {
             this.simulationTick.setValue(res.getTick());
             this.simulationTickMax.setValue(res.getMaxTick());
             this.simulationSecond.setValue(res.getSecond());
             this.simulationSecondMax.setValue(res.getMaxSecond());
+            if (showControlButtons){
+                this.stopButton.setVisible(true);
+                if (showPause){
+                    this.pauseButton.setVisible(true);
+                    this.resumeButton.setVisible(false);
+                }
+                else {
+                    this.pauseButton.setVisible(false);
+                    this.resumeButton.setVisible(true);
+                }
+            }
+            else{
+                this.stopButton.setVisible(false);
+                this.pauseButton.setVisible(false);
+                this.resumeButton.setVisible(false);
+            }
         });
     }
 

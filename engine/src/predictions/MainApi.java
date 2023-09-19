@@ -42,4 +42,6 @@ public interface MainApi {
     void reRunSimulation(Integer identifier);
 
     EntityListDto getCurrentEntityAmounts(Integer identifier);
+
+    void copyEnvironment(Integer identifier);
 }

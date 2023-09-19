@@ -3,6 +3,7 @@ package predictions.concurent;
 import dto.RunHistoryDto;
 import dto.subdto.show.EntityListDto;
 import dto.subdto.show.interactive.RunProgressDto;
+import predictions.client.container.ClientDataContainerImpl;
 import predictions.definition.entity.EntityDefinition;
 import predictions.execution.EntityCountHistory;
 import predictions.execution.instance.world.WorldInstance;
@@ -155,11 +156,17 @@ public class SimulationManagerImpl implements SimulationManager{
         Integer tickMax = checked.getMaxTick();
         Duration duration = checked.getRunningTime();
         Duration maxDuration = checked.getMaxTime();
-        return new RunProgressDto(tick,tickMax, duration,maxDuration);
+        String status = simulationStates.get(identifier).name();
+        return new RunProgressDto(tick,tickMax, duration,maxDuration, status);
     }
 
     @Override
     public EntityListDto getCurrentEntityAmounts(Integer identifier) {
         return worlds.get(identifier).getCurrentEntityCounts();
+    }
+
+    @Override
+    public synchronized ClientDataContainerImpl getEnvironment(Integer identifier) {
+        return worlds.get(identifier).getClientContainer();
     }
 }

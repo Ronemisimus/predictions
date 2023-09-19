@@ -115,7 +115,7 @@ public class MainApiImpl implements MainApi {
     }
 
     public void runSimulation() {
-        WorldInstance activeWorld = new WorldInstanceImpl(activeDefinition, clientDataContainer);
+        WorldInstance activeWorld = new WorldInstanceImpl(activeDefinition, (ClientDataContainerImpl) clientDataContainer);
         simulationManager.addSimulation(activeWorld);
         clientDataContainer = new ClientDataContainerImpl((ClientDataContainerImpl) clientDataContainer);
     }
@@ -209,5 +209,11 @@ public class MainApiImpl implements MainApi {
     @Override
     public EntityListDto getCurrentEntityAmounts(Integer identifier) {
         return simulationManager.getCurrentEntityAmounts(identifier);
+    }
+
+    @Override
+    public void copyEnvironment(Integer identifier) {
+        ClientDataContainerImpl res = simulationManager.getEnvironment(identifier);
+        this.clientDataContainer = new ClientDataContainerImpl(res);
     }
 }

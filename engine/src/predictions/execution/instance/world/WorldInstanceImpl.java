@@ -4,7 +4,7 @@ import dto.subdto.show.EntityListDto;
 import dto.subdto.show.world.EntityDto;
 import predictions.action.api.Action;
 import predictions.action.api.ActionType;
-import predictions.client.container.ClientDataContainer;
+import predictions.client.container.ClientDataContainerImpl;
 import predictions.concurent.SimulationManagerImpl;
 import predictions.concurent.SimulationState;
 import predictions.definition.entity.EntityDefinition;
@@ -37,7 +37,7 @@ public class WorldInstanceImpl implements WorldInstance{
     private final ActiveEnvironment activeEnvironment;
     private final EntityInstanceManager entityInstanceManager;
     private final World world;
-    private final ClientDataContainer clientDataContainer;
+    private final ClientDataContainerImpl clientDataContainer;
     private Termination reason;
     private SimulationState state;
     private static final List<ActionType> finalPhaseTypes = Arrays.asList(
@@ -51,9 +51,9 @@ public class WorldInstanceImpl implements WorldInstance{
     private final Instant startTime;
     private Duration duration;
 
-    public WorldInstanceImpl(World world, ClientDataContainer clientDataContainer) {
+    public WorldInstanceImpl(World world, ClientDataContainerImpl clientDataContainer) {
         this.world = world;
-        this.clientDataContainer = clientDataContainer;
+        this.clientDataContainer = new ClientDataContainerImpl(clientDataContainer);
         this.activeEnvironment = world.getEnvVariablesManager().createActiveEnvironment();
         List<String> entities = new ArrayList<>();
         world.getEntityDefinitions().forEachRemaining(entityDefinition -> entities.add(entityDefinition.getName()));
@@ -377,6 +377,11 @@ public class WorldInstanceImpl implements WorldInstance{
         return new EntityListDto(counts.entrySet().stream()
                 .map(e -> new EntityDto(null, e.getKey(), Math.toIntExact(e.getValue())))
                 .collect(Collectors.toList()));
+    }
+
+    @Override
+    public ClientDataContainerImpl getClientContainer() {
+        return this.clientDataContainer;
     }
 
     @Override

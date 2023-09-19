@@ -46,9 +46,9 @@ public class ClientDataContainerImpl implements ClientDataContainer {
     public ClientDataContainerImpl(ClientDataContainerImpl clientDataContainer) {
         gridHeight = clientDataContainer.gridHeight;
         gridWidth = clientDataContainer.gridWidth;
-        envValues = clientDataContainer.envValues;
+        envValues = new HashMap<>(clientDataContainer.envValues);
         propertyDefinitions = clientDataContainer.propertyDefinitions;
-        entityAmounts = clientDataContainer.entityAmounts;
+        entityAmounts = new HashMap<>(clientDataContainer.entityAmounts);
         entityDefinitions = clientDataContainer.entityDefinitions;
     }
 

@@ -3,6 +3,8 @@ package predictions.concurent;
 import dto.RunHistoryDto;
 import dto.subdto.show.EntityListDto;
 import dto.subdto.show.interactive.RunProgressDto;
+import predictions.client.container.ClientDataContainer;
+import predictions.client.container.ClientDataContainerImpl;
 import predictions.definition.entity.EntityDefinition;
 import predictions.execution.EntityCountHistory;
 import predictions.execution.instance.world.WorldInstance;
@@ -45,4 +47,5 @@ public interface SimulationManager {
     RunProgressDto getRunProgress(Integer identifier);
 
     EntityListDto getCurrentEntityAmounts(Integer identifier);
+    ClientDataContainerImpl getEnvironment(Integer identifier);
 }

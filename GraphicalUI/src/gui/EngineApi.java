@@ -228,4 +228,8 @@ public class EngineApi {
         EntityListDto res = api.getCurrentEntityAmounts(identifier);
         return res.getEntities();
     }
+
+    public void copyEnvironment(Integer identifier) {
+        api.copyEnvironment(identifier);
+    }
 }

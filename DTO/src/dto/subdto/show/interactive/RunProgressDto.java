@@ -11,11 +11,14 @@ public class RunProgressDto implements DTO {
     private final Duration second;
     private final Duration maxSecond;
 
-    public RunProgressDto(Integer tick, Integer maxTick, Duration second, Duration maxSecond) {
+    private final String status;
+
+    public RunProgressDto(Integer tick, Integer maxTick, Duration second, Duration maxSecond, String status) {
         this.tick = tick;
         this.maxTick = maxTick;
         this.second = second;
         this.maxSecond = maxSecond;
+        this.status = status;
     }
 
     public Integer getTick() {
@@ -32,5 +35,9 @@ public class RunProgressDto implements DTO {
 
     public Duration getMaxSecond() {
         return maxSecond;
+    }
+
+    public String getStatus() {
+        return status;
     }
 }
