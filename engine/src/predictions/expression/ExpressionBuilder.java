@@ -173,7 +173,7 @@ public class ExpressionBuilder {
                     throw new RuntimeException("missing property in entity of evaluate expression");
                 }
             case "percent":
-                if (type != PropertyType.FLOAT && type != PropertyType.DECIMAL) {
+                if (type != PropertyType.FLOAT) {
                     builder.withExpression(finalExpression)
                             .percentTypeError(type.name());
                     throw new RuntimeException("percent expression where " + type.name() + " expected");
