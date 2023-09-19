@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 public class EntityCountHistory implements Cloneable {
     private final Map<Integer,Integer> entityCount;
 
-    private static final int MAX_HISTORY_SIZE = 100;
+    private static final int MAX_HISTORY_SIZE = 10000;
 
     private int latestTick;
 
