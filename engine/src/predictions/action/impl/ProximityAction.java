@@ -33,13 +33,21 @@ public class ProximityAction extends AbstractAction {
                         .map(prdAction-> ConverterPRDEngine.getActionFromPRD(prdAction,contextDefinition, builder))
                         .collect(Collectors.toList());
         ExpressionErrorDto.Builder expressionBuilder = new ExpressionErrorDto.Builder();
+        Expression<Double> res;
         try {
-            distanceOf1 = ExpressionBuilder.buildDoubleExpression(s, contextDefinition, expressionBuilder);
-        }catch (Exception e)
+            Expression<Integer> temp = ExpressionBuilder.buildDecimalExpression(s, contextDefinition, expressionBuilder);
+            res = context -> ((Integer)temp.evaluate(context)).doubleValue();
+        }catch (Exception e1)
         {
-            builder.expressionError(expressionBuilder.build());
-            throw e;
+            try {
+                res = ExpressionBuilder.buildDoubleExpression(s, contextDefinition, expressionBuilder);
+            }catch (Exception e)
+            {
+                builder.expressionError(expressionBuilder.build());
+                throw e;
+            }
         }
+        distanceOf1 = res;
     }
 
     @Override

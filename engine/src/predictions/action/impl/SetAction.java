@@ -21,7 +21,7 @@ public class SetAction extends AbstractAction {
 
     private final Boolean propInSecondary;
     private final String property;
-    private Expression<?> valueExpression;
+    private final Expression<?> valueExpression;
 
     public SetAction(ContextDefinition contextDefinition,
                      String entityName,
@@ -42,6 +42,8 @@ public class SetAction extends AbstractAction {
                 switch (prop.get().getType())
                 {
                     case DECIMAL:
+                        this.valueExpression = ExpressionBuilder.buildDecimalExpression(valueExpression, contextDefinition, expressionBuilder);
+                        break;
                     case FLOAT:
                         this.valueExpression = ExpressionBuilder.buildDoubleExpression(valueExpression, contextDefinition, expressionBuilder);
                         break;
@@ -51,7 +53,14 @@ public class SetAction extends AbstractAction {
                     case BOOLEAN:
                         this.valueExpression = ExpressionBuilder.buildBooleanExpression(valueExpression, contextDefinition, expressionBuilder);
                         break;
+                    default:
+                        expressionBuilder.withExpression(valueExpression).badExpressionType(prop.get().getType().name());
+                        throw new RuntimeException("unknown property type: " + prop.get().getType());
                 }
+            }
+            else{
+                expressionBuilder.withExpression(valueExpression).missingPropertyInEntityError(entityName, property, "unknown");
+                throw new RuntimeException("property not in context");
             }
         }catch (Exception e)
         {

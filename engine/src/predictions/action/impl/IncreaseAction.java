@@ -41,12 +41,19 @@ public class IncreaseAction extends AbstractAction {
             throw new RuntimeException("increase action can't operate on a none number property " + property);
         }
 
+        Expression<Double> res;
         try {
-            this.byExpression = ExpressionBuilder.buildDoubleExpression(byExpression, contextDefinition, expBuilder);
+            Expression<Integer> temp = ExpressionBuilder.buildDecimalExpression(byExpression, contextDefinition, expBuilder);
+            res = context -> ((Integer)temp.evaluate(context)).doubleValue();
         }catch (Exception e) {
-            builder.expressionError(expBuilder.build());
-            throw e;
+            try {
+                res = ExpressionBuilder.buildDoubleExpression(byExpression, contextDefinition, expBuilder);
+            }catch (Exception e1) {
+                builder.expressionError(expBuilder.build());
+                throw e1;
+            }
         }
+        this.byExpression = res;
     }
 
     @Override

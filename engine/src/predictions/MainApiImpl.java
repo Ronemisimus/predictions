@@ -137,7 +137,7 @@ public class MainApiImpl implements MainApi {
         List<String> entities = new ArrayList<>(res.keySet());
         List<Map<Integer, Integer>> counts = entities.stream()
                 .map(res::get)
-                .map(ech -> ech.getEntityCount(tick))
+                .map(EntityCountHistory::getEntityCount)
                 .collect(Collectors.toList());
         return new SingleRunHistoryDto(entities, counts, tick,null, null, null);
     }

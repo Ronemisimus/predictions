@@ -51,21 +51,31 @@ public class CalculationAction extends AbstractAction {
             throw new RuntimeException("missing arguments for calculation");
         }
         List<Expression<Double>> args1Exp = Arrays.stream(args1)
-                        .map(exp -> {
-                            try {
-                                return ExpressionBuilder.buildDoubleExpression(exp, contextDefinition, expBuilder);
-                            } catch (Exception e) {
-                                builder.expressionError(expBuilder.build());
-                                throw e;
-                            }
-                        }).collect(Collectors.toList());
+                .map(exp -> {
+                    try {
+                        Expression<Integer> temp = ExpressionBuilder.buildDecimalExpression(exp, contextDefinition, expBuilder);
+                        return (Expression<Double>) context -> ((Integer)temp.evaluate(context)).doubleValue();
+                    } catch (Exception e) {
+                        try {
+                            return ExpressionBuilder.buildDoubleExpression(exp, contextDefinition, expBuilder);
+                        }catch (Exception e1){
+                            builder.expressionError(expBuilder.build());
+                            throw e;
+                        }
+                    }
+                }).collect(Collectors.toList());
         List<Expression<Double>> args2Exp = Arrays.stream(args2)
                 .map(exp -> {
                     try {
-                        return ExpressionBuilder.buildDoubleExpression(exp, contextDefinition, expBuilder);
+                        Expression<Integer> temp = ExpressionBuilder.buildDecimalExpression(exp, contextDefinition, expBuilder);
+                        return (Expression<Double>) context -> ((Integer)temp.evaluate(context)).doubleValue();
                     } catch (Exception e) {
-                        builder.expressionError(expBuilder.build());
-                        throw e;
+                        try {
+                            return ExpressionBuilder.buildDoubleExpression(exp, contextDefinition, expBuilder);
+                        }catch (Exception e1){
+                            builder.expressionError(expBuilder.build());
+                            throw e;
+                        }
                     }
                 }).collect(Collectors.toList());
         exps = new ArrayList<>();

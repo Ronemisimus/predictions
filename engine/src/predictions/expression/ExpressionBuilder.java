@@ -38,6 +38,18 @@ public class ExpressionBuilder {
         return buildSimpleDoubleExpression(expression, builder);
     }
 
+    public static Expression<Integer> buildDecimalExpression(String expression,
+                                                           ContextDefinition contextDefinition,
+                                                           ExpressionErrorDto.Builder builder) {
+        //noinspection unchecked
+        Expression<Integer> funcExpression = (Expression<Integer>) buildFunctionExpression(expression, contextDefinition, PropertyType.DECIMAL, builder);
+        if (funcExpression != null) return funcExpression;
+        //noinspection unchecked
+        Expression<Integer> entPropertyExpression = (Expression<Integer>) buildEntityPropertyExpression(expression, contextDefinition);
+        if (entPropertyExpression != null) return entPropertyExpression;
+        return new DoubleWrapExpression(buildSimpleDoubleExpression(expression, builder));
+    }
+
     private static Expression<Double> buildSimpleDoubleExpression(String expression,
                                                                     ExpressionErrorDto.Builder builder) {
         try {
@@ -126,6 +138,7 @@ public class ExpressionBuilder {
                 }
                 else
                 {
+                    if (type == PropertyType.DECIMAL) return new DoubleWrapExpression(new RandomExpression(finalInt));
                     return new RandomExpression(finalInt);
                 }
             case "evaluate":
@@ -251,13 +264,16 @@ public class ExpressionBuilder {
                                                        ContextDefinition contextDefinition,
                                                        ExpressionErrorDto.Builder builder) {
         try {
-            return buildDoubleExpression(valueExpression, contextDefinition, builder);
-        }catch (Exception e)
-        {
+            return buildDecimalExpression(valueExpression, contextDefinition, builder);
+        } catch (Exception e) {
             try {
-                return buildBooleanExpression(valueExpression, contextDefinition, builder);
-            }catch (Exception e1) {
-                return buildStringExpression(valueExpression, contextDefinition, builder);
+                return buildDoubleExpression(valueExpression, contextDefinition, builder);
+            } catch (Exception e1) {
+                try {
+                    return buildBooleanExpression(valueExpression, contextDefinition, builder);
+                } catch (Exception e2) {
+                    return buildStringExpression(valueExpression, contextDefinition, builder);
+                }
             }
         }
     }

@@ -2,7 +2,6 @@ package predictions.execution;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class EntityCountHistory implements Cloneable {
     private final Map<Integer,Integer> entityCount;
@@ -21,7 +20,7 @@ public class EntityCountHistory implements Cloneable {
         this.latestTick = latestTick;
     }
 
-    public Map<Integer, Integer> getEntityCount(int tick) {
+    public Map<Integer, Integer> getEntityCount() {
         Map<Integer,Integer> snapshot;
         synchronized (this) {
             snapshot = new HashMap<>(entityCount);

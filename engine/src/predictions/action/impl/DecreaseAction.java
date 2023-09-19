@@ -41,13 +41,19 @@ public class DecreaseAction extends AbstractAction {
             builder.propertyTypeMismatch(property, ActionType.DECREASE.name());
             throw new IllegalArgumentException("increase action can't operate on a none number property [" + property);
         }
-
+        Expression<Double> res;
         try {
-            this.byExpression = ExpressionBuilder.buildDoubleExpression(byExpression, contextDefinition, expressionBuilder);
-        }catch (Exception e){
-            builder.expressionError(expressionBuilder.build());
-            throw e;
+            Expression<Integer> temp = ExpressionBuilder.buildDecimalExpression(byExpression, contextDefinition, expressionBuilder);
+            res = context -> ((Integer)temp.evaluate(context)).doubleValue();
+        }catch (Exception e1){
+            try {
+                res = ExpressionBuilder.buildDoubleExpression(byExpression, contextDefinition, expressionBuilder);
+            }catch (Exception e){
+                builder.expressionError(expressionBuilder.build());
+                throw e;
+            }
         }
+        this.byExpression = res;
     }
 
     @Override

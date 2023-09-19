@@ -114,7 +114,10 @@ public class WorldInstanceImpl implements WorldInstance{
             }
         }catch (Exception e){
             System.out.println("thread " + Thread.currentThread() + "exception");
+            //noinspection CallToPrintStackTrace
             e.printStackTrace();
+            state = SimulationState.STOPPED;
+            SimulationManagerImpl.getInstance().updateState(this.hashCode(), state);
         }
     }
 
