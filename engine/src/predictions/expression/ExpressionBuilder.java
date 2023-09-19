@@ -33,7 +33,7 @@ public class ExpressionBuilder {
         Expression<Double> funcExpression = (Expression<Double>) buildFunctionExpression(expression, contextDefinition, PropertyType.FLOAT, builder);
         if (funcExpression != null) return funcExpression;
         //noinspection unchecked
-        Expression<Double> entPropertyExpression = (Expression<Double>) buildEntityPropertyExpression(expression, contextDefinition);
+        Expression<Double> entPropertyExpression = (Expression<Double>) buildEntityPropertyExpression(expression, contextDefinition, PropertyType.FLOAT);
         if (entPropertyExpression != null) return entPropertyExpression;
         return buildSimpleDoubleExpression(expression, builder);
     }
@@ -45,9 +45,14 @@ public class ExpressionBuilder {
         Expression<Integer> funcExpression = (Expression<Integer>) buildFunctionExpression(expression, contextDefinition, PropertyType.DECIMAL, builder);
         if (funcExpression != null) return funcExpression;
         //noinspection unchecked
-        Expression<Integer> entPropertyExpression = (Expression<Integer>) buildEntityPropertyExpression(expression, contextDefinition);
+        Expression<Integer> entPropertyExpression = (Expression<Integer>) buildEntityPropertyExpression(expression, contextDefinition, PropertyType.DECIMAL);
         if (entPropertyExpression != null) return entPropertyExpression;
-        return new DoubleWrapExpression(buildSimpleDoubleExpression(expression, builder));
+        return buildSimpleDecimalExpression(expression, builder);
+    }
+
+    private static Expression<Integer> buildSimpleDecimalExpression(String expression, ExpressionErrorDto.Builder builder) {
+        int i = Integer.parseInt(expression);
+        return new DoubleWrapExpression(new NumberExpression((double) i));
     }
 
     private static Expression<Double> buildSimpleDoubleExpression(String expression,
@@ -64,13 +69,14 @@ public class ExpressionBuilder {
     }
 
     private static Expression<?> buildEntityPropertyExpression(String expression,
-                                                               ContextDefinition contextDefinition) {
+                                                               ContextDefinition contextDefinition,
+                                                               PropertyType type) {
         Optional<PropertyDefinition<?>> propDef = contextDefinition.getPrimaryEntityDefinition().getProps().stream()
-                .filter(e -> e.getName().equals(expression)).findFirst();
+                .filter(e -> e.getName().equals(expression)).filter(e->e.getType().equals(type)).findFirst();
         Optional<PropertyDefinition<?>> propSecondary = contextDefinition.getSecondaryEntityDefinition() == null?
                 Optional.empty() :
                 contextDefinition.getSecondaryEntityDefinition().getProps().stream()
-                .filter(e -> e.getName().equals(expression)).findFirst();
+                .filter(e -> e.getName().equals(expression)).filter(e->e.getType().equals(type)).findFirst();
         if (propDef.isPresent())
                 return new PropertyExpression<>(contextDefinition.getPrimaryEntityDefinition(), expression);
         else if (propSecondary.isPresent())
@@ -226,7 +232,7 @@ public class ExpressionBuilder {
         Expression<String> funcExpression = (Expression<String>) buildFunctionExpression(valueExpression, contextDefinition, PropertyType.STRING, builder);
         if (funcExpression != null) return funcExpression;
         //noinspection unchecked
-        Expression<String> entPropertyExpression = (Expression<String>) buildEntityPropertyExpression(valueExpression, contextDefinition);
+        Expression<String> entPropertyExpression = (Expression<String>) buildEntityPropertyExpression(valueExpression, contextDefinition, PropertyType.STRING);
         if (entPropertyExpression != null) return entPropertyExpression;
         return buildSimpleStringExpression(valueExpression, builder);
     }
@@ -255,7 +261,7 @@ public class ExpressionBuilder {
         Expression<Boolean> funcExpression = (Expression<Boolean>) buildFunctionExpression(valueExpression, contextDefinition, PropertyType.BOOLEAN, builder);
         if (funcExpression != null) return funcExpression;
         //noinspection unchecked
-        Expression<Boolean> entPropertyExpression = (Expression<Boolean>) buildEntityPropertyExpression(valueExpression, contextDefinition);
+        Expression<Boolean> entPropertyExpression = (Expression<Boolean>) buildEntityPropertyExpression(valueExpression, contextDefinition, PropertyType.BOOLEAN);
         if (entPropertyExpression != null) return entPropertyExpression;
         return buildSimpleBooleanExpression(valueExpression);
     }
