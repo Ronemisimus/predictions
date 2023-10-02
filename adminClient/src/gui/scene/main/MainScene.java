@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
@@ -67,8 +68,10 @@ public class MainScene{
         try {
             FXMLLoader loader = new FXMLLoader(loaderClass.getResource(fileName));
             centerStage.setCenter(null);
-            Parent root = loader.load();
+            AnchorPane root = loader.load();
             centerStage.setCenter(root);
+            root.prefWidthProperty().bind(centerStage.widthProperty());
+            root.prefHeightProperty().bind(centerStage.heightProperty());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
