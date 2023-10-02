@@ -25,15 +25,15 @@
                       <GridPane.margin>
                           <Insets bottom="5.0" left="10.0" right="10.0" top="5.0"/>
                       </GridPane.margin>
-                      <Button fx:id="DetailsButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false"
-                              text="Details" textAlignment="CENTER" AnchorPane.bottomAnchor="5.0"
+                      <Button fx:id="managementButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false"
+                              text="Management" textAlignment="CENTER" AnchorPane.bottomAnchor="5.0"
                               AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0"/>
                   </AnchorPane>
                   <AnchorPane GridPane.columnIndex="1">
                       <GridPane.margin>
                           <Insets bottom="5.0" left="10.0" right="10.0" top="5.0"/>
                       </GridPane.margin>
-                      <Button fx:id="newExecutionButton" mnemonicParsing="false" text="New Execution"
+                      <Button fx:id="allocationsButton" mnemonicParsing="false" text="Allocations"
                               AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0"
                               AnchorPane.topAnchor="5.0" GridPane.columnIndex="1"/>
                   </AnchorPane>
@@ -41,7 +41,7 @@
                       <GridPane.margin>
                           <Insets bottom="5.0" left="10.0" right="10.0" top="5.0"/>
                       </GridPane.margin>
-                      <Button fx:id="resultsButton" mnemonicParsing="false" text="Results" AnchorPane.bottomAnchor="5.0"
+                      <Button fx:id="executionHistoryButton" mnemonicParsing="false" text="Execution History" AnchorPane.bottomAnchor="5.0"
                               AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0"
                               GridPane.columnIndex="2"/>
                   </AnchorPane>
