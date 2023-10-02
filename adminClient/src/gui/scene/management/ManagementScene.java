@@ -1,6 +1,7 @@
 package gui.scene.management;
 
 import gui.ServerApi;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -33,7 +34,10 @@ public class ManagementScene {
         loadFileButton.setOnAction(this::handleLoadFileButton);
         setThreadCountButton.setOnAction(this::handleSetThreadCountButton);
         filePathHolder.setOnAction(this::handleFilePathHolderClick);
-        filePathHolder.tooltipProperty().bind(Bindings.createObjectBinding(() -> new Tooltip(filePathHolder.textProperty().get()), filePathHolder.textProperty()));
+        filePathHolder.tooltipProperty()
+                .bind(Bindings.createObjectBinding(
+                        () -> new Tooltip(filePathHolder.textProperty().get())
+                        ,filePathHolder.textProperty()));
         loaded = false;
     }
 
@@ -101,8 +105,11 @@ public class ManagementScene {
             throw new RuntimeException(e);
         }
         String filePath = fileChooser.showOpenDialog(null).getAbsolutePath();
-        if (ServerApi.getInstance().LoadFile(filePath)) {
-            filePathHolder.setText(filePath);
-        }
+
+        new Thread(() -> {
+            if (ServerApi.getInstance().LoadFile(filePath)) {
+                Platform.runLater(() -> filePathHolder.setText(filePath));
+            }
+        }).start();
     }
 }
