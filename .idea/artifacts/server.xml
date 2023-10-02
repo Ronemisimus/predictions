@@ -6,6 +6,9 @@
         <element id="directory" name="classes">
           <element id="module-output" name="server" />
         </element>
+        <element id="directory" name="lib">
+          <element id="artifact" artifact-name="engine" />
+        </element>
       </element>
       <element id="javaee-facet-resources" facet="server/web/Web" />
     </root>
