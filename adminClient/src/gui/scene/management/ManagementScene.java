@@ -1,6 +1,6 @@
 package gui.scene.management;
 
-import gui.ServerApi;
+import gui.util.ServerApi;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;

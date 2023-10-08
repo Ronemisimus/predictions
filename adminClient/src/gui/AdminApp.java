@@ -1,6 +1,7 @@
 package gui;
 
 import gui.scene.main.MainScene;
+import gui.util.ServerApi;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -30,6 +31,9 @@ public class AdminApp extends Application {
         primaryStage.show();
     }
     public static void main(String[] args) {
-        launch(args);
+        boolean res = ServerApi.getInstance().tryLogin();
+        if (res) {
+            launch(args);
+        }
     }
 }

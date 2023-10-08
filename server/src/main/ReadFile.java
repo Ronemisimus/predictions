@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet(name="readFile", urlPatterns={"/readFile"})
+@WebServlet(name="readFile", urlPatterns={"/admin/readFile"})
 public class ReadFile extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
