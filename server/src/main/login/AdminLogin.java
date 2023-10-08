@@ -55,6 +55,7 @@ public class AdminLogin extends HttpServlet {
                         session.setAttribute("type", "admin");
                         resp.getWriter().println("admin");
                         adminLoggedIn = true;
+                        getServletContext().setAttribute("adminSession", session);
                     }
                     else {
                         Optional.ofNullable(req.getSession(false)).ifPresent(HttpSession::invalidate);

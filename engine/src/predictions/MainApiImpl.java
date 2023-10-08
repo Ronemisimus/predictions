@@ -27,6 +27,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
+import java.io.StringReader;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -42,16 +43,12 @@ public class MainApiImpl implements MainApi {
     {
         possibleWorlds = new HashMap<>();
         simulationManager = SimulationManagerImpl.getInstance();
+        simulationManager.initializeThreadPool(1);
         clientDataContainer = null;
     }
 
     @Override
-    public ReadFileDto readFile(String file) {
-        File f = new File(file);
-
-        ReadFileDto resDto = checkPath(file, f);
-        if(resDto != null) return resDto;
-
+    public ReadFileDto readFile(String content) {
         PRDWorld res;
 
         try {
@@ -60,7 +57,7 @@ public class MainApiImpl implements MainApi {
             JAXBContext context = JAXBContext.newInstance(PRDWorld.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
             unmarshaller.setSchema(schema);
-            res = (PRDWorld) unmarshaller.unmarshal(f);
+            res = (PRDWorld) unmarshaller.unmarshal(new StringReader(content));
         } catch (JAXBException | SAXException e) {
             return new ReadFileDto.Builder().matchesSchema(false).build();
         }
@@ -70,38 +67,12 @@ public class MainApiImpl implements MainApi {
             World loaded = WorldImpl.fromPRD(res, builder);
             clientDataContainer = new ClientDataContainerImpl(loaded);
             possibleWorlds.put(loaded.getName(), loaded);
-            simulationManager.initializeThreadPool(0);
         } catch (Exception e)
         {
             return builder.build();
         }
 
         return builder.fileLoaded().build();
-    }
-
-    private ReadFileDto checkPath(String path, File f){
-        FileSelectionDto.Builder builder = new FileSelectionDto.Builder(path);
-
-        if(!f.isAbsolute()) return new ReadFileDto.Builder()
-                .fileSelectionError(
-                        builder.fullPathError().build()
-                ).build();
-        if (!f.exists()) return new ReadFileDto.Builder()
-                .fileSelectionError(
-                        builder.fileExists().build()
-                ).build();
-        if(!f.isFile())
-        {
-            return new ReadFileDto.Builder()
-                    .fileSelectionError(
-                            builder.isFile().build()
-                    ).build();
-        }
-        if(!f.getName().endsWith(".xml")) return new ReadFileDto.Builder()
-                .fileSelectionError(
-                        builder.isXML().build()
-                ).build();
-        return null;
     }
 
     @Override

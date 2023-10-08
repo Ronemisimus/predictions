@@ -9,7 +9,7 @@ import dto.subdto.show.world.EntityDto;
 import java.util.List;
 
 public interface MainApi {
-    ReadFileDto readFile(String file);
+    ReadFileDto readFile(String content);
     ShowWorldDto showLoadedWorld(String name);
 
     EnvDto getEnv();
