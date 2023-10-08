@@ -67,6 +67,7 @@ public class MainApiImpl implements MainApi {
             World loaded = WorldImpl.fromPRD(res, builder);
             clientDataContainer = new ClientDataContainerImpl(loaded);
             possibleWorlds.put(loaded.getName(), loaded);
+            builder.name(loaded.getName());
         } catch (Exception e)
         {
             return builder.build();

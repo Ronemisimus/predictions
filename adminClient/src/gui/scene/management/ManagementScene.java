@@ -1,10 +1,10 @@
 package gui.scene.management;
 
+import gui.scene.management.worldNameItem.WorldNameItem;
 import gui.util.ServerApi;
 import javafx.application.Platform;
 import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -12,8 +12,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
+import javafx.util.StringConverter;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
@@ -24,64 +24,56 @@ public class ManagementScene {
     @FXML
     private AnchorPane toolbar;
     @FXML
-    private ChoiceBox<Hyperlink> filePathHolder;
+    private ChoiceBox<WorldNameItem> filePathHolder;
     @FXML
     private Button loadFileButton;
     @FXML
     private Button setThreadCountButton;
     private boolean loaded;
 
-    private ObservableList<Hyperlink> hyperlinkList;
+    private ObservableList<WorldNameItem> hyperlinkList;
 
     @FXML
     private void initialize(){
-        hyperlinkList = new SimpleListProperty<>();
+        hyperlinkList = FXCollections.emptyObservableList();
         toolbar.prefWidthProperty().bind(titledPane.widthProperty().subtract(150));
         loadFileButton.setOnAction(this::handleLoadFileButton);
         filePathHolder.valueProperty().addListener(this::handleSelectedFileChange);
         setThreadCountButton.setOnAction(this::handleSetThreadCountButton);
-        filePathHolder.tooltipProperty()
-                .bind(Bindings.createObjectBinding(
-                        () -> new Tooltip(filePathHolder.valueProperty().get().getText())
-                        ,filePathHolder.valueProperty()));
         filePathHolder.setItems(hyperlinkList);
+        filePathHolder.setConverter(new StringConverter<WorldNameItem>() {
+
+            /**
+             * Converts the object provided into its string form.
+             * Format of the returned string is defined by the specific converter.
+             *
+             * @param object - a WorldNameItem containing the name and hyperlink
+             * @return a string representation of the object passed in.
+             */
+            @Override
+            public String toString(WorldNameItem object) {
+                return object.getName().getText() + " " + object.getHyperlink().getText();
+            }
+
+            /**
+             * Converts the string provided into an object defined by the specific converter.
+             * Format of the string and type of the resulting object is defined by the specific converter.
+             *
+             * @param string - the text representation of the object
+             * @return an object representation of the string passed in.
+             */
+            @Override
+            public WorldNameItem fromString(String string) {
+                return new WorldNameItem(string.split(" ")[0], string.split(" ")[1]);
+            }
+        });
         loaded = false;
     }
 
-    private void handleSelectedFileChange(Observable observable, Hyperlink oldValue, Hyperlink newValue) {
+    private void handleSelectedFileChange(Observable observable, WorldNameItem oldValue, WorldNameItem newValue) {
         if (loaded) {
-            String filePath = newValue.getText();
-        }
-    }
-
-    private void handleFilePathHolderClick(ActionEvent actionEvent) {
-        if (loaded) {
-            String filePath = filePathHolder.valueProperty().get().getText();
-            new Thread(() -> {
-                // Check if Desktop is supported (i.e., the application is running in a GUI environment)
-                if (Desktop.isDesktopSupported()) {
-                    Desktop desktop = Desktop.getDesktop();
-                    File fileToOpen = new File(filePath);
-
-                    try {
-                        // Check if the file/folder exists before attempting to open it
-                        if (fileToOpen.exists()) {
-                            if (desktop.isSupported(Desktop.Action.OPEN)) {
-                                desktop.open(fileToOpen);
-                            } else {
-                                System.err.println("Desktop is not supported.");
-                            }
-                        } else {
-                            System.out.println("File or folder does not exist: " + filePath);
-                        }
-                    } catch (IOException e) {
-                        System.err.println("Error opening file/folder: " + filePath);
-                        e.printStackTrace(System.err);
-                    }
-                } else {
-                    System.err.println("Desktop is not supported.");
-                }
-            }).start();
+            String worldName = newValue.getName().getText();
+            // TODO: show world details
         }
     }
 
@@ -120,11 +112,11 @@ public class ManagementScene {
         String filePath = fileChooser.showOpenDialog(null).getAbsolutePath();
 
         new Thread(() -> {
-            if (ServerApi.getInstance().LoadFile(filePath)) {
+            String worldName = ServerApi.getInstance().LoadFile(filePath);
+            if (worldName != null) {
                 Platform.runLater(() -> {
-                    Hyperlink temp = new Hyperlink(filePath);
-                    temp.setOnAction(this::handleFilePathHolderClick);
-                    hyperlinkList.add(temp);
+                    WorldNameItem worldNameItem = new WorldNameItem(worldName, filePath);
+                    hyperlinkList.add(worldNameItem);
                 });
             }
         }).start();

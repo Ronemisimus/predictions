@@ -55,24 +55,24 @@ public class ServerApi {
 
     }
 
-    public boolean LoadFile(String filePath) {
+    public String LoadFile(String filePath) {
         // get file string content
         File file = new File(filePath);
         if (!file.exists()) {
             Alert("Invalid File","File does not exist","Please select a valid file");
-            return false;
+            return null;
         }
         if (!file.isAbsolute()) {
             Alert("Invalid File","File is not an absolute path","Please select a valid file");
-            return false;
+            return null;
         }
         if (!file.isFile()) {
             Alert("Invalid File","File is not a file","Please select a valid file");
-            return false;
+            return null;
         }
         if (!file.canRead()) {
             Alert("Invalid File","File cannot be read","Please select a valid file");
-            return false;
+            return null;
         }
 
         // send file content to server at localhost:8080/server/readFile using post request with okhttp client
@@ -81,7 +81,7 @@ public class ServerApi {
                 .post(FormBody.create(file, MediaType.parse("application/xml")))
                 .url(HOST + "/readFile").build());
 
-        boolean result;
+        String result;
 
         try (Response response = call.execute()) {
             Gson gson = new Gson();
@@ -91,8 +91,8 @@ public class ServerApi {
             } else {
                 readFileDto = null;
             }
-            result = readFileDto != null && readFileDto.isFileLoaded();
-            if (!result){
+            result = readFileDto != null && readFileDto.isFileLoaded()? readFileDto.getName(): null;
+            if (result==null){
                 Platform.runLater(() -> {
                     ReadFileError readFileError = ReadFileError.build(readFileDto);
                     readFileError.show();
@@ -101,13 +101,34 @@ public class ServerApi {
         } catch (IOException e) {
             Alert("Error", "Cannot use file", "reason: " + e.getMessage());
             e.printStackTrace(System.err);
-            return false;
+            return null;
         }
         return result;
     }
 
     public void SetThreadCount(int enteredInteger) {
-
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new okhttp3.Request.Builder()
+                .url(new HttpUrl.Builder()
+                        .host(HOST)
+                        .addPathSegment("admin")
+                        .addPathSegment("setThreadCount")
+                        .addQueryParameter("threadCount", String.valueOf(enteredInteger))
+                        .build())
+                .build());
+        try (Response response = call.execute()) {
+            if (response.isSuccessful())
+            {
+                Alert success = new Alert(Alert.AlertType.INFORMATION, "Thread Count Set to " + enteredInteger);
+                success.showAndWait();
+            }
+            else{
+                Alert("Error", "can't send thread count", "thread count: " + enteredInteger);
+            }
+        } catch (IOException e) {
+            Alert("Error", "can't send thread count", "reason: " + e.getMessage());
+            e.printStackTrace(System.err);
+        }
     }
 
     public boolean tryLogin() {

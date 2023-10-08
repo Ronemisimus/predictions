@@ -18,6 +18,7 @@ public class ReadFileDto implements DTO{
     private final RuleErrorDto ruleErrorDto;
     private final TerminationBadDto terminationBadDto;
     private final boolean fileLoaded;
+    private final String name;
 
     private ReadFileDto(Builder builder) {
         this.fileSelectionDto = builder.fileSelectionDto;
@@ -31,9 +32,15 @@ public class ReadFileDto implements DTO{
         this.ruleErrorDto = builder.ruleErrorDto;
         this.terminationBadDto = builder.terminationBadDto;
         this.fileLoaded = builder.fileLoaded;
+        this.name = builder.name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public static class Builder {
+        private String name;
         // Add more default values and parameters as needed
         private FileSelectionDto fileSelectionDto = null;
         private Boolean matchesSchema = false;
@@ -51,6 +58,11 @@ public class ReadFileDto implements DTO{
 
         public Builder fileSelectionError(FileSelectionDto fileSelectionDto) {
             this.fileSelectionDto = fileSelectionDto;
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.name = name;
             return this;
         }
 
