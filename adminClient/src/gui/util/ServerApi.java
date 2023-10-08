@@ -1,5 +1,8 @@
 package gui.util;
 
+import com.google.gson.Gson;
+import dto.ReadFileDto;
+import gui.readFileError.ReadFileError;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.text.Text;
@@ -78,10 +81,23 @@ public class ServerApi {
                 .post(FormBody.create(file, MediaType.parse("application/xml")))
                 .url(HOST + "/readFile").build());
 
-        boolean result = false;
+        boolean result;
 
         try (Response response = call.execute()) {
-            // TODO: check session and get ReadFileDto object
+            Gson gson = new Gson();
+            ReadFileDto readFileDto;
+            if (response.body() != null) {
+                readFileDto = gson.fromJson(response.body().string(), ReadFileDto.class);
+            } else {
+                readFileDto = null;
+            }
+            result = readFileDto != null && readFileDto.isFileLoaded();
+            if (!result){
+                Platform.runLater(() -> {
+                    ReadFileError readFileError = ReadFileError.build(readFileDto);
+                    readFileError.show();
+                });
+            }
         } catch (IOException e) {
             Alert("Error", "Cannot use file", "reason: " + e.getMessage());
             e.printStackTrace(System.err);
