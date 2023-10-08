@@ -5,7 +5,6 @@
 	<xs:element name="PRD-world">
 		<xs:complexType>
 			<xs:all>
-				<xs:element name="PRD-thread-count" type="xs:int"/>
 				<xs:element ref="PRD-environment"/>
 				<xs:element name="PRD-grid">
 					<xs:complexType>
@@ -15,8 +14,9 @@
 				</xs:element>
 				<xs:element ref="PRD-entities"/>
 				<xs:element ref="PRD-rules"/>
-				<xs:element ref="PRD-termination"/>
 			</xs:all>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="sleep" type="xs:int"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="PRD-value">
