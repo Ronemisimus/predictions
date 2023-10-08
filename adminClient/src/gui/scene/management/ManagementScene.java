@@ -2,7 +2,10 @@ package gui.scene.management;
 
 import gui.util.ServerApi;
 import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -21,29 +24,39 @@ public class ManagementScene {
     @FXML
     private AnchorPane toolbar;
     @FXML
-    private Hyperlink filePathHolder;
+    private ChoiceBox<Hyperlink> filePathHolder;
     @FXML
     private Button loadFileButton;
     @FXML
     private Button setThreadCountButton;
     private boolean loaded;
 
+    private ObservableList<Hyperlink> hyperlinkList;
+
     @FXML
     private void initialize(){
+        hyperlinkList = new SimpleListProperty<>();
         toolbar.prefWidthProperty().bind(titledPane.widthProperty().subtract(150));
         loadFileButton.setOnAction(this::handleLoadFileButton);
+        filePathHolder.valueProperty().addListener(this::handleSelectedFileChange);
         setThreadCountButton.setOnAction(this::handleSetThreadCountButton);
-        filePathHolder.setOnAction(this::handleFilePathHolderClick);
         filePathHolder.tooltipProperty()
                 .bind(Bindings.createObjectBinding(
-                        () -> new Tooltip(filePathHolder.textProperty().get())
-                        ,filePathHolder.textProperty()));
+                        () -> new Tooltip(filePathHolder.valueProperty().get().getText())
+                        ,filePathHolder.valueProperty()));
+        filePathHolder.setItems(hyperlinkList);
         loaded = false;
+    }
+
+    private void handleSelectedFileChange(Observable observable, Hyperlink oldValue, Hyperlink newValue) {
+        if (loaded) {
+            String filePath = newValue.getText();
+        }
     }
 
     private void handleFilePathHolderClick(ActionEvent actionEvent) {
         if (loaded) {
-            String filePath = filePathHolder.getText();
+            String filePath = filePathHolder.valueProperty().get().getText();
             new Thread(() -> {
                 // Check if Desktop is supported (i.e., the application is running in a GUI environment)
                 if (Desktop.isDesktopSupported()) {
@@ -108,7 +121,11 @@ public class ManagementScene {
 
         new Thread(() -> {
             if (ServerApi.getInstance().LoadFile(filePath)) {
-                Platform.runLater(() -> filePathHolder.setText(filePath));
+                Platform.runLater(() -> {
+                    Hyperlink temp = new Hyperlink(filePath);
+                    temp.setOnAction(this::handleFilePathHolderClick);
+                    hyperlinkList.add(temp);
+                });
             }
         }).start();
     }
