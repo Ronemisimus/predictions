@@ -56,7 +56,7 @@ public class MainApiImpl implements MainApi {
 
         try {
             SchemaFactory schemaFactory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
-            Schema schema = schemaFactory.newSchema(getClass().getResource("predictions-v2.xsd"));
+            Schema schema = schemaFactory.newSchema(getClass().getResource("predictions-v3.xsd"));
             JAXBContext context = JAXBContext.newInstance(PRDWorld.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
             unmarshaller.setSchema(schema);

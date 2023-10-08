@@ -3,7 +3,6 @@ package predictions.definition.world.impl;
 import dto.ReadFileDto;
 import dto.subdto.read.dto.EntityErrorDto;
 import dto.subdto.read.dto.RepeatEntityDto;
-import dto.subdto.read.dto.TerminationBadDto;
 import dto.subdto.show.world.EntityDto;
 import dto.subdto.show.world.PropertyDto;
 import dto.subdto.show.world.RuleDto;
@@ -28,84 +27,72 @@ import java.util.stream.Collectors;
 
 public class WorldImpl implements World {
 
+    private final String name;
     private final EnvVariablesManager envVariablesManager;
     private final Collection<EntityDefinition> entityDefinitions;
     private final Collection<Rule> rules;
     private final Collection<Termination> terminations;
     private final Integer gridWidth;
     private final Integer gridHeight;
-    private final Integer threadCount;
+    private Integer threadCount;
 
 
-    private WorldImpl(EnvVariablesManager envVariablesManager,
+    private WorldImpl(String name,
+                      EnvVariablesManager envVariablesManager,
                       Collection<EntityDefinition> entityDefinitions,
                       Collection<Rule> rules,
-                      Collection<Termination> terminations,
                       Integer gridWidth,
-                      Integer gridHeight,
-                      Integer threadCount) {
+                      Integer gridHeight) {
+        this.name = name;
         this.envVariablesManager = envVariablesManager;
         this.entityDefinitions = entityDefinitions;
         this.rules = rules;
-        this.terminations = terminations;
+        this.terminations = new ArrayList<>();
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
-        this.threadCount = threadCount;
+        this.threadCount = 0;
     }
 
     private WorldImpl(final PRDWorld res,
                       final EnvVariablesManager env,
                       final Collection<EntityDefinition> entityDefinitions,
                       final ReadFileDto.Builder builder) {
-        this(env,
-            entityDefinitions,
-            res.getPRDRules().getPRDRule().stream().map(prdRule-> ConverterPRDEngine.getRuleFromPRD(prdRule, res.getPRDEntities(), env, builder))
+        this(res.getName(),
+                env,
+                entityDefinitions,
+                res.getPRDRules().getPRDRule().stream()
+                        .map(prdRule->
+                                ConverterPRDEngine.getRuleFromPRD(prdRule,
+                                        res.getPRDEntities(),
+                                        env,
+                                        builder
+                                )
+                        )
                     .collect(Collectors.toList()),
-            createTerminations(res.getPRDTermination(),builder),
-            res.getPRDGrid().getColumns(),
-            res.getPRDGrid().getRows(),
-            res.getPRDThreadCount());
+                res.getPRDGrid().getColumns(),
+                res.getPRDGrid().getRows()
+        );
     }
 
-    private static Collection<Termination> createTerminations(PRDTermination prdTermination, ReadFileDto.Builder builder) {
-        List<Termination> res = new ArrayList<>();
-        if (prdTermination.getPRDByUser()!=null)
-        {
-            res.add(new UserTermination());
-        }
-        if (prdTermination.getPRDBySecondOrPRDByTicks()!=null)
-        {
-            prdTermination.getPRDBySecondOrPRDByTicks()
-                    .forEach(prdBySecondOrPRDByTicks ->{
-                        Integer countBySeconds = prdBySecondOrPRDByTicks instanceof PRDBySecond? ((PRDBySecond)prdBySecondOrPRDByTicks).getCount():null;
-                        Integer countByTicks = prdBySecondOrPRDByTicks instanceof PRDByTicks? ((PRDByTicks)prdBySecondOrPRDByTicks).getCount():null;
-                        boolean badCount = (countBySeconds!=null && countBySeconds<=0) ||
-                                (countByTicks!=null && countByTicks<=0);
-                        if (badCount)
-                        {
-                            builder.terminationError(
-                                    new TerminationBadDto(countBySeconds,countByTicks)
-                            );
-                            throw new RuntimeException("Invalid termination count " + prdBySecondOrPRDByTicks);
-                        }
+    public void setThreadCount(Integer threadCount) {
+        this.threadCount = threadCount;
+    }
 
-                        res.add(prdBySecondOrPRDByTicks instanceof PRDByTicks?
-                                        new TicksTermination((PRDByTicks)prdBySecondOrPRDByTicks):
-                                prdBySecondOrPRDByTicks instanceof PRDBySecond?
-                                        new TimeTermination((PRDBySecond)prdBySecondOrPRDByTicks):
-                                null);
-                    });
-        }
-        return res;
+    public void addUserTermination() {
+        this.terminations.add(new UserTermination());
+    }
+
+    public void addTicksTermination(Integer ticks) {
+        this.terminations.add(new TicksTermination(ticks));
+    }
+
+    public void addTimeTermination(Duration time) {
+        this.terminations.add(new TimeTermination(time));
     }
 
     public static World fromPRD(final PRDWorld res, final ReadFileDto.Builder builder) {
         final EnvVariablesManager env = new EnvVariableManagerImpl(res.getPRDEnvironment(), builder);
         final Collection<EntityDefinition> entityDefinitions = buildEntityDefinitions(res.getPRDEntities(), builder);
-        if (res.getPRDThreadCount()<=0) {
-            builder.badThreadCountError();
-            throw new RuntimeException("Invalid thread count");
-        }
         if (res.getPRDGrid().getRows()<10 || res.getPRDGrid().getColumns()<10 ||
                 res.getPRDGrid().getRows() >100 || res.getPRDGrid().getColumns() > 100) {
             builder.gridSizeError(res.getPRDGrid().getColumns(), res.getPRDGrid().getRows());
@@ -194,5 +181,9 @@ public class WorldImpl implements World {
                 this.gridWidth,
                 this.gridHeight,
                 this.threadCount);
+    }
+
+    public String getName() {
+        return name;
     }
 }
