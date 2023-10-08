@@ -385,6 +385,11 @@ public class WorldInstanceImpl implements WorldInstance{
     }
 
     @Override
+    public Iterator<Termination> getTerminations() {
+        return this.world.getTerminations();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

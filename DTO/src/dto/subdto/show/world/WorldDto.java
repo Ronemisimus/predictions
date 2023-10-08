@@ -17,7 +17,6 @@ public class WorldDto {
 
     private final Integer gridHeight;
 
-    private final Integer threadCount;
 
     public WorldDto(List<PropertyDto> environment,
                     List<EntityDto> entities,
@@ -26,8 +25,7 @@ public class WorldDto {
                     Integer timeTermination,
                     Boolean userTermination,
                     Integer gridWidth,
-                    Integer gridHeight,
-                    Integer threadCount) {
+                    Integer gridHeight) {
         this.environment = environment;
         this.entities = entities;
         this.rules = rules;
@@ -36,7 +34,6 @@ public class WorldDto {
         this.ticksTermination = tickTermination;
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
-        this.threadCount = threadCount;
     }
 
     public List<PropertyDto> getEnvironment() {
@@ -71,7 +68,4 @@ public class WorldDto {
         return gridHeight;
     }
 
-    public Integer getThreadCount() {
-        return threadCount;
-    }
 }

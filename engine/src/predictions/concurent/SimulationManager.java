@@ -8,8 +8,10 @@ import predictions.client.container.ClientDataContainerImpl;
 import predictions.definition.entity.EntityDefinition;
 import predictions.execution.EntityCountHistory;
 import predictions.execution.instance.world.WorldInstance;
+import predictions.termination.api.Termination;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 
 public interface SimulationManager {
@@ -48,4 +50,6 @@ public interface SimulationManager {
 
     EntityListDto getCurrentEntityAmounts(Integer identifier);
     ClientDataContainerImpl getEnvironment(Integer identifier);
+
+    Iterator<Termination> getTerminations(Integer identifier);
 }

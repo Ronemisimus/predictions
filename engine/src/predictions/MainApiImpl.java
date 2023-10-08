@@ -33,14 +33,14 @@ import java.util.stream.Collectors;
 
 public class MainApiImpl implements MainApi {
 
-    //private final Map<Integer, WorldInstance> history;
-    private World activeDefinition;
+    private final Map<String,World> possibleWorlds;
     private ClientDataContainer clientDataContainer;
 
     private final SimulationManager simulationManager;
 
     public MainApiImpl()
     {
+        possibleWorlds = new HashMap<>();
         simulationManager = SimulationManagerImpl.getInstance();
         clientDataContainer = null;
     }
@@ -67,9 +67,10 @@ public class MainApiImpl implements MainApi {
 
         ReadFileDto.Builder builder = new ReadFileDto.Builder().matchesSchema(true);
         try {
-            activeDefinition = WorldImpl.fromPRD(res, builder);
-            clientDataContainer = new ClientDataContainerImpl(activeDefinition);
-            simulationManager.initializeThreadPool(activeDefinition.getThreadCount());
+            World loaded = WorldImpl.fromPRD(res, builder);
+            clientDataContainer = new ClientDataContainerImpl(loaded);
+            possibleWorlds.put(loaded.getName(), loaded);
+            simulationManager.initializeThreadPool(0);
         } catch (Exception e)
         {
             return builder.build();
@@ -104,8 +105,10 @@ public class MainApiImpl implements MainApi {
     }
 
     @Override
-    public ShowWorldDto showLoadedWorld() {
-        WorldDto res = activeDefinition.getDto();
+    public ShowWorldDto showLoadedWorld(String name) {
+        World selected = possibleWorlds.getOrDefault(name, null);
+        if (selected == null) return new ShowWorldDto(null);
+        WorldDto res = selected.getDto();
         return new ShowWorldDto(res);
     }
 
@@ -114,8 +117,10 @@ public class MainApiImpl implements MainApi {
         return new EnvDto(clientDataContainer.getEnv());
     }
 
-    public void runSimulation() {
-        WorldInstance activeWorld = new WorldInstanceImpl(activeDefinition, (ClientDataContainerImpl) clientDataContainer);
+    public void runSimulation(String name) {
+        World selected = possibleWorlds.get(name);
+        if (selected == null) return;
+        WorldInstance activeWorld = new WorldInstanceImpl(selected, (ClientDataContainerImpl) clientDataContainer);
         simulationManager.addSimulation(activeWorld);
         clientDataContainer = new ClientDataContainerImpl((ClientDataContainerImpl) clientDataContainer);
     }
@@ -173,7 +178,7 @@ public class MainApiImpl implements MainApi {
 
     @Override
     public void unload() throws InterruptedException {
-        activeDefinition = null;
+        possibleWorlds.clear();
         clientDataContainer = null;
         simulationManager.unload();
     }
@@ -186,7 +191,12 @@ public class MainApiImpl implements MainApi {
     @Override
     public boolean stopSimulation(Integer identifier) {
         AtomicBoolean userCanTerminate = new AtomicBoolean(false);
-        activeDefinition.getTerminations().forEachRemaining(t -> userCanTerminate.set(userCanTerminate.get() || t.getTerminationType().equals(TerminationType.USER)));
+        simulationManager.getTerminations(identifier)
+                .forEachRemaining(t ->
+                        userCanTerminate.set(
+                                userCanTerminate.get() || t.getTerminationType().equals(TerminationType.USER)
+                        )
+                );
         if (userCanTerminate.get()) simulationManager.stopWorld(identifier);
         return userCanTerminate.get();
     }

@@ -34,7 +34,8 @@ public class WorldImpl implements World {
     private final Collection<Termination> terminations;
     private final Integer gridWidth;
     private final Integer gridHeight;
-    private Integer threadCount;
+
+    private final Integer sleepTime;
 
 
     private WorldImpl(String name,
@@ -42,7 +43,8 @@ public class WorldImpl implements World {
                       Collection<EntityDefinition> entityDefinitions,
                       Collection<Rule> rules,
                       Integer gridWidth,
-                      Integer gridHeight) {
+                      Integer gridHeight,
+                      Integer sleepTime) {
         this.name = name;
         this.envVariablesManager = envVariablesManager;
         this.entityDefinitions = entityDefinitions;
@@ -50,7 +52,7 @@ public class WorldImpl implements World {
         this.terminations = new ArrayList<>();
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
-        this.threadCount = 0;
+        this.sleepTime = sleepTime;
     }
 
     private WorldImpl(final PRDWorld res,
@@ -70,12 +72,9 @@ public class WorldImpl implements World {
                         )
                     .collect(Collectors.toList()),
                 res.getPRDGrid().getColumns(),
-                res.getPRDGrid().getRows()
+                res.getPRDGrid().getRows(),
+                res.getSleep()
         );
-    }
-
-    public void setThreadCount(Integer threadCount) {
-        this.threadCount = threadCount;
     }
 
     public void addUserTermination() {
@@ -153,10 +152,6 @@ public class WorldImpl implements World {
     public int getGridHeight() {
         return this.gridHeight;
     }
-    @Override
-    public Integer getThreadCount() {
-        return this.threadCount;
-    }
 
     @Override
     public WorldDto getDto() {
@@ -179,11 +174,15 @@ public class WorldImpl implements World {
                 timeTerminationInteger,
                 userTermination,
                 this.gridWidth,
-                this.gridHeight,
-                this.threadCount);
+                this.gridHeight);
     }
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Integer getSleepTime() {
+        return sleepTime;
     }
 }

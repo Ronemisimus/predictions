@@ -9,6 +9,7 @@ import predictions.termination.api.Termination;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -43,4 +44,6 @@ public interface WorldInstance extends Runnable {
     EntityListDto getCurrentEntityCounts();
 
     ClientDataContainerImpl getClientContainer();
+
+    Iterator<Termination> getTerminations();
 }

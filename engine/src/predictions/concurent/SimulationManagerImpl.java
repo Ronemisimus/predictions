@@ -8,12 +8,10 @@ import predictions.definition.entity.EntityDefinition;
 import predictions.execution.EntityCountHistory;
 import predictions.execution.instance.world.WorldInstance;
 import predictions.execution.instance.world.WorldInstanceImpl;
+import predictions.termination.api.Termination;
 
 import java.time.Duration;
-import java.util.AbstractMap;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
@@ -168,5 +166,10 @@ public class SimulationManagerImpl implements SimulationManager{
     @Override
     public synchronized ClientDataContainerImpl getEnvironment(Integer identifier) {
         return worlds.get(identifier).getClientContainer();
+    }
+
+    @Override
+    public Iterator<Termination> getTerminations(Integer identifier) {
+        return worlds.get(identifier).getTerminations();
     }
 }

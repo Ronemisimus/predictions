@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: gui.MainApp
-Class-Path: engine.jar jfreechart-1.5.2.jar
-

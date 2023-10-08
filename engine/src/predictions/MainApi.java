@@ -10,10 +10,10 @@ import java.util.List;
 
 public interface MainApi {
     ReadFileDto readFile(String file);
-    ShowWorldDto showLoadedWorld();
+    ShowWorldDto showLoadedWorld(String name);
 
     EnvDto getEnv();
-    void runSimulation();
+    void runSimulation(String name);
 
     RunHistoryDto getRunHistory();
 
