@@ -12,6 +12,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
@@ -53,6 +54,36 @@ public class ManagementScene {
                 filePathHolder.setText(newValue.getHyperlink());
             }
         });
+        filePathHolder.setOnAction(this::handleHyperlinkClick);
+    }
+
+    private void handleHyperlinkClick(ActionEvent actionEvent) {
+        String filePath = filePathHolder.getText();
+        new Thread(() -> {
+            // Check if Desktop is supported (i.e., the application is running in a GUI environment)
+            if (Desktop.isDesktopSupported()) {
+                Desktop desktop = Desktop.getDesktop();
+                File fileToOpen = new File(filePath);
+
+                try {
+                    // Check if the file/folder exists before attempting to open it
+                    if (fileToOpen.exists()) {
+                        if (desktop.isSupported(Desktop.Action.OPEN)) {
+                            desktop.open(fileToOpen);
+                        } else {
+                            System.err.println("Desktop is not supported.");
+                        }
+                    } else {
+                        System.out.println("File or folder does not exist: " + filePath);
+                    }
+                } catch (IOException e) {
+                    System.err.println("Error opening file/folder: " + filePath);
+                    e.printStackTrace(System.err);
+                }
+            } else {
+                System.err.println("Desktop is not supported.");
+            }
+        }).start();
     }
 
     private void handleSetThreadCountButton(ActionEvent actionEvent) {
