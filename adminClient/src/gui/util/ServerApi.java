@@ -109,9 +109,7 @@ public class ServerApi {
     public void SetThreadCount(int enteredInteger) {
         //noinspection KotlinInternalInJava
         Call call = client.newCall(new okhttp3.Request.Builder()
-                .url(new HttpUrl.Builder()
-                        .host(HOST)
-                        .addPathSegment("admin")
+                .url(HttpUrl.get(HOST).newBuilder()
                         .addPathSegment("setThreadCount")
                         .addQueryParameter("threadCount", String.valueOf(enteredInteger))
                         .build())

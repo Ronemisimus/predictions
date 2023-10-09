@@ -1,36 +1,33 @@
 package gui.scene.management.worldNameItem;
 
 import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 
-public class WorldNameItem extends HBox {
-    private final Hyperlink hyperlink;
-    private final Text name;
-
+public class WorldNameItem {
+    private final String hyperlink;
+    private final String name;
     public WorldNameItem(String name, String hyperlink) {
-        this.hyperlink = new Hyperlink(hyperlink);
-        this.name = new Text(name);
-        this.getChildren().add(this.name);
-        this.getChildren().add(this.hyperlink);
-        this.hyperlink.setOnAction(this::handleHyperlinkClick);
+        this.hyperlink = hyperlink;
+        this.name = name;
     }
 
-    public Hyperlink getHyperlink() {
+    public String getHyperlink() {
         return hyperlink;
     }
 
-    public Text getName() {
+    public String getName() {
         return name;
     }
 
     private void handleHyperlinkClick(ActionEvent actionEvent) {
-        String filePath = getHyperlink().getText();
+        String filePath = getHyperlink();
         new Thread(() -> {
             // Check if Desktop is supported (i.e., the application is running in a GUI environment)
             if (Desktop.isDesktopSupported()) {
@@ -58,4 +55,8 @@ public class WorldNameItem extends HBox {
         }).start();
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
 }

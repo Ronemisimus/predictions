@@ -3,16 +3,14 @@ package gui.scene.management;
 import gui.scene.management.worldNameItem.WorldNameItem;
 import gui.util.ServerApi;
 import javafx.application.Platform;
-import javafx.beans.Observable;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
-import javafx.util.StringConverter;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,57 +22,37 @@ public class ManagementScene {
     @FXML
     private AnchorPane toolbar;
     @FXML
-    private ChoiceBox<WorldNameItem> filePathHolder;
+    private ComboBox<WorldNameItem> nameSelector;
+    @FXML
+    private Hyperlink filePathHolder;
     @FXML
     private Button loadFileButton;
     @FXML
     private Button setThreadCountButton;
-    private boolean loaded;
-
-    private ObservableList<WorldNameItem> hyperlinkList;
 
     @FXML
     private void initialize(){
-        hyperlinkList = FXCollections.emptyObservableList();
         toolbar.prefWidthProperty().bind(titledPane.widthProperty().subtract(150));
         loadFileButton.setOnAction(this::handleLoadFileButton);
-        filePathHolder.valueProperty().addListener(this::handleSelectedFileChange);
         setThreadCountButton.setOnAction(this::handleSetThreadCountButton);
-        filePathHolder.setItems(hyperlinkList);
-        filePathHolder.setConverter(new StringConverter<WorldNameItem>() {
-
-            /**
-             * Converts the object provided into its string form.
-             * Format of the returned string is defined by the specific converter.
-             *
-             * @param object - a WorldNameItem containing the name and hyperlink
-             * @return a string representation of the object passed in.
-             */
+        nameSelector.setCellFactory(comboBox -> new ListCell<WorldNameItem>() {
             @Override
-            public String toString(WorldNameItem object) {
-                return object.getName().getText() + " " + object.getHyperlink().getText();
-            }
-
-            /**
-             * Converts the string provided into an object defined by the specific converter.
-             * Format of the string and type of the resulting object is defined by the specific converter.
-             *
-             * @param string - the text representation of the object
-             * @return an object representation of the string passed in.
-             */
-            @Override
-            public WorldNameItem fromString(String string) {
-                return new WorldNameItem(string.split(" ")[0], string.split(" ")[1]);
+            public void updateItem(WorldNameItem item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null) {
+                    setText(item.getName());
+                }
             }
         });
-        loaded = false;
-    }
-
-    private void handleSelectedFileChange(Observable observable, WorldNameItem oldValue, WorldNameItem newValue) {
-        if (loaded) {
-            String worldName = newValue.getName().getText();
-            // TODO: show world details
-        }
+        filePathHolder.tooltipProperty().bind(Bindings.createObjectBinding(
+                () -> new Tooltip(filePathHolder.getText()),
+                filePathHolder.textProperty()
+        ));
+        nameSelector.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                filePathHolder.setText(newValue.getHyperlink());
+            }
+        });
     }
 
     private void handleSetThreadCountButton(ActionEvent actionEvent) {
@@ -104,19 +82,18 @@ public class ManagementScene {
         );
         // open project root
         try {
-            loaded = true;
             fileChooser.setInitialDirectory(new File(".").getCanonicalFile());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        String filePath = fileChooser.showOpenDialog(null).getAbsolutePath();
+        String filePath = Optional.ofNullable(fileChooser.showOpenDialog(null)).orElse(new File("")).getAbsolutePath();
 
         new Thread(() -> {
             String worldName = ServerApi.getInstance().LoadFile(filePath);
             if (worldName != null) {
                 Platform.runLater(() -> {
                     WorldNameItem worldNameItem = new WorldNameItem(worldName, filePath);
-                    hyperlinkList.add(worldNameItem);
+                    nameSelector.getItems().add(worldNameItem);
                 });
             }
         }).start();
