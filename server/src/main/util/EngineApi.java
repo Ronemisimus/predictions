@@ -1,6 +1,7 @@
 package main.util;
 
 import dto.ReadFileDto;
+import dto.ShowWorldDto;
 import predictions.MainApi;
 import predictions.MainApiImpl;
 
@@ -23,5 +24,9 @@ public class EngineApi {
 
     public void setThreadCount(int threadCount) {
         mainApi.setThreadCount(threadCount);
+    }
+
+    public ShowWorldDto showLoadedWorld(String worldName) {
+        return mainApi.showLoadedWorld(worldName);
     }
 }

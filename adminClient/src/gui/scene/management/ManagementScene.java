@@ -1,15 +1,19 @@
 package gui.scene.management;
 
+import gui.scene.management.tree.OpenableItem;
 import gui.scene.management.worldNameItem.WorldNameItem;
 import gui.util.ServerApi;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Text;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
 import java.awt.*;
@@ -30,6 +34,10 @@ public class ManagementScene {
     private Button loadFileButton;
     @FXML
     private Button setThreadCountButton;
+    @FXML
+    private TreeView<String> treeView;
+    @FXML
+    private ScrollPane detailsView;
 
     @FXML
     private void initialize(){
@@ -52,6 +60,38 @@ public class ManagementScene {
         nameSelector.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 filePathHolder.setText(newValue.getHyperlink());
+                TreeItem<String> res = ServerApi.getInstance().showLoadedWorld(newValue.getName());
+                treeView.setRoot(res);
+
+                treeView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+                treeView.setCellFactory(param -> new TreeCell<String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setText(null);
+                        } else {
+                            setText(item);
+                        }
+
+                        selectedProperty().addListener(e -> {
+                            if (((ReadOnlyBooleanProperty)e).getValue()) {
+                                if (getTreeItem() instanceof OpenableItem) {
+                                    OpenableItem openableItem = (OpenableItem) getTreeItem();
+                                    Parent root = openableItem.getDetailsView();
+                                    if (root instanceof VBox) {
+                                        ((VBox) root).setSpacing(10);
+                                        root.setStyle("-fx-padding: 10px;");
+                                    }
+                                    detailsView.setContent(root);
+                                } else {
+                                    detailsView.setContent(null);
+                                }
+                            }
+                        });
+                    }
+                });
+
             }
         });
         filePathHolder.setOnAction(this::handleHyperlinkClick);

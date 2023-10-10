@@ -1,10 +1,15 @@
 package gui.util;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import dto.ReadFileDto;
+import dto.ShowWorldDto;
 import gui.readFileError.ReadFileError;
+import gui.scene.management.ComparableDeserializer;
+import gui.scene.management.tree.WorldDetailsItem;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
+import javafx.scene.control.TreeItem;
 import javafx.scene.text.Text;
 import okhttp3.*;
 
@@ -171,5 +176,32 @@ public class ServerApi {
         fis.close();
 
         return publicKeyBytes;
+    }
+
+    public TreeItem<String> showLoadedWorld(String name) {
+        // create call to show world dto
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new okhttp3.Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("showWorld")
+                        .addQueryParameter("worldName", name)
+                        .build())
+                .build());
+
+        try (Response response = call.execute()) {
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(Comparable.class, new ComparableDeserializer())
+                    .create();
+            ShowWorldDto showWorldDto;
+            if (response.body() != null) {
+                showWorldDto = gson.fromJson(response.body().string(), ShowWorldDto.class);
+                return new WorldDetailsItem(showWorldDto);
+            }
+            return null;
+        } catch (IOException e) {
+            Alert("Error", "Cannot show world", "reason: " + e.getMessage());
+            e.printStackTrace(System.err);
+            return null;
+        }
     }
 }
