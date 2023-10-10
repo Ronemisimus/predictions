@@ -20,4 +20,8 @@ public class EngineApi {
     public ReadFileDto readFile(char[] content) {
         return mainApi.readFile(String.valueOf(content));
     }
+
+    public void setThreadCount(int threadCount) {
+        mainApi.setThreadCount(threadCount);
+    }
 }

@@ -172,4 +172,12 @@ public class SimulationManagerImpl implements SimulationManager{
     public Iterator<Termination> getTerminations(Integer identifier) {
         return worlds.get(identifier).getTerminations();
     }
+
+    @Override
+    public synchronized void setThreadCount(int threadCount) {
+        if (executorService!=null) {
+            executorService.shutdownNow();
+        }
+        executorService = Executors.newFixedThreadPool(threadCount);
+    }
 }

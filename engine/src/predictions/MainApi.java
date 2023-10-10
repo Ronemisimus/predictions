@@ -44,4 +44,6 @@ public interface MainApi {
     EntityListDto getCurrentEntityAmounts(Integer identifier);
 
     void copyEnvironment(Integer identifier);
+
+    void setThreadCount(int threadCount);
 }

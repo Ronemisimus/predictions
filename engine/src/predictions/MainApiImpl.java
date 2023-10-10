@@ -2,7 +2,6 @@ package predictions;
 
 import dto.*;
 import dto.subdto.SingleRunHistoryDto;
-import dto.subdto.read.dto.FileSelectionDto;
 import dto.subdto.show.EntityListDto;
 import dto.subdto.show.interactive.RunProgressDto;
 import dto.subdto.show.world.EntityDto;
@@ -26,7 +25,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import java.io.File;
 import java.io.StringReader;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -197,5 +195,10 @@ public class MainApiImpl implements MainApi {
     public void copyEnvironment(Integer identifier) {
         ClientDataContainerImpl res = simulationManager.getEnvironment(identifier);
         this.clientDataContainer = new ClientDataContainerImpl(res);
+    }
+
+    @Override
+    public void setThreadCount(int threadCount) {
+        simulationManager.setThreadCount(threadCount);
     }
 }

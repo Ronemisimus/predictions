@@ -52,4 +52,6 @@ public interface SimulationManager {
     ClientDataContainerImpl getEnvironment(Integer identifier);
 
     Iterator<Termination> getTerminations(Integer identifier);
+
+    void setThreadCount(int threadCount);
 }

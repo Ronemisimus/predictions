@@ -11,6 +11,10 @@
         <servlet-name>readFile</servlet-name>
         <servlet-class>main.ReadFile</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>adminSetThread</servlet-name>
+        <servlet-class>main.thread.adminSet.AdminSetThread</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AdminLogin</servlet-name>
         <url-pattern>/admin/</url-pattern>
@@ -18,5 +22,9 @@
     <servlet-mapping>
         <servlet-name>readFile</servlet-name>
         <url-pattern>/admin/readFile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>adminSetThread</servlet-name>
+        <url-pattern>/admin/setThreadCount</url-pattern>
     </servlet-mapping>
 </web-app>
