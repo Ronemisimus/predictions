@@ -2,14 +2,21 @@ package clientGui.scene.details;
 
 import clientGui.scene.details.tree.OpenableItem;
 import clientGui.util.ServerApi;
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 
 public class DetailsScene {
@@ -27,9 +34,27 @@ public class DetailsScene {
     private void initialize(){
         toolbar.prefWidthProperty().bind(titledPane.widthProperty().subtract(150));
         nameSelector.valueProperty().addListener(this::handleNameSelector);
+        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this::updateNameSelector, 0, 500, TimeUnit.MILLISECONDS);
     }
 
-    private void handleNameSelector(Observable observable, String oldValue, String newValue) {
+    private void updateNameSelector() {
+        ObservableList<String> names = nameSelector.getItems();
+
+        List<String> loadedWorlds = ServerApi.getInstance().getLoadedWorlds();
+
+        List<String> addedNames = loadedWorlds.stream()
+                .filter(name -> !names.contains(name))
+                .collect(Collectors.toList());
+        List<String> removedNames = names.stream()
+                .filter(name -> !loadedWorlds.contains(name))
+                .collect(Collectors.toList());
+        Platform.runLater(() -> {
+            names.addAll(addedNames);
+            names.removeAll(removedNames);
+        });
+    }
+
+    private void handleNameSelector(Observable observable, String ignoredOldValue, String newValue) {
         if (newValue != null) {
             TreeItem<String> res = ServerApi.getInstance().showLoadedWorld(newValue);
             treeView.setRoot(res);

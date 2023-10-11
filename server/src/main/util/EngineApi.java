@@ -6,6 +6,8 @@ import dto.ShowWorldDto;
 import predictions.MainApi;
 import predictions.MainApiImpl;
 
+import java.util.List;
+
 public class EngineApi {
     private final MainApi mainApi;
 
@@ -34,5 +36,9 @@ public class EngineApi {
     public RunHistoryDto getRunStates() {
 
         return mainApi.getRunHistory();
+    }
+
+    public List<String> getLoadedWorlds() {
+        return mainApi.getLoadedWorlds();
     }
 }

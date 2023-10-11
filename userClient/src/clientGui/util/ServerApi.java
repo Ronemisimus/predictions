@@ -13,6 +13,8 @@ import javafx.scene.text.Text;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -107,7 +109,6 @@ public class ServerApi {
         Call call = client.newCall(new Request.Builder()
                 .url(HttpUrl.get(HOST).newBuilder()
                         .addPathSegment("showWorld")
-                        .addQueryParameter("username", Username.wrap(username))
                         .addQueryParameter("worldName", name)
                         .build())
                 .build());
@@ -127,5 +128,25 @@ public class ServerApi {
             e.printStackTrace(System.err);
             return null;
         }
+    }
+
+    public List<String> getLoadedWorlds() {
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("getLoadedWorlds")
+                        .build())
+                .build());
+
+        try (Response response = call.execute()) {
+            Gson gson = new Gson();
+            if (response.body() != null) {
+                //noinspection unchecked
+                return (List<String>)gson.fromJson(response.body().string(), ArrayList.class);
+            }
+        }catch (IOException e) {
+            e.printStackTrace(System.err);
+        }
+        return null;
     }
 }

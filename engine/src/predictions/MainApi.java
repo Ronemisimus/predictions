@@ -46,4 +46,6 @@ public interface MainApi {
     void copyEnvironment(Integer identifier);
 
     void setThreadCount(int threadCount);
+
+    List<String> getLoadedWorlds();
 }

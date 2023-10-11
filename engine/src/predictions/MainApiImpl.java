@@ -201,4 +201,9 @@ public class MainApiImpl implements MainApi {
     public void setThreadCount(int threadCount) {
         simulationManager.setThreadCount(threadCount);
     }
+
+    @Override
+    public List<String> getLoadedWorlds() {
+        return new ArrayList<>(possibleWorlds.keySet());
+    }
 }
