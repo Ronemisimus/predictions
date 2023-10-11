@@ -3,9 +3,13 @@ package gui.util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dto.ReadFileDto;
+import dto.RunHistoryDto;
 import dto.ShowWorldDto;
+import dto.subdto.show.instance.RunStateDto;
+import gui.history.data.RunState;
 import gui.readFileError.ReadFileError;
 import gui.scene.management.ComparableDeserializer;
+import gui.scene.management.RunStateRow;
 import gui.scene.management.tree.WorldDetailsItem;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -14,7 +18,11 @@ import javafx.scene.text.Text;
 import okhttp3.*;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class ServerApi {
     public static volatile ServerApi instance = null;
@@ -202,6 +210,33 @@ public class ServerApi {
             Alert("Error", "Cannot show world", "reason: " + e.getMessage());
             e.printStackTrace(System.err);
             return null;
+        }
+    }
+
+    public List<RunStateRow> getRunStates() {
+        Call call = client.newCall(new okhttp3.Request.Builder()
+                .url(HOST + "/getRunStates").build());
+
+        try (Response response = call.execute()) {
+            RunHistoryDto res = null;
+            if (response.body() != null) {
+                res = new Gson().fromJson(response.body().string(), RunHistoryDto.class);
+            }
+            List<RunStateDto> states;
+            if (res != null) {
+                states = new ArrayList<>(res.getRunStates().values());
+            }
+            else{
+                states = new ArrayList<>();
+            }
+            return Arrays.stream(RunState.values())
+                    .map(run -> new RunStateRow(run.name(), (int) states.stream()
+                            .filter(s -> RunState.getRunState(s).equals(run)).count()))
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            Alert("Error", "Cannot get run states", "reason: " + e.getMessage());
+            e.printStackTrace(System.err);
+            return new ArrayList<>();
         }
     }
 }

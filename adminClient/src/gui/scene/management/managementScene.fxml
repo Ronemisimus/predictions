@@ -35,29 +35,21 @@
                         <Button fx:id="loadFileButton" contentDisplay="CENTER" mnemonicParsing="false" text="Load File" textAlignment="CENTER" />
                      </HBox>
                      <AnchorPane GridPane.columnSpan="4">
-                        <children>
-                           <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                              <columnConstraints>
-                                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-                                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                              </columnConstraints>
-                              <rowConstraints>
-                                 <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                              </rowConstraints>
-                              <children>
-                                 <AnchorPane>
-                                    <children>
-                                       <ComboBox fx:id="nameSelector" prefWidth="150.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                    </children>
-                                 </AnchorPane>
-                                 <AnchorPane GridPane.columnIndex="1">
-                                    <children>
-                                       <Hyperlink fx:id="filePathHolder" text="file path here" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                    </children>
-                                 </AnchorPane>
-                              </children>
-                           </GridPane>
-                        </children>
+                        <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <AnchorPane>
+                              <ComboBox fx:id="nameSelector" prefWidth="150.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                           </AnchorPane>
+                           <AnchorPane GridPane.columnIndex="1">
+                              <Hyperlink fx:id="filePathHolder" text="file path here" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                           </AnchorPane>
+                        </GridPane>
                      </AnchorPane>
                   </GridPane>
                </AnchorPane>
@@ -67,17 +59,12 @@
             </GridPane>
          </AnchorPane>
       </graphic>
-      <content>
-         <SplitPane dividerPositions="0.29797979797979796, 0.5" prefHeight="160.0" prefWidth="200.0">
-           <items>
-             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                  <children>
-                     <TreeView fx:id="treeView" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                  </children></AnchorPane>
-             <ScrollPane fx:id="detailsView" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="282.0" />
-               <AnchorPane prefHeight="160.0" prefWidth="249.0" />
-           </items>
-         </SplitPane>
-      </content>
+      <SplitPane dividerPositions="0.29797979797979796, 0.5" prefHeight="160.0" prefWidth="200.0">
+         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+            <TreeView fx:id="treeView" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+         </AnchorPane>
+         <ScrollPane fx:id="detailsView" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="282.0" />
+         <ScrollPane fx:id="queueList" />
+      </SplitPane>
    </TitledPane>
 </AnchorPane>

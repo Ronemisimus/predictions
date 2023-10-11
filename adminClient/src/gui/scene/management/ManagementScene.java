@@ -6,6 +6,8 @@ import gui.util.ServerApi;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -19,7 +21,12 @@ import javafx.stage.FileChooser;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class ManagementScene {
     @FXML
@@ -38,6 +45,8 @@ public class ManagementScene {
     private TreeView<String> treeView;
     @FXML
     private ScrollPane detailsView;
+    @FXML
+    private ScrollPane queueList;
 
     @FXML
     private void initialize(){
@@ -95,6 +104,36 @@ public class ManagementScene {
             }
         });
         filePathHolder.setOnAction(this::handleHyperlinkClick);
+        initQueueList();
+    }
+
+    private void initQueueList() {
+        TableView<RunStateRow> table = new TableView<>();
+        queueList.setContent(table);
+        table.prefHeightProperty().bind(queueList.heightProperty().subtract(5));
+        table.prefWidthProperty().bind(queueList.widthProperty().subtract(5));
+        TableColumn<RunStateRow,String> stateColumn = new TableColumn<>("State");
+        stateColumn.prefWidthProperty().bind(table.widthProperty().multiply(0.5));
+        TableColumn<RunStateRow,Integer> countColumn = new TableColumn<>("Count");
+        countColumn.prefWidthProperty().bind(table.widthProperty().multiply(0.5));
+        stateColumn.setCellValueFactory(cellData -> cellData.getValue().stateProperty());
+        countColumn.setCellValueFactory(cellData -> cellData.getValue().countProperty());
+        //noinspection unchecked
+        table.getColumns().addAll(stateColumn, countColumn);
+        ScheduledExecutorService runStateGetter = Executors.newScheduledThreadPool(1);
+        final ObservableList<RunStateRow> rows = FXCollections.observableArrayList();
+        table.setItems(rows);
+        runStateGetter.scheduleAtFixedRate(() -> {
+            java.util.List<RunStateRow> res = ServerApi.getInstance().getRunStates();
+            java.util.List<RunStateRow> added = res.stream()
+                    .filter(row -> !rows.contains(row))
+                    .collect(Collectors.toList());
+            List<RunStateRow> removed = rows.stream()
+                    .filter(row -> !res.contains(row))
+                    .collect(Collectors.toList());
+            rows.addAll(added);
+            rows.removeAll(removed);
+        }, 0, 500, TimeUnit.MILLISECONDS);
     }
 
     private void handleHyperlinkClick(ActionEvent actionEvent) {

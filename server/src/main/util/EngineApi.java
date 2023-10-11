@@ -1,6 +1,7 @@
 package main.util;
 
 import dto.ReadFileDto;
+import dto.RunHistoryDto;
 import dto.ShowWorldDto;
 import predictions.MainApi;
 import predictions.MainApiImpl;
@@ -28,5 +29,10 @@ public class EngineApi {
 
     public ShowWorldDto showLoadedWorld(String worldName) {
         return mainApi.showLoadedWorld(worldName);
+    }
+
+    public RunHistoryDto getRunStates() {
+
+        return mainApi.getRunHistory();
     }
 }
