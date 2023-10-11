@@ -8,6 +8,10 @@
         <servlet-class>main.login.AdminLogin</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>ClientLogin</servlet-name>
+        <servlet-class>main.login.ClientLogin</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>readFile</servlet-name>
         <servlet-class>main.ReadFile</servlet-class>
     </servlet>
@@ -26,5 +30,9 @@
     <servlet-mapping>
         <servlet-name>adminSetThread</servlet-name>
         <url-pattern>/admin/setThreadCount</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ClientLogin</servlet-name>
+        <url-pattern>/</url-pattern>
     </servlet-mapping>
 </web-app>
