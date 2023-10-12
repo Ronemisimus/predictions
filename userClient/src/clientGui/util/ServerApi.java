@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dto.ShowWorldDto;
 import clientGui.scene.details.ComparableDeserializer;
+import dto.subdto.requests.RequestEntryDto;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextInputDialog;
@@ -145,8 +146,48 @@ public class ServerApi {
                 return (List<String>)gson.fromJson(response.body().string(), ArrayList.class);
             }
         }catch (IOException e) {
+            Alert("Error", "Cannot get loaded worlds", "reason: " + e.getMessage());
             e.printStackTrace(System.err);
         }
         return null;
+    }
+
+    public void submitRequest(String worldName, Integer runAmount, Boolean userTermination, Integer ticksTermination, Integer secondsTermination) {
+        if (runAmount == null || runAmount <= 0) {
+            Alert("Invalid Run Amount", "Run Amount must be greater than 0", "Please select a valid run amount");
+            return;
+        }
+        if (secondsTermination != null && secondsTermination < 0) {
+            Alert("Invalid Seconds Termination", "Seconds Termination must be greater than or equal to 0", "Please select a valid seconds termination");
+            return;
+        }
+        if (ticksTermination != null && ticksTermination < 0) {
+            Alert("Invalid Ticks Termination", "Ticks Termination must be greater than or equal to 0", "Please select a valid ticks termination");
+            return;
+        }
+
+        RequestEntryDto requestEntryDto = new RequestEntryDto(username,
+                worldName,
+                runAmount,
+                ticksTermination,
+                secondsTermination,
+                userTermination);
+
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("requests")
+                        .build())
+                .post(RequestBody.create(new Gson().toJson(requestEntryDto), MediaType.parse("application/json")))
+                .build());
+
+        try (Response response = call.execute()) {
+            if (response.isSuccessful()) {
+                Alert("Success", "Request Submitted", "Request successfully submitted");
+            }
+        } catch (IOException e) {
+            Alert("Error", "Cannot submit request", "reason: " + e.getMessage());
+            e.printStackTrace(System.err);
+        }
     }
 }

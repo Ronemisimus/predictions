@@ -1,13 +1,11 @@
 package gui.scene.main;
 
 import gui.scene.management.ManagementScene;
-import gui.scene.requests.Requests;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
@@ -56,7 +54,7 @@ public class MainScene{
 
     @FXML
     public void handleAllocationsButton(ActionEvent actionEvent){
-        loadSubScene("requests.fxml", Requests.class);
+
     }
 
     @FXML

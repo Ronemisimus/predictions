@@ -1,6 +1,7 @@
 package clientGui.scene.main;
 
 import clientGui.scene.details.DetailsScene;
+import clientGui.scene.requests.Requests;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
@@ -61,7 +62,7 @@ public class MainScene{
 
     @FXML
     public void handleRequestsButton(ActionEvent actionEvent){
-        // TODO: handle requests button
+        loadSubScene("requests.fxml", Requests.class);
     }
 
     @FXML
