@@ -1,7 +1,6 @@
 package main.getLoadedWorlds;
 
 import com.google.gson.Gson;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,7 +14,7 @@ import java.util.List;
 @WebServlet(name = "getLoadedWorlds", urlPatterns = "/getLoadedWorlds")
 public class getLoadedWorlds extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession session = req.getSession(false);
         if (session == null) {
             // send unauthorized message with correct status code

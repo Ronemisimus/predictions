@@ -3,7 +3,6 @@ package main.requests.servlets;
 import com.google.gson.Gson;
 import dto.subdto.requests.RequestDetailsDto;
 import dto.subdto.requests.RequestEntryDto;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
 public class userRequests extends HttpServlet {
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession session = req.getSession(false);
         if (session == null){
             // send unauthorized message with correct status code

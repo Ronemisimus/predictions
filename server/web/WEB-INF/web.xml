@@ -19,6 +19,39 @@
         <servlet-name>adminSetThread</servlet-name>
         <servlet-class>main.thread.adminSet.AdminSetThread</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>adminRequests</servlet-name>
+        <servlet-class>main.requests.servlets.adminRequests</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>getLoadedWorlds</servlet-name>
+        <servlet-class>main.getLoadedWorlds.getLoadedWorlds</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>getRunStates</servlet-name>
+        <servlet-class>main.getRunStates</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>userRequests</servlet-name>
+        <servlet-class>main.requests.servlets.userRequests</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>userRequests</servlet-name>
+        <url-pattern>/requests</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>getRunStates</servlet-name>
+        <url-pattern>/getRunStates</url-pattern>
+        <url-pattern>/admin/getRunStates</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>getLoadedWorlds</servlet-name>
+        <url-pattern>/getLoadedWorlds</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>adminRequests</servlet-name>
+        <url-pattern>/admin/requests</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminLogin</servlet-name>
         <url-pattern>/admin/</url-pattern>

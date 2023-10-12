@@ -2,8 +2,6 @@ package main;
 
 import com.google.gson.Gson;
 import dto.RunHistoryDto;
-import dto.subdto.show.instance.RunStateDto;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +14,7 @@ import java.io.IOException;
 @WebServlet(name = "getRunStates", urlPatterns = {"/getRunStates", "/admin/getRunStates"})
 public class getRunStates extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession session = req.getSession(false);
         if (session == null) {
             // send unauthorized message with correct status code
