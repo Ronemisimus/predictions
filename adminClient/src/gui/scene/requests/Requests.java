@@ -1,6 +1,7 @@
 package gui.scene.requests;
 
 import gui.util.ServerApi;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -32,5 +33,15 @@ public class Requests {
         List<String> worldNames = ServerApi.getInstance().getWorldNames();
         worldNameComboBox.getItems().clear();
         worldNameComboBox.getItems().addAll(worldNames);
+
+        ticksTerminationTextField.disableProperty().bind(ticksTerminationCheckBox.selectedProperty().not());
+        secondsTerminationTextField.disableProperty().bind(secondsTerminationCheckBox.selectedProperty().not());
+        ticksTerminationCheckBox.selectedProperty().addListener((o, oldValue, newValue) -> {
+            if (!newValue) ticksTerminationTextField.setText("");
+        });
+        secondsTerminationCheckBox.selectedProperty().addListener((o, oldValue, newValue) -> {
+            if (!newValue) secondsTerminationTextField.setText("");
+        });
+
     }
 }
