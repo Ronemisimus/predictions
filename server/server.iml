@@ -19,8 +19,8 @@
     </content>
     <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" scope="PROVIDED" name="Tomcat 10.0.8" level="application_server_libraries" />
     <orderEntry type="module" module-name="DTO" />
+    <orderEntry type="library" scope="PROVIDED" name="Tomcat 10.0.8" level="application_server_libraries" />
     <orderEntry type="module" module-name="engine" />
     <orderEntry type="module-library">
       <library>
