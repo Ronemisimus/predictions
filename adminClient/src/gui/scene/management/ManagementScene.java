@@ -3,6 +3,7 @@ package gui.scene.management;
 import gui.scene.management.tree.OpenableItem;
 import gui.scene.management.worldNameItem.WorldNameItem;
 import gui.util.ServerApi;
+import gui.util.WorldManager;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -53,6 +54,7 @@ public class ManagementScene {
         toolbar.prefWidthProperty().bind(titledPane.widthProperty().subtract(150));
         loadFileButton.setOnAction(this::handleLoadFileButton);
         setThreadCountButton.setOnAction(this::handleSetThreadCountButton);
+        nameSelector.getItems().addAll(WorldManager.getInstance().getWorlds());
         nameSelector.setCellFactory(comboBox -> new ListCell<WorldNameItem>() {
             @Override
             public void updateItem(WorldNameItem item, boolean empty) {
@@ -202,8 +204,9 @@ public class ManagementScene {
             String worldName = ServerApi.getInstance().LoadFile(filePath);
             if (worldName != null) {
                 Platform.runLater(() -> {
-                    WorldNameItem worldNameItem = new WorldNameItem(worldName, filePath);
-                    nameSelector.getItems().add(worldNameItem);
+                    WorldManager.getInstance().addWorld(worldName, filePath);
+                    nameSelector.getItems().add(WorldManager.getInstance().getWorldNameItem(worldName));
+                    nameSelector.setValue(WorldManager.getInstance().getWorldNameItem(worldName));
                 });
             }
         }).start();

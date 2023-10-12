@@ -239,4 +239,20 @@ public class ServerApi {
             return new ArrayList<>();
         }
     }
+
+    public List<String> getWorldNames() {
+        Call call = client.newCall(new okhttp3.Request.Builder()
+                .url(HOST + "/getLoadedWorlds").build());
+
+        List<String> result = new ArrayList<>();
+        try (Response response = call.execute()) {
+            if (response.body() != null) {
+                //noinspection unchecked
+                result.addAll((ArrayList<String>) new Gson().fromJson(response.body().string(), ArrayList.class));
+            }
+        } catch (IOException e) {
+            e.printStackTrace(System.err);
+        }
+        return result;
+    }
 }

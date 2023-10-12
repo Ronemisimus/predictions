@@ -47,6 +47,7 @@
     <servlet-mapping>
         <servlet-name>getLoadedWorlds</servlet-name>
         <url-pattern>/getLoadedWorlds</url-pattern>
+        <url-pattern>/admin/getLoadedWorlds</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>adminRequests</servlet-name>

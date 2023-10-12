@@ -11,8 +11,13 @@ import main.util.EngineApi;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(name = "getLoadedWorlds", urlPatterns = "/getLoadedWorlds")
+@WebServlet(name = "getLoadedWorlds", urlPatterns = {"/getLoadedWorlds", "/admin/getLoadedWorlds"})
 public class getLoadedWorlds extends HttpServlet {
+
+    public getLoadedWorlds() {
+        System.out.println(this.getServletInfo());
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession session = req.getSession(false);

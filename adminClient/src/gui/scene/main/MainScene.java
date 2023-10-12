@@ -1,6 +1,7 @@
 package gui.scene.main;
 
 import gui.scene.management.ManagementScene;
+import gui.scene.requests.Requests;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
@@ -55,7 +56,7 @@ public class MainScene{
 
     @FXML
     public void handleAllocationsButton(ActionEvent actionEvent){
-
+        loadSubScene("requests.fxml", Requests.class);
     }
 
     @FXML
