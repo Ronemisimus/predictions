@@ -1,6 +1,7 @@
 package clientGui.scene.details;
 
 import clientGui.scene.details.tree.OpenableItem;
+import clientGui.scene.SceneController;
 import clientGui.util.ServerApi;
 import javafx.application.Platform;
 import javafx.beans.Observable;
@@ -15,11 +16,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
-public class DetailsScene {
+public class DetailsScene implements SceneController {
     @FXML
     private AnchorPane toolbar;
     @FXML
@@ -30,11 +32,18 @@ public class DetailsScene {
     private TreeView<String> treeView;
     @FXML
     private ScrollPane detailsView;
+
+    private ScheduledExecutorService dataGetter;
+
+    private static DetailsScene detailsController = null;
+
     @FXML
     private void initialize(){
         toolbar.prefWidthProperty().bind(titledPane.widthProperty().subtract(150));
         nameSelector.valueProperty().addListener(this::handleNameSelector);
-        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this::updateNameSelector, 0, 500, TimeUnit.MILLISECONDS);
+        dataGetter = Executors.newScheduledThreadPool(1);
+        dataGetter.scheduleAtFixedRate(this::updateNameSelector, 0, 500, TimeUnit.MILLISECONDS);
+        detailsController = this;
     }
 
     private void updateNameSelector() {
@@ -52,6 +61,10 @@ public class DetailsScene {
             names.addAll(addedNames);
             names.removeAll(removedNames);
         });
+    }
+
+    public static DetailsScene getInstance(){
+        return detailsController;
     }
 
     private void handleNameSelector(Observable observable, String ignoredOldValue, String newValue) {
@@ -94,5 +107,10 @@ public class DetailsScene {
                 });
             }
         };
+    }
+
+    @Override
+    public void destroy() {
+        this.dataGetter.shutdownNow();
     }
 }

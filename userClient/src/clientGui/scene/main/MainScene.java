@@ -1,5 +1,6 @@
 package clientGui.scene.main;
 
+import clientGui.scene.SceneController;
 import clientGui.scene.details.DetailsScene;
 import clientGui.scene.requests.Requests;
 import javafx.application.Platform;
@@ -30,6 +31,8 @@ public class MainScene{
     @FXML
     private Button resultsButton;
 
+    private SceneController sceneController;
+
     private static MainScene mainController = null;
 
     @FXML
@@ -58,11 +61,13 @@ public class MainScene{
     @FXML
     private void handleDetailsButton(ActionEvent actionEvent) {
         loadSubScene("DetailsScene.fxml", DetailsScene.class);
+        sceneController = DetailsScene.getInstance();
     }
 
     @FXML
     public void handleRequestsButton(ActionEvent actionEvent){
         loadSubScene("requests.fxml", Requests.class);
+        sceneController = Requests.getInstance();
     }
 
     @FXML
@@ -72,6 +77,9 @@ public class MainScene{
 
     private void loadSubScene(String fileName, Class<?> loaderClass)
     {
+        if (sceneController!=null) {
+            sceneController.destroy();
+        }
         try {
             FXMLLoader loader = new FXMLLoader(loaderClass.getResource(fileName));
             centerStage.setCenter(null);

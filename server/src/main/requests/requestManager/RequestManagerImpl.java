@@ -39,6 +39,8 @@ public class RequestManagerImpl implements RequestManager {
     public synchronized Request addRequest(RequestEntryDto request) {
         Request req = new RequestImpl(request);
         requests.put(req.getRequestId(), req);
+        completedRuns.put(req.getRequestId(),0);
+        runsCurrentlyRunning.put(req.getRequestId(),0);
         return req;
     }
 

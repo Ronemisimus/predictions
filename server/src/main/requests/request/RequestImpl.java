@@ -107,8 +107,8 @@ public class RequestImpl implements Request {
         tickLimit == null) res = false;
         if (terminationTypes.contains(TerminationType.SECONDS) &&
         secondsLimit == null) res = false;
-        if (requestingUser == null ||
-                UserManager.getInstance().userExists(requestingUser)) res = false;
+        if (requestingUser == null) res = false;
+        if (res && !UserManager.getInstance().userExists(requestingUser)) res = false;
         return res;
     }
 }

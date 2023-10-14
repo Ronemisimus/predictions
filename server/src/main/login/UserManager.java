@@ -26,6 +26,6 @@ public class UserManager {
     }
 
     public synchronized boolean sameUser(String username, HttpSession session) {
-        return usernames.get(username).equals(session.getId());
+        return userExists(username) && usernames.get(username).equals(session.getId());
     }
 }

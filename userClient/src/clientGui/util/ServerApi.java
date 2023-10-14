@@ -1,10 +1,12 @@
 package clientGui.util;
 
 import clientGui.scene.details.tree.WorldDetailsItem;
+import clientGui.scene.requests.RequestsDetailsRow;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dto.ShowWorldDto;
 import clientGui.scene.details.ComparableDeserializer;
+import dto.subdto.requests.RequestDetailsDto;
 import dto.subdto.requests.RequestEntryDto;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 public class ServerApi {
     public static volatile ServerApi instance = null;
@@ -45,12 +48,13 @@ public class ServerApi {
         return instance;
     }
 
-    private void Alert(String title, String headerText, String contentText) {
+    private void Alert(String title, String headerText, String contentText, Alert.AlertType type) {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle(title);
             alert.setHeaderText(headerText);
             alert.setContentText(contentText);
+            alert.setAlertType(type);
 
             // Calculate preferred width based on content
             Text text = new Text(contentText);
@@ -74,13 +78,12 @@ public class ServerApi {
         dialog.setHeaderText(null);
         dialog.setContentText("Enter your username:");
         dialog.showAndWait().ifPresent(username -> {
-            this.username = username;
-            String storageUsername = Username.wrap(username);
+            this.username = Username.wrap(username);
 
             //noinspection KotlinInternalInJava
             Call call = client.newCall(new Request.Builder()
                     .url(HttpUrl.get(HOST).newBuilder()
-                            .addQueryParameter("username", storageUsername)
+                            .addQueryParameter("username", this.username)
                             .build())
                     .build());
 
@@ -94,10 +97,11 @@ public class ServerApi {
                 }
                 if (!result.get()) {
                     String reason = response.body() != null ? response.body().string() : "unknown";
-                    Alert("Error", "Cannot login","Reason: " + reason);
+                    Alert("Error", "Cannot login","Reason: " + reason, Alert.AlertType.ERROR);
                 }
             } catch (IOException e) {
-                Alert("Connection Error", "Cannot login","Reason: " + e.getMessage());
+                Alert("Connection Error", "Cannot login","Reason: " + e.getMessage(), Alert.AlertType.ERROR);
+                e.printStackTrace(System.err);
             }
         });
 
@@ -125,7 +129,7 @@ public class ServerApi {
             }
             return null;
         } catch (IOException e) {
-            Alert("Error", "Cannot show world", "reason: " + e.getMessage());
+            Alert("Error", "Cannot show world", "reason: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace(System.err);
             return null;
         }
@@ -146,7 +150,7 @@ public class ServerApi {
                 return (List<String>)gson.fromJson(response.body().string(), ArrayList.class);
             }
         }catch (IOException e) {
-            Alert("Error", "Cannot get loaded worlds", "reason: " + e.getMessage());
+            Alert("Error", "Cannot get loaded worlds", "reason: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace(System.err);
         }
         return null;
@@ -154,15 +158,17 @@ public class ServerApi {
 
     public void submitRequest(String worldName, Integer runAmount, Boolean userTermination, Integer ticksTermination, Integer secondsTermination) {
         if (runAmount == null || runAmount <= 0) {
-            Alert("Invalid Run Amount", "Run Amount must be greater than 0", "Please select a valid run amount");
+            Alert("Invalid Run Amount", "Run Amount must be greater than 0", "Please select a valid run amount", Alert.AlertType.ERROR);
             return;
         }
         if (secondsTermination != null && secondsTermination < 0) {
-            Alert("Invalid Seconds Termination", "Seconds Termination must be greater than or equal to 0", "Please select a valid seconds termination");
+            Alert("Invalid Seconds Termination", "Seconds Termination must be greater than or equal to 0",
+                    "Please select a valid seconds termination", Alert.AlertType.ERROR);
             return;
         }
         if (ticksTermination != null && ticksTermination < 0) {
-            Alert("Invalid Ticks Termination", "Ticks Termination must be greater than or equal to 0", "Please select a valid ticks termination");
+            Alert("Invalid Ticks Termination", "Ticks Termination must be greater than or equal to 0",
+                    "Please select a valid ticks termination", Alert.AlertType.ERROR);
             return;
         }
 
@@ -183,11 +189,39 @@ public class ServerApi {
 
         try (Response response = call.execute()) {
             if (response.isSuccessful()) {
-                Alert("Success", "Request Submitted", "Request successfully submitted");
+                Alert("Success", "Request Submitted", "Your request has been submitted", Alert.AlertType.INFORMATION);
             }
         } catch (IOException e) {
-            Alert("Error", "Cannot submit request", "reason: " + e.getMessage());
+            Alert("Error", "Cannot submit request", "reason: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace(System.err);
         }
+    }
+
+    public List<RequestsDetailsRow> getRequests() {
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("requests")
+                        .addQueryParameter("username", username)
+                        .build())
+                .build());
+
+        try (Response response = call.execute()) {
+            Gson gson = new Gson();
+            if (response.body() != null) {
+                String body = response.body().string();
+
+                java.lang.reflect.Type listType = new com.google.gson.reflect.TypeToken<ArrayList<RequestDetailsDto>>(){}.getType();
+
+                List<RequestDetailsDto> requests = gson.fromJson(body, listType);
+                return requests.stream()
+                        .map(RequestsDetailsRow::new)
+                        .collect(Collectors.toList());
+            }
+        } catch (Exception e) {
+            Alert("Error", "Cannot get requests", "reason: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace(System.err);
+        }
+        return new ArrayList<>();
     }
 }

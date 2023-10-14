@@ -33,14 +33,14 @@ public class userRequests extends HttpServlet {
                 resp.setStatus(404);
                 resp.getWriter().println("user not found");
             }
-            else if (!UserManager.getInstance().sameUser(username, session)) {
-                resp.setStatus(401);
-                resp.getWriter().println("unauthorized");
-            }
-            else {
+            else if (UserManager.getInstance().sameUser(username, session)) {
                 Collection<RequestDetailsDto> requests = RequestManager.getInstance().getRequestsByUser(username);
                 Gson gson = new Gson();
                 resp.getWriter().print(gson.toJson(requests));
+            }
+            else {
+                resp.setStatus(401);
+                resp.getWriter().println("unauthorized");
             }
         }
     }
