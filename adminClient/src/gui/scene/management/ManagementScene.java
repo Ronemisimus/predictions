@@ -1,5 +1,6 @@
 package gui.scene.management;
 
+import gui.scene.SceneController;
 import gui.scene.management.tree.OpenableItem;
 import gui.scene.management.worldNameItem.WorldNameItem;
 import gui.util.ServerApi;
@@ -29,7 +30,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class ManagementScene {
+public class ManagementScene implements SceneController {
     @FXML
     private TitledPane titledPane;
     @FXML
@@ -49,8 +50,17 @@ public class ManagementScene {
     @FXML
     private ScrollPane queueList;
 
+    private ScheduledExecutorService runStateGetter;
+
+    private static ManagementScene mainController = null;
+
+    public static SceneController getInstance() {
+        return mainController;
+    }
+
     @FXML
     private void initialize(){
+        mainController = this;
         toolbar.prefWidthProperty().bind(titledPane.widthProperty().subtract(150));
         loadFileButton.setOnAction(this::handleLoadFileButton);
         setThreadCountButton.setOnAction(this::handleSetThreadCountButton);
@@ -122,7 +132,7 @@ public class ManagementScene {
         countColumn.setCellValueFactory(cellData -> cellData.getValue().countProperty());
         //noinspection unchecked
         table.getColumns().addAll(stateColumn, countColumn);
-        ScheduledExecutorService runStateGetter = Executors.newScheduledThreadPool(1);
+        runStateGetter = Executors.newScheduledThreadPool(1);
         final ObservableList<RunStateRow> rows = FXCollections.observableArrayList();
         table.setItems(rows);
         runStateGetter.scheduleAtFixedRate(() -> {
@@ -210,5 +220,10 @@ public class ManagementScene {
                 });
             }
         }).start();
+    }
+
+    @Override
+    public void destroy() {
+        runStateGetter.shutdownNow();
     }
 }

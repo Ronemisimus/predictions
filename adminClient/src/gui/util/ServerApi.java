@@ -2,12 +2,15 @@ package gui.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import dto.ReadFileDto;
 import dto.RunHistoryDto;
 import dto.ShowWorldDto;
+import dto.subdto.requests.RequestDetailsDto;
 import dto.subdto.show.instance.RunStateDto;
 import gui.history.data.RunState;
 import gui.readFileError.ReadFileError;
+import gui.scene.allocations.RequestDetailsRow;
 import gui.scene.management.ComparableDeserializer;
 import gui.scene.management.RunStateRow;
 import gui.scene.management.tree.WorldDetailsItem;
@@ -18,6 +21,7 @@ import javafx.scene.text.Text;
 import okhttp3.*;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -254,5 +258,47 @@ public class ServerApi {
             e.printStackTrace(System.err);
         }
         return result;
+    }
+
+    public List<RequestDetailsRow> getRequests() {
+        Call call = client.newCall(new okhttp3.Request.Builder()
+                .url(HOST + "/requests").build());
+
+        List<RequestDetailsRow> result = new ArrayList<>();
+        try (Response response = call.execute()) {
+            if (response.body() != null) {
+                java.lang.reflect.Type listType = new TypeToken<ArrayList<RequestDetailsDto>>(){}.getType();
+                List<RequestDetailsDto> requestDto = new Gson().fromJson(response.body().string(), listType);
+                result.addAll(requestDto.stream()
+                        .map(RequestDetailsRow::new)
+                        .collect(Collectors.toList()));
+            }
+        } catch (IOException e) {
+            e.printStackTrace(System.err);
+        }
+        return result;
+    }
+
+    public void setRequestStatus(int requestId, String status) {
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new okhttp3.Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("requests")
+                        .addQueryParameter("requestId", String.valueOf(requestId))
+                        .addQueryParameter("status", status)
+                        .build())
+                .post(new FormBody.Builder().build())
+                .build());
+
+        try (Response response = call.execute()) {
+            if (response.isSuccessful())
+            {
+                Alert success = new Alert(Alert.AlertType.INFORMATION, "Request Status Set to " + status);
+                success.showAndWait();
+            }
+        } catch (IOException e) {
+            Alert("Error", "Cannot set request status", "reason: " + e.getMessage());
+            e.printStackTrace(System.err);
+        }
     }
 }

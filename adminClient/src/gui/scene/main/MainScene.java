@@ -1,5 +1,7 @@
 package gui.scene.main;
 
+import gui.scene.SceneController;
+import gui.scene.allocations.Allocations;
 import gui.scene.management.ManagementScene;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -29,6 +31,8 @@ public class MainScene{
 
     private static MainScene mainController = null;
 
+    private SceneController currentController;
+
     @FXML
     public void initialize(){
         managementButton.setOnAction(this::handleManagementButton);
@@ -50,11 +54,13 @@ public class MainScene{
     @FXML
     private void handleManagementButton(ActionEvent actionEvent) {
         loadSubScene("managementScene.fxml", ManagementScene.class);
+        currentController = ManagementScene.getInstance();
     }
 
     @FXML
     public void handleAllocationsButton(ActionEvent actionEvent){
-
+        loadSubScene("allocations.fxml", Allocations.class);
+        currentController = Allocations.getInstance();
     }
 
     @FXML
@@ -64,6 +70,9 @@ public class MainScene{
 
     private void loadSubScene(String fileName, Class<?> loaderClass)
     {
+        if (currentController != null) {
+            currentController.destroy();
+        }
         try {
             FXMLLoader loader = new FXMLLoader(loaderClass.getResource(fileName));
             centerStage.setCenter(null);
