@@ -25,9 +25,9 @@ public class RequestImpl implements Request {
         if (request.isUserTermination()) this.terminationTypes.add(TerminationType.USER);
         if (request.getTickLimit()!=null) this.terminationTypes.add(TerminationType.TICKS);
         if (request.getSecondsLimit()!=null) this.terminationTypes.add(TerminationType.SECONDS);
-        if (request.getTickLimit()!=null && request.getSecondsLimit()>0) this.tickLimit = request.getTickLimit();
+        if (request.getTickLimit()!=null && request.getTickLimit()>0) this.tickLimit = request.getTickLimit();
         else this.tickLimit = null;
-        if (request.getSecondsLimit()!=null && request.getTickLimit()>0) this.secondsLimit = request.getSecondsLimit();
+        if (request.getSecondsLimit()!=null && request.getSecondsLimit()>0) this.secondsLimit = request.getSecondsLimit();
         else this.secondsLimit = null;
         this.status = RequestStatus.WAITING;
         this.requestingUser = request.getUsername();
