@@ -2,6 +2,7 @@ package clientGui.scene.main;
 
 import clientGui.scene.SceneController;
 import clientGui.scene.details.DetailsScene;
+import clientGui.scene.newExecution.NewExecutionScene;
 import clientGui.scene.requests.Requests;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -12,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -47,10 +49,12 @@ public class MainScene{
         Platform.runLater(()->detailsButton.fire());
     }
 
-    private void handleNewExecutionButton(ActionEvent actionEvent) {
-        // TODO: handle new execution button
+    public void handleNewExecutionButton(ActionEvent actionEvent) {
+        loadSubScene("newExecutionScene.fxml", NewExecutionScene.class);
+        sceneController = NewExecutionScene.getInstance();
     }
 
+    @NotNull
     public static synchronized MainScene getInstance(MainScene mainScene) {
         if(mainController==null){
             mainController = mainScene;
@@ -90,5 +94,13 @@ public class MainScene{
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void fireResultsButton() {
+        resultsButton.fire();
+    }
+
+    public void fireNewExecutionButton() {
+        newExecutionButton.fire();
     }
 }

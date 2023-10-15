@@ -179,7 +179,7 @@ public class Requests implements SceneController {
     }
 
     private void updateRequestTable() {
-        List<RequestsDetailsRow> requests = ServerApi.getInstance().getRequests();
+        List<RequestsDetailsRow> requests = ServerApi.getInstance().getRequestsRows();
         List<RequestsDetailsRow> added = requests.stream()
                 .filter(request -> !tableView.getItems().contains(request)).collect(Collectors.toList());
         List<RequestsDetailsRow> removed = tableView.getItems().stream()

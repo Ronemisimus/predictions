@@ -1,11 +1,14 @@
 package clientGui.util;
 
+import clientGui.execution.environment.EntityAmountGetter;
+import clientGui.execution.environment.EnvironmentVariableGetter;
+import clientGui.scene.details.ComparableDeserializer;
 import clientGui.scene.details.tree.WorldDetailsItem;
+import clientGui.scene.newExecution.RequestSelection;
 import clientGui.scene.requests.RequestsDetailsRow;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dto.ShowWorldDto;
-import clientGui.scene.details.ComparableDeserializer;
 import dto.subdto.requests.RequestDetailsDto;
 import dto.subdto.requests.RequestEntryDto;
 import javafx.application.Platform;
@@ -19,7 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class ServerApi {
@@ -197,7 +199,13 @@ public class ServerApi {
         }
     }
 
-    public List<RequestsDetailsRow> getRequests() {
+    public List<RequestsDetailsRow> getRequestsRows() {
+        return getRequests().stream()
+                .map(RequestsDetailsRow::new)
+                .collect(Collectors.toList());
+    }
+
+    private List<RequestDetailsDto> getRequests() {
         //noinspection KotlinInternalInJava
         Call call = client.newCall(new Request.Builder()
                 .url(HttpUrl.get(HOST).newBuilder()
@@ -213,15 +221,54 @@ public class ServerApi {
 
                 java.lang.reflect.Type listType = new com.google.gson.reflect.TypeToken<ArrayList<RequestDetailsDto>>(){}.getType();
 
-                List<RequestDetailsDto> requests = gson.fromJson(body, listType);
-                return requests.stream()
-                        .map(RequestsDetailsRow::new)
-                        .collect(Collectors.toList());
+                return gson.fromJson(body, listType);
             }
         } catch (Exception e) {
             Alert("Error", "Cannot get requests", "reason: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace(System.err);
         }
         return new ArrayList<>();
+    }
+
+    public List<EntityAmountGetter> getEntityAmounts() {
+        // TODO: implement
+        throw new RuntimeException("Not implemented");
+    }
+
+    public List<EnvironmentVariableGetter> getEnvironmentVariables() {
+        // TODO: implement
+        throw new RuntimeException("Not implemented");
+    }
+
+    public void runSimulation() {
+        // TODO: implement
+        throw new RuntimeException("Not implemented");
+    }
+
+    public void setEntityAmount(String name, int amount) {
+        // TODO: implement
+        throw new RuntimeException("Not implemented");
+    }
+
+    public void setEnvironmentVariable(String name, String value) {
+        // TODO: implement
+        throw new RuntimeException("Not implemented");
+    }
+
+    public List<RequestSelection> getApprovedOpenRequests() {
+        return getRequests().stream()
+                .filter(req->req.getStatus().equals("APPROVED_OPEN"))
+                .map(RequestSelection::new)
+                .collect(Collectors.toList());
+    }
+
+    public void stopRequest(int requestId) {
+        // TODO: implement
+        throw new RuntimeException("Not implemented");
+    }
+
+    public void addRequest(int requestId) {
+        // TODO: implement
+        throw new RuntimeException("Not implemented");
     }
 }
