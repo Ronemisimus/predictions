@@ -263,12 +263,54 @@ public class ServerApi {
     }
 
     public void stopRequest(int requestId) {
-        // TODO: implement
-        throw new RuntimeException("Not implemented");
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("cancelRequest")
+                        .addQueryParameter("requestId", String.valueOf(requestId))
+                        .addQueryParameter("username", username)
+                        .build())
+                .build());
+        try (Response response = call.execute()) {
+            if (response.isSuccessful()) {
+                Alert("Success",
+                        "Request Cancelled",
+                        "Your request has been cancelled", Alert.AlertType.INFORMATION);
+            }else{
+                Alert("Error", "Cannot cancel request",
+                        "reason: " + (response.body() != null ? response.body().string() : "unknown"), Alert.AlertType.ERROR);
+            }
+        } catch (IOException e) {
+            Alert("Error", "Cannot cancel request",
+                    "reason: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace(System.err);
+        }
     }
 
     public void addRequest(int requestId) {
-        // TODO: implement
-        throw new RuntimeException("Not implemented");
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("addRequest")
+                        .addQueryParameter("requestId", String.valueOf(requestId))
+                        .addQueryParameter("username", username)
+                        .build())
+                .build());
+
+        try (Response response = call.execute()) {
+            if (response.isSuccessful()) {
+                Alert("Success",
+                        "Request Added",
+                        "Your request has been added", Alert.AlertType.INFORMATION);
+            }else{
+                Alert("Error", "Cannot add request",
+                        "reason: " + (response.body() != null ? response.body().string() : "unknown"), Alert.AlertType.ERROR);
+            }
+        }
+        catch (IOException e) {
+            Alert("Error", "Cannot add request",
+                    "reason: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace(System.err);
+        }
     }
 }
