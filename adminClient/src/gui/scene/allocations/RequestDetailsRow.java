@@ -2,6 +2,7 @@ package gui.scene.allocations;
 
 import dto.subdto.requests.RequestDetailsDto;
 import gui.util.ServerApi;
+import gui.util.Username;
 import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -24,7 +25,7 @@ public class RequestDetailsRow {
 
     public RequestDetailsRow(RequestDetailsDto requestDetailsDto) {
         requestId = new SimpleIntegerProperty(requestDetailsDto.getRequestId());
-        requestingUser = new SimpleStringProperty(requestDetailsDto.getUsername());
+        requestingUser = new SimpleStringProperty(Username.unwrap(requestDetailsDto.getUsername()));
         worldName = new SimpleStringProperty(requestDetailsDto.getWorldName());
         runAmount = new SimpleIntegerProperty(requestDetailsDto.getRunAllocation());
         ticksTermination = new SimpleStringProperty(requestDetailsDto.getTickLimit()==null?"-":requestDetailsDto.getTickLimit().toString());
@@ -34,10 +35,13 @@ public class RequestDetailsRow {
         runsUsed = new SimpleIntegerProperty(requestDetailsDto.getRunsUsed());
         runsCompleted = new SimpleIntegerProperty(requestDetailsDto.getRunsCompleted());
         runsCurrentlyRunning = new SimpleIntegerProperty(requestDetailsDto.getRunsCurrentlyRunning());
-        approveButton = new SimpleObjectProperty<>(new Button("Approve"));
-        approveButton.getValue().setOnAction(this::approveButton);
-        rejectButton = new SimpleObjectProperty<>(new Button("Reject"));
-        rejectButton.getValue().setOnAction(this::rejectButton);
+        Button approveButton = new Button("Approve"), rejectButton = new Button("Reject");
+        approveButton.setDisable(!requestDetailsDto.getStatus().equals("WAITING"));
+        rejectButton.setDisable(!requestDetailsDto.getStatus().equals("WAITING"));
+        this.approveButton = new SimpleObjectProperty<>(approveButton);
+        this.approveButton.getValue().setOnAction(this::approveButton);
+        this.rejectButton = new SimpleObjectProperty<>(rejectButton);
+        this.rejectButton.getValue().setOnAction(this::rejectButton);
     }
 
     private void rejectButton(ActionEvent actionEvent) {

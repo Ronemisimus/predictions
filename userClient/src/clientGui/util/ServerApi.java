@@ -70,8 +70,8 @@ public class ServerApi {
 
     }
 
-    public boolean tryLogin() {
-        AtomicBoolean result = new AtomicBoolean(false);
+    public String tryLogin() {
+        String[] result = {null};
 
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Username Input");
@@ -91,11 +91,11 @@ public class ServerApi {
                 if (response.isSuccessful()) {
                     cookieManager.loadForRequest(call.request().url()).forEach(cookie -> {
                         if (cookie.name().equals("JSESSIONID")) {
-                            result.set(true);
+                            result[0] = this.username;
                         }
                     });
                 }
-                if (!result.get()) {
+                if (result[0] == null) {
                     String reason = response.body() != null ? response.body().string() : "unknown";
                     Alert("Error", "Cannot login","Reason: " + reason, Alert.AlertType.ERROR);
                 }
@@ -105,7 +105,7 @@ public class ServerApi {
             }
         });
 
-        return result.get();
+        return result[0];
     }
 
     public TreeItem<String> showLoadedWorld(String name) {

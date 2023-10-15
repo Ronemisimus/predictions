@@ -2,6 +2,7 @@ package clientGui;
 
 import clientGui.scene.main.MainScene;
 import clientGui.util.ServerApi;
+import clientGui.util.Username;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -25,9 +26,9 @@ public class UserApp extends Application {
      */
     @Override
     public void start(Stage primaryStage) throws Exception {
-        boolean res = ServerApi.getInstance().tryLogin();
-        if (res) {
-
+        String res = ServerApi.getInstance().tryLogin();
+        if (res!=null) {
+            primaryStage.setTitle("User: " + Username.unwrap(res));
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(MainScene.class.getResource("MainScene.fxml"));
             primaryStage.setScene(new Scene(loader.load()));

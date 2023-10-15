@@ -3,9 +3,14 @@ package clientGui.scene.requests;
 import clientGui.scene.SceneController;
 import clientGui.util.ServerApi;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.text.Text;
+import javafx.util.Callback;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -15,7 +20,9 @@ import java.util.stream.Collectors;
 
 public class Requests implements SceneController {
     @FXML
-    public TableView<RequestsDetailsRow> tableView;
+    private TableView<RequestsDetailsRow> tableView;
+    @FXML
+    private ScrollPane tableLimit;
     @FXML
     private ComboBox<String> worldNameComboBox;
     @FXML
@@ -66,31 +73,109 @@ public class Requests implements SceneController {
 
         submitButton.setOnAction(this::submitRequest);
         requestsController = this;
+
+        tableView.prefWidthProperty().bind(Bindings.max(1600, tableLimit.widthProperty().subtract(3)));
+        tableView.prefHeightProperty().bind(Bindings.max(600, tableLimit.heightProperty().subtract(3)));
     }
 
     private void initializeTableView() {
-        TableColumn<RequestsDetailsRow, Integer> idColumn = new TableColumn<>("Id");
-        idColumn.setCellValueFactory(cellData -> cellData.getValue().requestIdProperty().asObject());
-        TableColumn<RequestsDetailsRow, String> worldName = new TableColumn<>("World");
-        worldName.setCellValueFactory(cellData -> cellData.getValue().worldNameProperty());
-        TableColumn<RequestsDetailsRow, Integer> runAmount = new TableColumn<>("Runs Requested");
-        runAmount.setCellValueFactory(cellData -> cellData.getValue().runAmountProperty().asObject());
-        TableColumn<RequestsDetailsRow, String> ticksTermination = new TableColumn<>("Ticks Termination");
-        ticksTermination.setCellValueFactory(cellData -> cellData.getValue().ticksTerminationProperty());
-        TableColumn<RequestsDetailsRow, String> secondsTermination = new TableColumn<>("Seconds Termination");
-        secondsTermination.setCellValueFactory(cellData -> cellData.getValue().secondsTerminationProperty());
-        TableColumn<RequestsDetailsRow, Boolean> userTermination = new TableColumn<>("User Termination");
-        userTermination.setCellValueFactory(cellData -> cellData.getValue().userTerminationProperty().asObject());
-        TableColumn<RequestsDetailsRow, String> status = new TableColumn<>("Request Status");
-        status.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
-        TableColumn<RequestsDetailsRow, Integer> runsUsed = new TableColumn<>("Runs Used");
-        runsUsed.setCellValueFactory(cellData -> cellData.getValue().runsUsedProperty().asObject());
-        TableColumn<RequestsDetailsRow, Integer> runsCompleted = new TableColumn<>("Runs Completed");
-        runsCompleted.setCellValueFactory(cellData -> cellData.getValue().runsCompletedProperty().asObject());
-        TableColumn<RequestsDetailsRow, Integer> runsCurrentlyRunning = new TableColumn<>("Runs Currently Running");
-        runsCurrentlyRunning.setCellValueFactory(cellData -> cellData.getValue().runsCurrentlyRunningProperty().asObject());
+        TableColumn<RequestsDetailsRow, Integer> idColumn = getRequestDetailsRowIntegerTableColumn(
+                "Id",cellData -> cellData.getValue().requestIdProperty().asObject());
+        TableColumn<RequestsDetailsRow, String> worldName = getRequestDetailsRowStringTableColumn(
+                "World",cellData -> cellData.getValue().worldNameProperty());
+        TableColumn<RequestsDetailsRow, Integer> runAmount = getRequestDetailsRowIntegerTableColumn(
+                "Runs Requested",cellData -> cellData.getValue().runAmountProperty().asObject());
+        TableColumn<RequestsDetailsRow, String> ticksTermination = getRequestDetailsRowStringTableColumn(
+                "Ticks Termination",cellData -> cellData.getValue().ticksTerminationProperty());
+        TableColumn<RequestsDetailsRow, String> secondsTermination = getRequestDetailsRowStringTableColumn(
+                "Seconds Termination",cellData -> cellData.getValue().secondsTerminationProperty());
+        TableColumn<RequestsDetailsRow, Boolean> userTermination = getRequestDetailsRowBooleanTableColumn(
+                cellData -> cellData.getValue().userTerminationProperty().asObject());
+        TableColumn<RequestsDetailsRow, String> status = getRequestDetailsRowStringTableColumn(
+                "Request Status",cellData -> cellData.getValue().statusProperty());
+        TableColumn<RequestsDetailsRow, Integer> runsUsed = getRequestDetailsRowIntegerTableColumn(
+                "Runs Used",cellData -> cellData.getValue().runsUsedProperty().asObject());
+        TableColumn<RequestsDetailsRow, Integer> runsCompleted = getRequestDetailsRowIntegerTableColumn(
+                "Runs Completed",cellData -> cellData.getValue().runsCompletedProperty().asObject());
+        TableColumn<RequestsDetailsRow, Integer> runsCurrentlyRunning = getRequestDetailsRowIntegerTableColumn(
+                "Runs Currently Running",cellData -> cellData.getValue().runsCurrentlyRunningProperty().asObject());
         //noinspection unchecked
         tableView.getColumns().addAll(idColumn, worldName, runAmount, ticksTermination, secondsTermination, userTermination, status, runsUsed, runsCompleted, runsCurrentlyRunning);
+
+        tableView.getColumns().forEach(col->updateColumnWidth(col, col.getText()));
+
+    }
+
+    @NotNull
+    private static TableColumn<RequestsDetailsRow, String> getRequestDetailsRowStringTableColumn(
+            String title,
+            Callback<TableColumn.CellDataFeatures<RequestsDetailsRow,String>, ObservableValue<String>> cell
+    ) {
+        TableColumn<RequestsDetailsRow, String> userColumn = new TableColumn<>(title);
+        userColumn.setCellValueFactory(cell);
+        userColumn.setCellFactory((column)-> new TableCell<RequestsDetailsRow, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                } else {
+                    setText(item);
+                    updateColumnWidth(getTableColumn(), item);
+                }
+            }
+        });
+        return userColumn;
+    }
+
+    private static void updateColumnWidth(TableColumn<RequestsDetailsRow, ?> tableColumn, String item) {
+        Text text = new Text(item);
+        double width = text.getLayoutBounds().getWidth() + 50;
+        double width2 = tableColumn.getWidth();
+        width = Math.max(width, width2);
+        tableColumn.setPrefWidth(width);
+    }
+
+    @NotNull
+    private static TableColumn<RequestsDetailsRow, Boolean> getRequestDetailsRowBooleanTableColumn(
+            Callback<TableColumn.CellDataFeatures<RequestsDetailsRow,Boolean>, ObservableValue<Boolean>> cell
+    ) {
+        TableColumn<RequestsDetailsRow, Boolean> userColumn = new TableColumn<>("User Termination");
+        userColumn.setCellValueFactory(cell);
+        userColumn.setCellFactory((column)-> new TableCell<RequestsDetailsRow, Boolean>() {
+            @Override
+            protected void updateItem(Boolean item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                } else {
+                    setText(item.toString());
+                    updateColumnWidth(getTableColumn(), item.toString());
+                }
+            }
+        });
+        return userColumn;
+    }
+
+    @NotNull
+    private static TableColumn<RequestsDetailsRow, Integer> getRequestDetailsRowIntegerTableColumn(
+            String title,
+            Callback<TableColumn.CellDataFeatures<RequestsDetailsRow,Integer>, ObservableValue<Integer>> cell) {
+        TableColumn<RequestsDetailsRow, Integer> idColumn = new TableColumn<>(title);
+        idColumn.setCellValueFactory(cell);
+        idColumn.setCellFactory(cellData -> new TableCell<RequestsDetailsRow, Integer>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                } else {
+                    setText(String.valueOf(item));
+                    updateColumnWidth(getTableColumn(), String.valueOf(item));
+                }
+            }
+        });
+        return idColumn;
     }
 
     private void updateRequestTable() {

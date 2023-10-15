@@ -33,7 +33,11 @@
             <Button fx:id="submitButton" text="Submit" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
         </AnchorPane>
         <AnchorPane>
-            <TableView fx:id="tableView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+         <ScrollPane fx:id="tableLimit" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <content>
+                  <TableView fx:id="tableView" />
+            </content>
+         </ScrollPane>
         </AnchorPane>
     </SplitPane>
 </AnchorPane>

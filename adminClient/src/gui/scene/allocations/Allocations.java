@@ -36,7 +36,7 @@ public class Allocations implements SceneController {
         allocationsController = this;
         requestsGetter = Executors.newScheduledThreadPool(1);
         requestsGetter.scheduleAtFixedRate(this::updateTable, 0, 1000, TimeUnit.MILLISECONDS);
-        //tableView.prefWidthProperty().bind(Bindings.max(900, mainRoot.widthProperty().subtract(3)));
+        tableView.prefWidthProperty().bind(Bindings.max(1800, mainRoot.widthProperty().subtract(3)));
         tableView.prefHeightProperty().bind(Bindings.max(600, mainRoot.heightProperty().subtract(3)));
         initializeTable();
     }

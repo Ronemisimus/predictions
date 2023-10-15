@@ -25,6 +25,7 @@ public class AdminApp extends Application {
      */
     @Override
     public void start(Stage primaryStage) throws Exception {
+        primaryStage.setTitle("Admin");
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(MainScene.class.getResource("MainScene.fxml"));
         primaryStage.setScene(new Scene(loader.load()));
