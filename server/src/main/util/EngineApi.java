@@ -1,8 +1,10 @@
 package main.util;
 
+import dto.EnvDto;
 import dto.ReadFileDto;
 import dto.RunHistoryDto;
 import dto.ShowWorldDto;
+import dto.subdto.show.world.EntityDto;
 import predictions.MainApi;
 import predictions.MainApiImpl;
 
@@ -40,5 +42,29 @@ public class EngineApi {
 
     public List<String> getLoadedWorlds() {
         return mainApi.getLoadedWorlds();
+    }
+
+    public void setSimulation(String username, String worldName) {
+        mainApi.setClientContainer(username, worldName);
+    }
+
+    public void clearSimulation(String username) {
+        mainApi.setClientContainer(username, null);
+    }
+
+    public EnvDto getEnv(String username) {
+        return mainApi.getEnv(username);
+    }
+
+    public void setEnvironmentVariable(String username, String name, Comparable<?> value) {
+        mainApi.setEnv(username, name, value);
+    }
+
+    public List<EntityDto> getEntities(String username) {
+        return mainApi.getEntityDefinitionCounts(username);
+    }
+
+    public void setEntityAmount(String username, String name, int amount) {
+        mainApi.setEntityAmount(username, name, amount);
     }
 }

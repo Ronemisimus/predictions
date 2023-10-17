@@ -1,5 +1,7 @@
 package dto.subdto.requests;
 
+import java.util.Objects;
+
 public class RequestDetailsDto {
     int requestId;
     String worldName;
@@ -145,5 +147,18 @@ public class RequestDetailsDto {
             this.runsCurrentlyRunning = runsCurrentlyRunning;
             return this;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RequestDetailsDto that = (RequestDetailsDto) o;
+        return requestId == that.requestId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(requestId);
     }
 }

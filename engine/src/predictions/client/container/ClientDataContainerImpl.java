@@ -79,6 +79,12 @@ public class ClientDataContainerImpl implements ClientDataContainer {
             {
                 envValues.put(name, value);
             }
+            else {
+                throw new RuntimeException("Illegal value");
+            }
+        }
+        else {
+            throw new RuntimeException("Invalid environment variable name");
         }
     }
 

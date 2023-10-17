@@ -12,7 +12,7 @@ public interface MainApi {
     ReadFileDto readFile(String content);
     ShowWorldDto showLoadedWorld(String name);
 
-    EnvDto getEnv();
+    EnvDto getEnv(String username);
     void runSimulation(String name);
 
     RunHistoryDto getRunHistory();
@@ -23,11 +23,11 @@ public interface MainApi {
     
     SingleRunHistoryDto getRunPropertyHistogram(int runId, String entityName, String propertyName);
 
-    void setEnv(String name, Comparable<?> value);
+    void setEnv(String username, String name, Comparable<?> value);
 
-    List<EntityDto> getEntityDefinitionCounts();
+    List<EntityDto> getEntityDefinitionCounts(String username);
 
-    void setEntityAmount(String name, int i);
+    void setEntityAmount(String username, String name, int count);
 
     void unload() throws InterruptedException;
 
@@ -43,9 +43,11 @@ public interface MainApi {
 
     EntityListDto getCurrentEntityAmounts(Integer identifier);
 
-    void copyEnvironment(Integer identifier);
+    void copyEnvironment(String username, Integer identifier);
 
     void setThreadCount(int threadCount);
 
     List<String> getLoadedWorlds();
+
+    void setClientContainer(String username, String worldName);
 }

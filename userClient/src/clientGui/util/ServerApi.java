@@ -8,9 +8,13 @@ import clientGui.scene.newExecution.RequestSelection;
 import clientGui.scene.requests.RequestsDetailsRow;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+import dto.EnvDto;
 import dto.ShowWorldDto;
 import dto.subdto.requests.RequestDetailsDto;
 import dto.subdto.requests.RequestEntryDto;
+import dto.subdto.show.world.EntityDto;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextInputDialog;
@@ -19,6 +23,7 @@ import javafx.scene.text.Text;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -148,10 +153,10 @@ public class ServerApi {
         try (Response response = call.execute()) {
             Gson gson = new Gson();
             if (response.body() != null) {
-                //noinspection unchecked
-                return (List<String>)gson.fromJson(response.body().string(), ArrayList.class);
+                Type type = new TypeToken<List<String>>(){}.getType();
+                return gson.fromJson(response.body().string(), type);
             }
-        }catch (IOException e) {
+        }catch (IOException | JsonSyntaxException e) {
             Alert("Error", "Cannot get loaded worlds", "reason: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace(System.err);
         }
@@ -231,13 +236,71 @@ public class ServerApi {
     }
 
     public List<EntityAmountGetter> getEntityAmounts() {
-        // TODO: implement
-        throw new RuntimeException("Not implemented");
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("getEntityAmounts")
+                        .addQueryParameter("username", username)
+                        .build())
+                .build());
+
+        try (Response response = call.execute()) {
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(Comparable.class, new ComparableDeserializer())
+                    .create();
+            if (response.isSuccessful() && response.body() != null) {
+                String body = response.body().string();
+                Type type = new TypeToken<List<EntityDto>>(){}.getType();
+                List<EntityDto> entities = gson.fromJson(body, type);
+                return entities.stream()
+                        .map(EntityAmountGetter::new)
+                        .collect(Collectors.toList());
+            }
+            else {
+                Alert("Error", "Cannot get entity amounts",
+                        "reason: " + (response.body() != null ? response.body().string() : "unknown"), Alert.AlertType.ERROR);
+            }
+        }
+        catch (IOException | JsonSyntaxException e) {
+            Alert("Error", "Cannot get entity amounts",
+                    "reason: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace(System.err);
+        }
+        return new ArrayList<>();
     }
 
     public List<EnvironmentVariableGetter> getEnvironmentVariables() {
-        // TODO: implement
-        throw new RuntimeException("Not implemented");
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("getEnvironmentVariables")
+                        .addQueryParameter("username", username)
+                        .build())
+                .build());
+
+        try (Response response = call.execute()) {
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(Comparable.class, new ComparableDeserializer())
+                    .create();
+            if (response.isSuccessful() && response.body() != null) {
+                String body = response.body().string();
+                Type type = new TypeToken<EnvDto>(){}.getType();
+                EnvDto env = gson.fromJson(body, type);
+                return env.getEnvironment().stream()
+                        .map(EnvironmentVariableGetter::new)
+                        .collect(Collectors.toList());
+            }
+            else {
+                Alert("Error", "Cannot get environment variables",
+                        "reason: " + (response.body() != null ? response.body().string() : "unknown"), Alert.AlertType.ERROR);
+            }
+        }
+        catch (IOException | JsonSyntaxException e) {
+            Alert("Error", "Cannot get environment variables",
+                    "reason: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace(System.err);
+        }
+        return new ArrayList<>();
     }
 
     public void runSimulation() {
@@ -246,13 +309,53 @@ public class ServerApi {
     }
 
     public void setEntityAmount(String name, int amount) {
-        // TODO: implement
-        throw new RuntimeException("Not implemented");
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("setEntityAmount")
+                        .addQueryParameter("username", username)
+                        .addQueryParameter("name", name)
+                        .addQueryParameter("amount", String.valueOf(amount))
+                        .build())
+                .build());
+
+        try (Response response = call.execute()) {
+            if (!response.isSuccessful()) {
+                Alert("Error", "Cannot set entity amount",
+                        "reason: " + (response.body() != null ? response.body().string() : "unknown"), Alert.AlertType.ERROR);
+                throw new RuntimeException("Cannot set entity amount");
+            }
+        }
+        catch (IOException e) {
+            Alert("Error", "Cannot set entity amount",
+                    "reason: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace(System.err);
+            throw new RuntimeException(e);
+        }
     }
 
     public void setEnvironmentVariable(String name, String value) {
-        // TODO: implement
-        throw new RuntimeException("Not implemented");
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("setEnvironmentVariable")
+                        .addQueryParameter("username", username)
+                        .addQueryParameter("name", name)
+                        .addQueryParameter("value", value)
+                        .build())
+                .build());
+
+        try (Response response = call.execute()) {
+            if (!response.isSuccessful()) {
+                Alert("Error", "Cannot set environment variable",
+                        "reason: " + (response.body() != null ? response.body().string() : "unknown"), Alert.AlertType.ERROR);
+                throw new RuntimeException("Cannot set environment variable");
+            }
+        } catch (IOException e) {
+            Alert("Error", "Cannot set environment variable",
+                    "reason: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace(System.err);
+        }
     }
 
     public List<RequestSelection> getApprovedOpenRequests() {
@@ -262,21 +365,17 @@ public class ServerApi {
                 .collect(Collectors.toList());
     }
 
-    public void stopRequest(int requestId) {
+    public void clearSimulation(int requestId) {
         //noinspection KotlinInternalInJava
         Call call = client.newCall(new Request.Builder()
                 .url(HttpUrl.get(HOST).newBuilder()
-                        .addPathSegment("cancelRequest")
+                        .addPathSegment("clearSimulation")
                         .addQueryParameter("requestId", String.valueOf(requestId))
                         .addQueryParameter("username", username)
                         .build())
                 .build());
         try (Response response = call.execute()) {
-            if (response.isSuccessful()) {
-                Alert("Success",
-                        "Request Cancelled",
-                        "Your request has been cancelled", Alert.AlertType.INFORMATION);
-            }else{
+            if (!response.isSuccessful()) {
                 Alert("Error", "Cannot cancel request",
                         "reason: " + (response.body() != null ? response.body().string() : "unknown"), Alert.AlertType.ERROR);
             }
@@ -287,22 +386,18 @@ public class ServerApi {
         }
     }
 
-    public void addRequest(int requestId) {
+    public void setSimulation(int requestId) {
         //noinspection KotlinInternalInJava
         Call call = client.newCall(new Request.Builder()
                 .url(HttpUrl.get(HOST).newBuilder()
-                        .addPathSegment("addRequest")
+                        .addPathSegment("setSimulation")
                         .addQueryParameter("requestId", String.valueOf(requestId))
                         .addQueryParameter("username", username)
                         .build())
                 .build());
 
         try (Response response = call.execute()) {
-            if (response.isSuccessful()) {
-                Alert("Success",
-                        "Request Added",
-                        "Your request has been added", Alert.AlertType.INFORMATION);
-            }else{
+            if (!response.isSuccessful()) {
                 Alert("Error", "Cannot add request",
                         "reason: " + (response.body() != null ? response.body().string() : "unknown"), Alert.AlertType.ERROR);
             }

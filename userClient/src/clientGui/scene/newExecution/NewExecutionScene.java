@@ -5,6 +5,7 @@ import clientGui.execution.environment.EnvironmentVariableGetter;
 import clientGui.scene.SceneController;
 import clientGui.scene.main.MainScene;
 import clientGui.util.ServerApi;
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -54,22 +55,31 @@ public class NewExecutionScene implements SceneController {
     }
 
     private void selectionChanged(Observable observable, RequestSelection oldValue, RequestSelection newValue) {
-        if (oldValue != null) ServerApi.getInstance().stopRequest(oldValue.getRequestId());
-        if (newValue != null) {
-            ServerApi.getInstance().addRequest(newValue.getRequestId());
-            List<EntityAmountGetter> roots = ServerApi.getInstance().getEntityAmounts();
-            VBox res = new VBox();
-            res.getChildren().addAll(roots);
-            leftPane.setCenter(res);
+        System.out.println("selection changed");
+        new Thread(() -> {
 
-            List<EnvironmentVariableGetter> environmentVariables = ServerApi.getInstance().getEnvironmentVariables();
-            VBox env = new VBox();
-            env.getChildren().addAll(environmentVariables);
-            centerPane.setCenter(env);
-        }
+            if (oldValue != null) {
+                ServerApi.getInstance().clearSimulation(oldValue.getRequestId());
+            }
+            if (newValue != null) {
+                ServerApi.getInstance().setSimulation(newValue.getRequestId());
+                List<EntityAmountGetter> roots = ServerApi.getInstance().getEntityAmounts();
+                List<EnvironmentVariableGetter> environmentVariables = ServerApi.getInstance().getEnvironmentVariables();
+                Platform.runLater(() -> {
+                    VBox res = new VBox();
+                    res.getChildren().addAll(roots);
+                    leftPane.setCenter(res);
+                    VBox env = new VBox();
+                    env.getChildren().addAll(environmentVariables);
+                    centerPane.setCenter(env);
+                    requestSelected.setValue(newValue);
+                });
+            }
+        }).start();
     }
 
     private void updateRequestSelected() {
+        System.out.println("update request selected");
         List<RequestSelection> requests = ServerApi.getInstance().getApprovedOpenRequests();
         List<RequestSelection> added = requests.stream()
                 .filter(name -> !requestSelected.getItems().contains(name))
@@ -77,12 +87,14 @@ public class NewExecutionScene implements SceneController {
         List<RequestSelection> removed = requestSelected.getItems().stream()
                 .filter(name -> !requests.contains(name))
                 .collect(Collectors.toList());
-        requestSelected.getItems().addAll(added);
-        requestSelected.getItems().removeAll(removed);
+        Platform.runLater(()-> {
+            requestSelected.getItems().addAll(added);
+            requestSelected.getItems().removeAll(removed);
+        });
     }
 
     private void handleClearButtonClick(ActionEvent event) {
-        if (requestSelected.getValue() != null) ServerApi.getInstance().stopRequest(requestSelected.getValue().getRequestId());
+        if (requestSelected.getValue() != null) ServerApi.getInstance().clearSimulation(requestSelected.getValue().getRequestId());
         //noinspection DataFlowIssue
         MainScene.getInstance(null).fireNewExecutionButton();
     }

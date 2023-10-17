@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 public class MainApiImpl implements MainApi {
 
     private final Map<String,World> possibleWorlds;
-    private ClientDataContainer clientDataContainer;
+    private Map<String,ClientDataContainer> clientDataContainer;
 
     private final SimulationManager simulationManager;
 
@@ -42,7 +42,7 @@ public class MainApiImpl implements MainApi {
         possibleWorlds = new HashMap<>();
         simulationManager = SimulationManagerImpl.getInstance();
         simulationManager.initializeThreadPool(1);
-        clientDataContainer = null;
+        clientDataContainer = new HashMap<>();
     }
 
     @Override
@@ -63,7 +63,6 @@ public class MainApiImpl implements MainApi {
         ReadFileDto.Builder builder = new ReadFileDto.Builder().matchesSchema(true);
         try {
             World loaded = WorldImpl.fromPRD(res, builder);
-            clientDataContainer = new ClientDataContainerImpl(loaded);
             possibleWorlds.put(loaded.getName(), loaded);
             builder.name(loaded.getName());
         } catch (Exception e)
@@ -83,8 +82,8 @@ public class MainApiImpl implements MainApi {
     }
 
     @Override
-    public EnvDto getEnv() {
-        return new EnvDto(clientDataContainer.getEnv());
+    public EnvDto getEnv(String username) {
+        return new EnvDto(clientDataContainer.get(username).getEnv());
     }
 
     public void runSimulation(String name) {
@@ -92,7 +91,6 @@ public class MainApiImpl implements MainApi {
         if (selected == null) return;
         WorldInstance activeWorld = new WorldInstanceImpl(selected, (ClientDataContainerImpl) clientDataContainer);
         simulationManager.addSimulation(activeWorld);
-        clientDataContainer = new ClientDataContainerImpl((ClientDataContainerImpl) clientDataContainer);
     }
 
     @Override
@@ -132,18 +130,18 @@ public class MainApiImpl implements MainApi {
     }
 
     @Override
-    public void setEnv(String name, Comparable<?> value) {
-        clientDataContainer.setEnv(name, value);
+    public void setEnv(String username, String name, Comparable<?> value) {
+        clientDataContainer.get(username).setEnv(name, value);
     }
 
     @Override
-    public List<EntityDto> getEntityDefinitionCounts() {
-        return clientDataContainer.getEntityCounts();
+    public List<EntityDto> getEntityDefinitionCounts(String username) {
+        return clientDataContainer.get(username).getEntityCounts();
     }
 
     @Override
-    public void setEntityAmount(String name, int i) {
-        clientDataContainer.setEntityAmount(name, i);
+    public void setEntityAmount(String username, String name, int count) {
+        clientDataContainer.get(username).setEntityAmount(name, count);
     }
 
     @Override
@@ -192,9 +190,9 @@ public class MainApiImpl implements MainApi {
     }
 
     @Override
-    public void copyEnvironment(Integer identifier) {
+    public void copyEnvironment(String username, Integer identifier) {
         ClientDataContainerImpl res = simulationManager.getEnvironment(identifier);
-        this.clientDataContainer = new ClientDataContainerImpl(res);
+        this.clientDataContainer.put(username, new ClientDataContainerImpl(res));
     }
 
     @Override
@@ -205,5 +203,14 @@ public class MainApiImpl implements MainApi {
     @Override
     public List<String> getLoadedWorlds() {
         return new ArrayList<>(possibleWorlds.keySet());
+    }
+
+    @Override
+    public void setClientContainer(String username, String worldName) {
+        if (worldName!=null) {
+            clientDataContainer.put(username, new ClientDataContainerImpl(possibleWorlds.get(worldName)));
+        }else{
+            clientDataContainer.remove(username);
+        }
     }
 }

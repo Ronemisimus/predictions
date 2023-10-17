@@ -12,11 +12,7 @@ public class SimpleCookieManager implements CookieJar {
 
     private final static String CACHE_MANAGER_PREFIX = "    [Cookie Manager] ---> ";
     Map<String, Map<String, Cookie>> cookies = new HashMap<>();
-    private Consumer<String> logData = System.out::println;
-
-    public void setLogData(Consumer<String> logData) {
-        this.logData = logData;
-    }
+    private final Consumer<String> logData = System.out::println;
 
     @NotNull
     @Override
@@ -50,9 +46,4 @@ public class SimpleCookieManager implements CookieJar {
         }
     }
 
-    public void removeCookiesOf(String domain) {
-        synchronized (this) {
-            cookies.remove(domain);
-        }
-    }
 }
