@@ -100,9 +100,11 @@ public class NewExecutionScene implements SceneController {
     }
 
     private void handleStartButtonClick(ActionEvent event) {
-        ServerApi.getInstance().runSimulation();
-        //noinspection DataFlowIssue
-        MainScene.getInstance(null).fireResultsButton();
+        try {
+            ServerApi.getInstance().runSimulation();
+            //noinspection DataFlowIssue
+            MainScene.getInstance(null).fireResultsButton();
+        }catch (Exception ignored){}
     }
 
     @Override

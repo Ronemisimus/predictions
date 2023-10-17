@@ -17,4 +17,6 @@ public interface ClientDataContainer {
     List<PropertyDto> getEnv();
 
     List<EntityDto> getEntityCounts();
+
+    String getWorld();
 }

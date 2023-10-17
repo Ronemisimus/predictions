@@ -13,7 +13,7 @@ public interface MainApi {
     ShowWorldDto showLoadedWorld(String name);
 
     EnvDto getEnv(String username);
-    void runSimulation(String name);
+    void runSimulation(String username);
 
     RunHistoryDto getRunHistory();
 

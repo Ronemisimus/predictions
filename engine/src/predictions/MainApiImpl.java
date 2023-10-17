@@ -86,10 +86,11 @@ public class MainApiImpl implements MainApi {
         return new EnvDto(clientDataContainer.get(username).getEnv());
     }
 
-    public void runSimulation(String name) {
-        World selected = possibleWorlds.get(name);
+    public void runSimulation(String username) {
+        ClientDataContainer cdc = clientDataContainer.get(username);
+        World selected = possibleWorlds.get(cdc.getWorld());
         if (selected == null) return;
-        WorldInstance activeWorld = new WorldInstanceImpl(selected, (ClientDataContainerImpl) clientDataContainer);
+        WorldInstance activeWorld = new WorldInstanceImpl(selected, (ClientDataContainerImpl) cdc);
         simulationManager.addSimulation(activeWorld);
     }
 

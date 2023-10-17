@@ -20,7 +20,10 @@ public class ClientDataContainerImpl implements ClientDataContainer {
 
     private final Map<String, EntityDefinition> entityDefinitions;
 
+    private final String world;
+
     public ClientDataContainerImpl(World world) {
+        this.world = world.getName();
         gridHeight = world.getGridHeight();
         gridWidth = world.getGridWidth();
 
@@ -44,6 +47,7 @@ public class ClientDataContainerImpl implements ClientDataContainer {
     }
 
     public ClientDataContainerImpl(ClientDataContainerImpl clientDataContainer) {
+        world = clientDataContainer.world;
         gridHeight = clientDataContainer.gridHeight;
         gridWidth = clientDataContainer.gridWidth;
         envValues = new HashMap<>(clientDataContainer.envValues);
@@ -110,5 +114,10 @@ public class ClientDataContainerImpl implements ClientDataContainer {
                 .map(EntityDefinition::getDto)
                 .map(dto -> new EntityDto(dto.getProps(), dto.getName(), entityAmounts.get(dto.getName())))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getWorld() {
+        return world;
     }
 }

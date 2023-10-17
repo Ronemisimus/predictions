@@ -67,4 +67,8 @@ public class EngineApi {
     public void setEntityAmount(String username, String name, int amount) {
         mainApi.setEntityAmount(username, name, amount);
     }
+
+    public void runSimulation(String username) {
+        mainApi.runSimulation(username);
+    }
 }

@@ -304,8 +304,25 @@ public class ServerApi {
     }
 
     public void runSimulation() {
-        // TODO: implement
-        throw new RuntimeException("Not implemented");
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("runSimulation")
+                        .addQueryParameter("username", username)
+                        .build())
+                .build());
+
+        try (Response response = call.execute()) {
+            if (!response.isSuccessful()) {
+                Alert("Error", "Cannot run simulation",
+                        "reason: " + (response.body() != null ? response.body().string() : "unknown"), Alert.AlertType.ERROR);
+                throw new RuntimeException("Cannot run simulation");
+            }
+        }catch (IOException e) {
+            Alert("Error", "Cannot run simulation",
+                    "reason: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace(System.err);
+        }
     }
 
     public void setEntityAmount(String name, int amount) {
