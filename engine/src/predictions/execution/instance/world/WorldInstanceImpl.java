@@ -390,6 +390,11 @@ public class WorldInstanceImpl implements WorldInstance{
     }
 
     @Override
+    public void setTerminations(boolean userTermination, Integer ticksLimit, Integer secondsLimit) {
+        this.world.setTerminations(userTermination, ticksLimit, secondsLimit);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

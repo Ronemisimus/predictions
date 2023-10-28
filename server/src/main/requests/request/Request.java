@@ -14,4 +14,9 @@ public interface Request {
     RequestStatus reject();
     String requestingUser();
     boolean isValid();
+    void addRun(Integer id);
+
+    int getRunsCurrentlyRunning();
+
+    int getRunsCompleted();
 }

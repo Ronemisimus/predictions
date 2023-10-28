@@ -6,6 +6,7 @@ import main.util.EngineApi;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class RequestImpl implements Request {
 
@@ -18,10 +19,13 @@ public class RequestImpl implements Request {
     private final Integer tickLimit, secondsLimit;
     private RequestStatus status;
 
+    private final List<Integer> runsRelatedToRequest;
+
     public RequestImpl(RequestEntryDto request) {
         this.worldName = request.getWorldName();
         this.runAllocation = request.getRunAllocation() == null ? 0 : request.getRunAllocation()>0?request.getRunAllocation():0;
         this.terminationTypes = new ArrayList<>();
+        this.runsRelatedToRequest = new ArrayList<>();
         if (request.isUserTermination()) this.terminationTypes.add(TerminationType.USER);
         if (request.getTickLimit()!=null) this.terminationTypes.add(TerminationType.TICKS);
         if (request.getSecondsLimit()!=null) this.terminationTypes.add(TerminationType.SECONDS);
@@ -110,5 +114,29 @@ public class RequestImpl implements Request {
         if (requestingUser == null) res = false;
         if (res && !UserManager.getInstance().userExists(requestingUser)) res = false;
         return res;
+    }
+
+    @Override
+    public void addRun(Integer id) {
+        runsRelatedToRequest.add(id);
+        if (runsRelatedToRequest.size() == runAllocation) {
+            status = RequestStatus.APPROVED_CLOSED;
+        }
+    }
+
+    @Override
+    public int getRunsCurrentlyRunning() {
+        return Math.toIntExact(
+                EngineApi.getInstance().getRunStates().getRunStates().entrySet().stream()
+                .filter(run -> (runsRelatedToRequest.contains(run.getKey()) && run.getValue().getRunning() || run.getValue().getPaused()))
+                .count());
+    }
+
+    @Override
+    public int getRunsCompleted() {
+        return Math.toIntExact(
+                EngineApi.getInstance().getRunStates().getRunStates().entrySet().stream()
+                        .filter(run -> (runsRelatedToRequest.contains(run.getKey()) && !run.getValue().getRunning() && !run.getValue().getPaused()))
+                        .count());
     }
 }

@@ -5,10 +5,7 @@ import dto.subdto.requests.RequestEntryDto;
 import main.requests.request.Request;
 import main.requests.request.RequestImpl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class RequestManagerImpl implements RequestManager {
@@ -16,14 +13,9 @@ public class RequestManagerImpl implements RequestManager {
     private static final RequestManagerImpl instance = new RequestManagerImpl();
 
     private final Map<Integer, Request> requests;
-    private final Map<Integer, Integer> completedRuns;
-
-    private final Map<Integer,Integer> runsCurrentlyRunning;
 
     private RequestManagerImpl(){
         requests = new HashMap<>();
-        completedRuns = new HashMap<>();
-        runsCurrentlyRunning = new HashMap<>();
     }
 
     public static synchronized RequestManagerImpl getInstance(){
@@ -39,8 +31,6 @@ public class RequestManagerImpl implements RequestManager {
     public synchronized Request addRequest(RequestEntryDto request) {
         Request req = new RequestImpl(request);
         requests.put(req.getRequestId(), req);
-        completedRuns.put(req.getRequestId(),0);
-        runsCurrentlyRunning.put(req.getRequestId(),0);
         return req;
     }
 
@@ -69,11 +59,21 @@ public class RequestManagerImpl implements RequestManager {
 
     @Override
     public synchronized int getRunsCurrentlyRunning(int requestId) {
-        return runsCurrentlyRunning.get(requestId);
+        Request req = requests.get(requestId);
+        if (req == null){
+            return 0;
+        }
+
+        return req.getRunsCurrentlyRunning();
     }
 
     @Override
     public synchronized int getRunsCompleted(int requestId) {
-        return completedRuns.get(requestId);
+        Request req = requests.get(requestId);
+        if (req == null){
+            return 0;
+        }
+
+        return req.getRunsCompleted();
     }
 }

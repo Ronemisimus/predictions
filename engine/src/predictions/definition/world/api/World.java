@@ -35,4 +35,6 @@ public interface World {
     int getGridWidth();
 
     int getGridHeight();
+
+    void setTerminations(boolean userTermination, Integer ticksLimit, Integer secondsLimit);
 }

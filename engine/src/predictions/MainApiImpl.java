@@ -86,12 +86,13 @@ public class MainApiImpl implements MainApi {
         return new EnvDto(clientDataContainer.get(username).getEnv());
     }
 
-    public void runSimulation(String username) {
+    public Integer runSimulation(String username) {
         ClientDataContainer cdc = clientDataContainer.get(username);
         World selected = possibleWorlds.get(cdc.getWorld());
-        if (selected == null) return;
+        if (selected == null) return null;
         WorldInstance activeWorld = new WorldInstanceImpl(selected, (ClientDataContainerImpl) cdc);
         simulationManager.addSimulation(activeWorld);
+        return activeWorld.getRunIdentifiers().getKey();
     }
 
     @Override
@@ -213,5 +214,10 @@ public class MainApiImpl implements MainApi {
         }else{
             clientDataContainer.remove(username);
         }
+    }
+
+    @Override
+    public void setTermination(String username, boolean userTermination, Integer ticksLimit, Integer secondsLimit) {
+        clientDataContainer.get(username).setTermination(userTermination, ticksLimit, secondsLimit);
     }
 }

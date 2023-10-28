@@ -5,6 +5,10 @@ import dto.ReadFileDto;
 import dto.RunHistoryDto;
 import dto.ShowWorldDto;
 import dto.subdto.show.world.EntityDto;
+import main.requests.request.Request;
+import main.requests.request.TerminationType;
+import main.requests.requestManager.RequestManager;
+import main.simulation.UserRequestManager;
 import predictions.MainApi;
 import predictions.MainApiImpl;
 
@@ -69,6 +73,13 @@ public class EngineApi {
     }
 
     public void runSimulation(String username) {
-        mainApi.runSimulation(username);
+        Integer requestId = UserRequestManager.getInstance().getRequestId(username);
+        Request request = RequestManager.getInstance().getRequest(requestId);
+        mainApi.setTermination(username,
+                request.getTerminationTypes().contains(TerminationType.USER),
+                request.getTickLimit(),
+                request.getSecondsLimit());
+        Integer id = mainApi.runSimulation(username);
+        request.addRun(id);
     }
 }

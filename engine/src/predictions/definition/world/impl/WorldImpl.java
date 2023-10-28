@@ -154,6 +154,13 @@ public class WorldImpl implements World {
     }
 
     @Override
+    public void setTerminations(boolean userTermination, Integer ticksLimit, Integer secondsLimit) {
+        if (userTermination) this.terminations.add(new UserTermination());
+        if (ticksLimit != null) this.terminations.add(new TicksTermination(ticksLimit));
+        if (secondsLimit != null) this.terminations.add(new TimeTermination(Duration.ofSeconds(secondsLimit)));
+    }
+
+    @Override
     public WorldDto getDto() {
         final List<PropertyDto> env = this.envVariablesManager.getEnvVariables().stream().map(PropertyDefinition::getDto).collect(Collectors.toList());
         final List<EntityDto> entities = this.entityDefinitions.stream().map(EntityDefinition::getDto).collect(Collectors.toList());

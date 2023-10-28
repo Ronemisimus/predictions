@@ -13,7 +13,7 @@ public interface MainApi {
     ShowWorldDto showLoadedWorld(String name);
 
     EnvDto getEnv(String username);
-    void runSimulation(String username);
+    Integer runSimulation(String username);
 
     RunHistoryDto getRunHistory();
 
@@ -50,4 +50,6 @@ public interface MainApi {
     List<String> getLoadedWorlds();
 
     void setClientContainer(String username, String worldName);
+
+    void setTermination(String username, boolean terminationTypes, Integer tickLimit, Integer tickLimit1);
 }

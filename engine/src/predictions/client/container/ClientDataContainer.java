@@ -19,4 +19,10 @@ public interface ClientDataContainer {
     List<EntityDto> getEntityCounts();
 
     String getWorld();
+
+    boolean isUserTermination();
+    Integer getTicksLimit();
+    Integer getSecondsLimit();
+
+    void setTermination(boolean userTermination, Integer ticksLimit, Integer secondsLimit);
 }

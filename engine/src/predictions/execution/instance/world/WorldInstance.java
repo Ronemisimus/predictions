@@ -46,4 +46,6 @@ public interface WorldInstance extends Runnable {
     ClientDataContainerImpl getClientContainer();
 
     Iterator<Termination> getTerminations();
+
+    void setTerminations(boolean userTermination, Integer ticksLimit, Integer secondsLimit);
 }

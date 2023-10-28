@@ -20,6 +20,11 @@ public class ClientDataContainerImpl implements ClientDataContainer {
 
     private final Map<String, EntityDefinition> entityDefinitions;
 
+    private boolean userTermination;
+    private Integer ticksLimit;
+
+    private Integer secondsLimit;
+
     private final String world;
 
     public ClientDataContainerImpl(World world) {
@@ -31,6 +36,10 @@ public class ClientDataContainerImpl implements ClientDataContainer {
         envValues = new HashMap<>();
         this.entityDefinitions = new HashMap<>();
         this.entityAmounts = new HashMap<>();
+
+        this.userTermination = false;
+        this.ticksLimit = null;
+        this.secondsLimit = null;
 
         for (PropertyDefinition<?> p : world.getEnvVariablesManager().getEnvVariables()){
             PropertyDto pDto = p.getDto();
@@ -54,6 +63,9 @@ public class ClientDataContainerImpl implements ClientDataContainer {
         propertyDefinitions = clientDataContainer.propertyDefinitions;
         entityAmounts = new HashMap<>(clientDataContainer.entityAmounts);
         entityDefinitions = clientDataContainer.entityDefinitions;
+        userTermination = clientDataContainer.userTermination;
+        ticksLimit = clientDataContainer.ticksLimit;
+        secondsLimit = clientDataContainer.secondsLimit;
     }
 
     @Override
@@ -98,6 +110,8 @@ public class ClientDataContainerImpl implements ClientDataContainer {
             Optional<Comparable<?>> res = Optional.ofNullable(envValues.get(name));
             res.ifPresent(comparable -> activeWorld.setEnvironmentVariable(name, comparable));
         }
+
+        activeWorld.setTerminations(userTermination, ticksLimit, secondsLimit);
     }
 
     @Override
@@ -119,5 +133,24 @@ public class ClientDataContainerImpl implements ClientDataContainer {
     @Override
     public String getWorld() {
         return world;
+    }
+
+    public boolean isUserTermination() {
+        return userTermination;
+    }
+
+    public Integer getTicksLimit() {
+        return ticksLimit;
+    }
+
+    public Integer getSecondsLimit() {
+        return secondsLimit;
+    }
+
+    @Override
+    public void setTermination(boolean userTermination, Integer ticksLimit, Integer secondsLimit) {
+        this.userTermination = userTermination;
+        this.ticksLimit = ticksLimit;
+        this.secondsLimit = secondsLimit;
     }
 }
