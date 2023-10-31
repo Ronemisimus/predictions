@@ -61,7 +61,7 @@ public class MainScene{
         if(mainController==null){
             mainController = mainScene;
         }
-        return mainScene;
+        return mainController;
     }
 
     @FXML
