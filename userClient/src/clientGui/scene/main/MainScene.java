@@ -1,9 +1,11 @@
 package clientGui.scene.main;
 
+import clientGui.history.scene.HistoryController;
 import clientGui.scene.SceneController;
 import clientGui.scene.details.DetailsScene;
 import clientGui.scene.newExecution.NewExecutionScene;
 import clientGui.scene.requests.Requests;
+import clientGui.util.ServerApi;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
@@ -76,7 +78,8 @@ public class MainScene{
 
     @FXML
     public void handleResultsButton(ActionEvent actionEvent){
-        // TODO: handle results button
+        loadSubScene("HistoryScene.fxml", HistoryController.class);
+        sceneController = HistoryController.getInstance();
     }
 
     private void loadSubScene(String fileName, Class<?> loaderClass)
@@ -101,6 +104,11 @@ public class MainScene{
     }
 
     public void fireNewExecutionButton() {
+        newExecutionButton.fire();
+    }
+
+    public void copyEnvironment(Integer identifier) {
+        ServerApi.getInstance().copyEnvironment(identifier);
         newExecutionButton.fire();
     }
 }

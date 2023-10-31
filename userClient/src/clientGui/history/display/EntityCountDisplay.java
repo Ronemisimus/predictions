@@ -1,5 +1,7 @@
 package clientGui.history.display;
 
+import clientGui.util.ServerApi;
+import dto.subdto.show.world.EntityDto;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -7,10 +9,12 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.Pane;
 
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class EntityCountDisplay {
     private final Integer identifier;
@@ -49,23 +53,23 @@ public class EntityCountDisplay {
     }
 
     private void getAmounts() {
-//        List<EntityDto> entities = EngineApi.getInstance().getCurrentEntityAmounts(identifier);
-//        List<HistogramLine> data = entities.stream()
-//                .map(entity -> new HistogramLine(
-//                        entity.getName(),
-//                        entity.getAmount()))
-//                .collect(Collectors.toList());
-//
-//        List<HistogramLine> changedData = entityChartData.stream()
-//                .filter(line -> !data.contains(line))
-//                .collect(Collectors.toList());
-//        List<HistogramLine> newData = data.stream()
-//                .filter(line -> !entityChartData.contains(line))
-//                .collect(Collectors.toList());
-//        Platform.runLater(() -> {
-//            entityChartData.removeAll(changedData);
-//            entityChartData.addAll(newData);
-//        });
+        List<EntityDto> entities = ServerApi.getInstance().getCurrentEntityAmounts(identifier);
+        List<HistogramLine> data = entities.stream()
+                .map(entity -> new HistogramLine(
+                        entity.getName(),
+                        entity.getAmount()))
+                .collect(Collectors.toList());
+
+        List<HistogramLine> changedData = entityChartData.stream()
+                .filter(line -> !data.contains(line))
+                .collect(Collectors.toList());
+        List<HistogramLine> newData = data.stream()
+                .filter(line -> !entityChartData.contains(line))
+                .collect(Collectors.toList());
+        Platform.runLater(() -> {
+            entityChartData.removeAll(changedData);
+            entityChartData.addAll(newData);
+        });
     }
 
     public void hide() {

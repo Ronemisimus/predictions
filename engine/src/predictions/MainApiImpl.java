@@ -91,7 +91,7 @@ public class MainApiImpl implements MainApi {
         World selected = possibleWorlds.get(cdc.getWorld());
         if (selected == null) return null;
         WorldInstance activeWorld = new WorldInstanceImpl(selected, (ClientDataContainerImpl) cdc);
-        simulationManager.addSimulation(activeWorld);
+        simulationManager.addSimulation(activeWorld, username);
         return activeWorld.getRunIdentifiers().getKey();
     }
 
@@ -219,5 +219,10 @@ public class MainApiImpl implements MainApi {
     @Override
     public void setTermination(String username, boolean userTermination, Integer ticksLimit, Integer secondsLimit) {
         clientDataContainer.get(username).setTermination(userTermination, ticksLimit, secondsLimit);
+    }
+
+    @Override
+    public RunHistoryDto getRunHistoryPerUser(String username) {
+        return simulationManager.getRunHistoryPerUser(username);
     }
 }

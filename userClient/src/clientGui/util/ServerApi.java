@@ -2,6 +2,9 @@ package clientGui.util;
 
 import clientGui.execution.environment.EntityAmountGetter;
 import clientGui.execution.environment.EnvironmentVariableGetter;
+import clientGui.history.data.PropertyData;
+import clientGui.history.data.RunState;
+import clientGui.history.display.RunDisplayed;
 import clientGui.scene.details.ComparableDeserializer;
 import clientGui.scene.details.tree.WorldDetailsItem;
 import clientGui.scene.newExecution.RequestSelection;
@@ -11,9 +14,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import dto.EnvDto;
+import dto.RunHistoryDto;
 import dto.ShowWorldDto;
+import dto.subdto.SingleRunHistoryDto;
 import dto.subdto.requests.RequestDetailsDto;
 import dto.subdto.requests.RequestEntryDto;
+import dto.subdto.show.EntityListDto;
+import dto.subdto.show.interactive.RunProgressDto;
 import dto.subdto.show.world.EntityDto;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -24,10 +31,11 @@ import okhttp3.*;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Duration;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class ServerApi {
     public static volatile ServerApi instance = null;
@@ -424,5 +432,345 @@ public class ServerApi {
                     "reason: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace(System.err);
         }
+    }
+
+    public List<RunDisplayed> getRunHistory() {
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("getRunHistory")
+                        .addQueryParameter("username", username)
+                        .build())
+                .build());
+
+        try (Response response = call.execute()) {
+            if (!response.isSuccessful()) {
+                Alert("Error", "Cannot get run history",
+                        "reason: " + (response.body() != null ? response.body().string() : "unknown"), Alert.AlertType.ERROR);
+                throw new RuntimeException("Cannot get run history");
+            }
+            Gson gson = new Gson();
+            RunHistoryDto runHistory = response.body() != null ? gson.fromJson(response.body().string(), RunHistoryDto.class): null;
+
+            return runHistory != null ? runHistory.getRunStates().keySet().stream()
+                    .map(runId -> new RunDisplayed(
+                            new AbstractMap.SimpleEntry<>(runId, runHistory.getRunList().get(runId)),
+                            runHistory.getRunStates().get(runId)))
+                    .collect(Collectors.toList()) : new ArrayList<>();
+        }catch (IOException e) {
+            Alert("Error", "Cannot get run history",
+                    "reason: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace(System.err);
+            return new ArrayList<>();
+        }
+    }
+
+    public Map<String, Map<Integer, Integer>> getSingleRunHistoryEntityAmount(Integer runIdentifier) {
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("getSingleRunHistoryEntityAmount")
+                        .addQueryParameter("username", username)
+                        .addQueryParameter("runIdentifier", String.valueOf(runIdentifier))
+                        .build())
+                .build());
+
+        try (Response response = call.execute()) {
+            Gson gson = checkSingleRunHistory(response);
+            SingleRunHistoryDto singleRunHistory;
+            if (response.body() != null) {
+                singleRunHistory = gson.fromJson(response.body().string(), SingleRunHistoryDto.class);
+            } else {
+                singleRunHistory = null;
+            }
+            return singleRunHistory==null ? new HashMap<>() : IntStream.range(0, singleRunHistory.getEntity().size()).boxed()
+                    .collect(Collectors.toMap(
+                       i -> singleRunHistory.getEntity().get(i),
+                       i -> singleRunHistory.getCounts().get(i)
+                    ));
+        } catch (IOException e) {
+            Alert("Error", "Cannot get run history",
+                    "reason: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace(System.err);
+            return new HashMap<>();
+        }
+    }
+
+    private Gson checkSingleRunHistory(Response response) throws IOException {
+        if (!response.isSuccessful()) {
+            Alert("Error", "Cannot get run history",
+                    "reason: " + (response.body() != null ? response.body().string() : "unknown"), Alert.AlertType.ERROR);
+            throw new RuntimeException("Cannot get run history");
+        }
+        return new GsonBuilder().registerTypeAdapter(Comparable.class, new ComparableDeserializer()).create();
+    }
+
+    public Map<String, Map<String, PropertyData>> getSingleRunHistoryPropertyData(Integer runIdentifier) {
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("getEntityList")
+                        .addQueryParameter("username", username)
+                        .addQueryParameter("runIdentifier", String.valueOf(runIdentifier))
+                        .build())
+                .build());
+
+        EntityListDto entityList;
+        try (Response response = call.execute()) {
+            if (!response.isSuccessful()) {
+                Alert("Error", "Cannot get Entity List",
+                        "reason: " + (response.body() != null ? response.body().string() : "unknown"), Alert.AlertType.ERROR);
+                throw new RuntimeException("Cannot get run history");
+            }
+            Gson gson = new GsonBuilder().registerTypeAdapter(Comparable.class, new ComparableDeserializer()).create();
+            if (response.body() != null) {
+                entityList = gson.fromJson(response.body().string(), EntityListDto.class);
+            } else {
+                entityList = null;
+            }
+        }
+        catch (IOException e) {
+            Alert("Error", "Cannot get Entity List",
+                    "reason: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace(System.err);
+            return new HashMap<>();
+        }
+
+        return entityList == null ? new HashMap<>() : entityList.getEntities().stream()
+                .map(entity -> new AbstractMap.SimpleEntry<>(entity.getName(), entity.getProps()))
+                .map(entry -> new AbstractMap.SimpleEntry<>(
+                        entry.getKey(),
+                        entry.getValue().stream()
+                                .map(prop -> new AbstractMap.SimpleEntry<>(
+                                        prop.getName(),
+                                        new PropertyData(
+                                                entry.getKey(),
+                                                prop,
+                                                getSingleRunPropertyData(
+                                                        runIdentifier,
+                                                        entry.getKey(),
+                                                        prop.getName()
+                                                )
+                                        )
+                                )).collect(Collectors.toMap(
+                                        AbstractMap.SimpleEntry::getKey,
+                                        AbstractMap.SimpleEntry::getValue
+                                ))
+                ))
+                .collect(Collectors.toMap(
+                        AbstractMap.SimpleEntry::getKey,
+                        AbstractMap.SimpleEntry::getValue
+                ));
+    }
+
+    private SingleRunHistoryDto getSingleRunPropertyData(Integer runIdentifier, String entity, String prop) {
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("getSingleRunPropertyData")
+                        .addQueryParameter("username", username)
+                        .addQueryParameter("runIdentifier", String.valueOf(runIdentifier))
+                        .addQueryParameter("entity", entity)
+                        .addQueryParameter("prop", prop)
+                        .build())
+                .build());
+
+        try (Response response = call.execute()) {
+            Gson gson = checkSingleRunHistory(response);
+            if (response.body() != null) {
+                return gson.fromJson(response.body().string(), SingleRunHistoryDto.class);
+            }
+        }
+        catch (IOException e) {
+            Alert("Error", "Cannot get run history",
+                    "reason: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace(System.err);
+        }
+        return new SingleRunHistoryDto(null, null, 0, new HashMap<>(), 0.0, 0.0);
+    }
+
+    public RunProgressDto getRunProgress(Integer identifier) {
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("getRunProgress")
+                        .addQueryParameter("username", username)
+                        .addQueryParameter("runIdentifier", String.valueOf(identifier))
+                        .build())
+                .build());
+
+        try (Response response = call.execute()) {
+            if (!response.isSuccessful()) {
+                Alert("Error", "Cannot get run history",
+                        "reason: " + (response.body() != null ? response.body().string() : "unknown"), Alert.AlertType.ERROR);
+                throw new RuntimeException("Cannot get run history");
+            }
+            Gson gson = new Gson();
+            if (response.body() != null) {
+                return gson.fromJson(response.body().string(), RunProgressDto.class);
+            }
+        }
+        catch (IOException e) {
+            Alert("Error", "Cannot get run history",
+                    "reason: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace(System.err);
+        }
+        return new RunProgressDto(null, 0, Duration.ZERO, Duration.ZERO, RunState.STOPPED.name());
+    }
+
+    public boolean stopSimulation(Integer identifier) {
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("stopSimulation")
+                        .addQueryParameter("username", username)
+                        .addQueryParameter("runIdentifier", String.valueOf(identifier))
+                        .build())
+                .build());
+
+        try (Response response = call.execute()) {
+            if (!response.isSuccessful()) {
+                Alert("Error", "Cannot stop simulation",
+                        "reason: " + (response.body() != null ? response.body().string() : "unknown"), Alert.AlertType.ERROR);
+                throw new RuntimeException("Cannot stop simulation");
+            }
+            Gson gson = new Gson();
+            if (response.body() != null) {
+                return gson.fromJson(response.body().string(), Boolean.class);
+            }
+        }
+        catch (IOException e) {
+            Alert("Error", "Cannot stop simulation",
+                    "reason: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace(System.err);
+            return false;
+        }
+        return false;
+    }
+
+    public void pauseSimulation(Integer identifier) {
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("pauseSimulation")
+                        .addQueryParameter("username", username)
+                        .addQueryParameter("runIdentifier", String.valueOf(identifier))
+                        .build())
+                .build());
+
+        try (Response response = call.execute()) {
+            if (!response.isSuccessful()) {
+                Alert("Error", "Cannot pause simulation",
+                        "reason: " + (response.body() != null ? response.body().string() : "unknown"), Alert.AlertType.ERROR);
+                throw new RuntimeException("Cannot pause simulation");
+            }
+        }
+        catch (IOException e) {
+            Alert("Error", "Cannot pause simulation",
+                    "reason: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace(System.err);
+        }
+    }
+
+    public void resumeSimulation(Integer identifier) {
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("resumeSimulation")
+                        .addQueryParameter("username", username)
+                        .addQueryParameter("runIdentifier", String.valueOf(identifier))
+                        .build())
+                .build());
+
+        try (Response response = call.execute()) {
+            if (!response.isSuccessful()) {
+                Alert("Error", "Cannot resume simulation",
+                        "reason: " + (response.body() != null ? response.body().string() : "unknown"), Alert.AlertType.ERROR);
+                throw new RuntimeException("Cannot resume simulation");
+            }
+        }
+        catch (IOException e) {
+            Alert("Error", "Cannot resume simulation",
+                    "reason: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace(System.err);
+        }
+    }
+
+    public void reRunSimulation(Integer identifier) {
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("reRunSimulation")
+                        .addQueryParameter("username", username)
+                        .addQueryParameter("runIdentifier", String.valueOf(identifier))
+                        .build())
+                .build());
+
+        try (Response response = call.execute()) {
+            if (!response.isSuccessful()) {
+                Alert("Error", "Cannot re-run simulation",
+                        "reason: " + (response.body() != null ? response.body().string() : "unknown"), Alert.AlertType.ERROR);
+                throw new RuntimeException("Cannot re-run simulation");
+            }
+        }
+        catch (IOException e) {
+            Alert("Error", "Cannot re-run simulation",
+                    "reason: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace(System.err);
+        }
+    }
+
+    public void copyEnvironment(Integer identifier) {
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("copyEnvironment")
+                        .addQueryParameter("username", username)
+                        .addQueryParameter("runIdentifier", String.valueOf(identifier))
+                        .build())
+                .build());
+
+        try (Response response = call.execute()) {
+            if (!response.isSuccessful()) {
+                Alert("Error", "Cannot copy environment",
+                        "reason: " + (response.body() != null ? response.body().string() : "unknown"), Alert.AlertType.ERROR);
+                throw new RuntimeException("Cannot copy environment");
+            }
+        }
+        catch (IOException e) {
+            Alert("Error", "Cannot copy environment",
+                    "reason: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace(System.err);
+        }
+    }
+
+    public List<EntityDto> getCurrentEntityAmounts(Integer identifier) {
+        //noinspection KotlinInternalInJava
+        Call call = client.newCall(new Request.Builder()
+                .url(HttpUrl.get(HOST).newBuilder()
+                        .addPathSegment("getCurrentEntityAmounts")
+                        .addQueryParameter("username", username)
+                        .addQueryParameter("runIdentifier", String.valueOf(identifier))
+                        .build())
+                .build());
+
+        try (Response response = call.execute()) {
+            if (!response.isSuccessful()) {
+                Alert("Error", "Cannot get current entity amounts",
+                        "reason: " + (response.body() != null ? response.body().string() : "unknown"), Alert.AlertType.ERROR);
+                throw new RuntimeException("Cannot get current entity amounts");
+            }
+            Gson gson = new GsonBuilder().registerTypeAdapter(Comparable.class, new ComparableDeserializer()).create();
+            if (response.body() != null) {
+                return gson.fromJson(response.body().string(), EntityListDto.class).getEntities();
+            }
+        }
+        catch (IOException e) {
+            Alert("Error", "Cannot get current entity amounts",
+                    "reason: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace(System.err);
+            throw new RuntimeException("Cannot get current entity amounts");
+        }
+        return new ArrayList<>();
     }
 }

@@ -52,4 +52,6 @@ public interface MainApi {
     void setClientContainer(String username, String worldName);
 
     void setTermination(String username, boolean terminationTypes, Integer tickLimit, Integer tickLimit1);
+
+    RunHistoryDto getRunHistoryPerUser(String username);
 }

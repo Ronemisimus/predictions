@@ -1,5 +1,9 @@
 package clientGui.history.display;
 
+import clientGui.history.data.RunState;
+import clientGui.scene.main.MainScene;
+import clientGui.util.ServerApi;
+import dto.subdto.show.interactive.RunProgressDto;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
@@ -9,10 +13,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.SplitPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
@@ -52,21 +53,22 @@ public class InteractiveRun {
         this.resumeButton = new Button("Resume");
         this.pauseButton = new Button("Pause");
         this.copyEnvironmentButton = new Button("Copy");
-//        stopButton.setOnAction(e-> new Thread(() -> {
-//            boolean stoppable = EngineApi.getInstance().stopSimulation(identifier);
-//            if (!stoppable) {
-//                Platform.runLater(()->{
-//                    Alert alert = new Alert(Alert.AlertType.ERROR, "this simulation is not able to stop by the user");
-//                    alert.show();
-//                });
-//            }
-//        }).start());
-//        pauseButton.setOnAction(e->new Thread(() -> EngineApi.getInstance().pauseSimulation(identifier)).start());
-//        resumeButton.setOnAction(e->new Thread(()->EngineApi.getInstance().resumeSimulation(identifier)).start());
-//        rerunButton.setOnAction(e->new Thread(()->EngineApi.getInstance().reRunSimulation(identifier)).start());
-//        copyEnvironmentButton.setOnAction(e->new Thread(()-> MainController.getInstance(null).copyEnvironment(identifier)).start());
-            this.stateGetter = Executors.newScheduledThreadPool(1);
-//        task = null;
+        stopButton.setOnAction(e-> new Thread(() -> {
+            boolean stoppable = ServerApi.getInstance().stopSimulation(identifier);
+            if (!stoppable) {
+                Platform.runLater(()->{
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "this simulation is not able to stop by the user");
+                    alert.show();
+                });
+            }
+        }).start());
+        pauseButton.setOnAction(e->new Thread(() -> ServerApi.getInstance().pauseSimulation(identifier)).start());
+        resumeButton.setOnAction(e->new Thread(()->ServerApi.getInstance().resumeSimulation(identifier)).start());
+        rerunButton.setOnAction(e->new Thread(()->ServerApi.getInstance().reRunSimulation(identifier)).start());
+        //noinspection DataFlowIssue
+        copyEnvironmentButton.setOnAction(e->new Thread(()-> MainScene.getInstance(null).copyEnvironment(identifier)).start());
+        this.stateGetter = Executors.newScheduledThreadPool(1);
+        task = null;
     }
 
     public SplitPane display() {
@@ -116,31 +118,31 @@ public class InteractiveRun {
     }
 
     private void updateTask() {
-//        RunProgressDto res = EngineApi.getInstance().getRunProgress(identifier);
-//        boolean showControlButtons = !res.getStatus().equals(RunState.FINISHED.name()) && !res.getStatus().equals(RunState.STOPPED.name());
-//        boolean showPause = showControlButtons && res.getStatus().equalsIgnoreCase("READY");
-//        Platform.runLater(() -> {
-//            this.simulationTick.setValue(res.getTick());
-//            this.simulationTickMax.setValue(res.getMaxTick());
-//            this.simulationSecond.setValue(res.getSecond());
-//            this.simulationSecondMax.setValue(res.getMaxSecond());
-//            if (showControlButtons){
-//                this.stopButton.setVisible(true);
-//                if (showPause){
-//                    this.pauseButton.setVisible(true);
-//                    this.resumeButton.setVisible(false);
-//                }
-//                else {
-//                    this.pauseButton.setVisible(false);
-//                    this.resumeButton.setVisible(true);
-//                }
-//            }
-//            else{
-//                this.stopButton.setVisible(false);
-//                this.pauseButton.setVisible(false);
-//                this.resumeButton.setVisible(false);
-//            }
-//        });
+        RunProgressDto res = ServerApi.getInstance().getRunProgress(identifier);
+        boolean showControlButtons = !res.getStatus().equals(RunState.FINISHED.name()) && !res.getStatus().equals(RunState.STOPPED.name());
+        boolean showPause = showControlButtons && res.getStatus().equalsIgnoreCase("READY");
+        Platform.runLater(() -> {
+            this.simulationTick.setValue(res.getTick());
+            this.simulationTickMax.setValue(res.getMaxTick());
+            this.simulationSecond.setValue(res.getSecond());
+            this.simulationSecondMax.setValue(res.getMaxSecond());
+            if (showControlButtons){
+                this.stopButton.setVisible(true);
+                if (showPause){
+                    this.pauseButton.setVisible(true);
+                    this.resumeButton.setVisible(false);
+                }
+                else {
+                    this.pauseButton.setVisible(false);
+                    this.resumeButton.setVisible(true);
+                }
+            }
+            else{
+                this.stopButton.setVisible(false);
+                this.pauseButton.setVisible(false);
+                this.resumeButton.setVisible(false);
+            }
+        });
     }
 
     private void linkProgressBars(Pane progressBarContainer) {

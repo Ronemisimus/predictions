@@ -21,6 +21,8 @@ public class SimulationManagerImpl implements SimulationManager{
 
     private final Map<Integer, WorldInstance> worlds;
 
+    private final Map<Integer, String> world_owners;
+
     private final Map<Integer, SimulationState> simulationStates;
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
@@ -30,6 +32,7 @@ public class SimulationManagerImpl implements SimulationManager{
         worlds = new HashMap<>();
         simulationStates = new HashMap<>();
         worldFutures = new HashMap<>();
+        world_owners = new HashMap<>();
     }
 
     private static final class InstanceHolder {
@@ -58,11 +61,12 @@ public class SimulationManagerImpl implements SimulationManager{
     }
 
     @Override
-    public void addSimulation(WorldInstance activeWorld) {
+    public void addSimulation(WorldInstance activeWorld, String username) {
         worlds.put(activeWorld.getRunIdentifiers().getKey(), activeWorld);
         simulationStates.put(activeWorld.getRunIdentifiers().getKey(), activeWorld.getSimulationState());
         //noinspection unchecked
         worldFutures.put(activeWorld.getRunIdentifiers().getKey(), (Future<Void>) executorService.submit(activeWorld));
+        world_owners.put(activeWorld.getRunIdentifiers().getKey(), username);
     }
 
     @Override
@@ -118,7 +122,7 @@ public class SimulationManagerImpl implements SimulationManager{
             synchronized (worlds.get(runId)) {
                  newRun = new WorldInstanceImpl((WorldInstanceImpl) worlds.get(runId));
             }
-            addSimulation(newRun);
+            addSimulation(newRun, world_owners.get(runId));
         }
     }
 
@@ -179,5 +183,19 @@ public class SimulationManagerImpl implements SimulationManager{
             executorService.shutdownNow();
         }
         executorService = Executors.newFixedThreadPool(threadCount);
+    }
+
+    @Override
+    public RunHistoryDto getRunHistoryPerUser(String username) {
+        return new RunHistoryDto(
+                worlds.entrySet().stream()
+                        .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue().getStartTime()))
+                        .filter(entry -> username.equals(world_owners.get(entry.getKey())))
+                        .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue)),
+                simulationStates.entrySet().stream()
+                        .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue().getDto()))
+                        .filter(entry -> username.equals(world_owners.get(entry.getKey())))
+                        .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
+        );
     }
 }

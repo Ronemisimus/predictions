@@ -4,6 +4,9 @@ import dto.EnvDto;
 import dto.ReadFileDto;
 import dto.RunHistoryDto;
 import dto.ShowWorldDto;
+import dto.subdto.SingleRunHistoryDto;
+import dto.subdto.show.EntityListDto;
+import dto.subdto.show.interactive.RunProgressDto;
 import dto.subdto.show.world.EntityDto;
 import main.requests.request.Request;
 import main.requests.request.TerminationType;
@@ -81,5 +84,33 @@ public class EngineApi {
                 request.getSecondsLimit());
         Integer id = mainApi.runSimulation(username);
         request.addRun(id);
+    }
+
+    public RunHistoryDto getRunHistory() {
+        return mainApi.getRunHistory();
+    }
+
+    public RunHistoryDto getRunHistoryPerUser(String username) {
+        return mainApi.getRunHistoryPerUser(username);
+    }
+
+    public SingleRunHistoryDto getRunEntityCounts(int runIdentifier) {
+        return mainApi.getRunEntityCounts(runIdentifier);
+    }
+
+    public EntityListDto getEntityList(int runIdentifier) {
+        return mainApi.getEntityList(runIdentifier);
+    }
+
+    public SingleRunHistoryDto getRunPropertyHist(int runIdentifier, String entity, String prop) {
+        return mainApi.getRunPropertyHistogram(runIdentifier, entity, prop);
+    }
+
+    public RunProgressDto getRunProgress(int runIdentifier) {
+        return mainApi.getRunProgress(runIdentifier);
+    }
+
+    public EntityListDto getCurrentEntityAmounts(int runIdentifier) {
+        return mainApi.getCurrentEntityAmounts(runIdentifier);
     }
 }

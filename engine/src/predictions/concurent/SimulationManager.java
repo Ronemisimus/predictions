@@ -3,7 +3,6 @@ package predictions.concurent;
 import dto.RunHistoryDto;
 import dto.subdto.show.EntityListDto;
 import dto.subdto.show.interactive.RunProgressDto;
-import predictions.client.container.ClientDataContainer;
 import predictions.client.container.ClientDataContainerImpl;
 import predictions.definition.entity.EntityDefinition;
 import predictions.execution.EntityCountHistory;
@@ -20,7 +19,7 @@ public interface SimulationManager {
 
     void initializeThreadPool(Integer threadCount);
 
-    void addSimulation(WorldInstance activeWorld);
+    void addSimulation(WorldInstance activeWorld, String username);
 
     Map<String, EntityCountHistory> getEntityCountHistory(int runId);
 
@@ -54,4 +53,6 @@ public interface SimulationManager {
     Iterator<Termination> getTerminations(Integer identifier);
 
     void setThreadCount(int threadCount);
+
+    RunHistoryDto getRunHistoryPerUser(String username);
 }
