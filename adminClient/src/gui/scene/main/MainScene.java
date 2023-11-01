@@ -1,5 +1,6 @@
 package gui.scene.main;
 
+import gui.history.scene.HistoryController;
 import gui.scene.SceneController;
 import gui.scene.allocations.Allocations;
 import gui.scene.management.ManagementScene;
@@ -28,9 +29,6 @@ public class MainScene{
     private Button allocationsButton;
     @FXML
     private Button executionHistoryButton;
-
-    private static MainScene mainController = null;
-
     private SceneController currentController;
 
     @FXML
@@ -40,15 +38,7 @@ public class MainScene{
         executionHistoryButton.setOnAction(this::handleExecutionHistoryButton);
         content.prefWidthProperty().bind(Bindings.max(900, mainRoot.widthProperty().subtract(20)));
         content.prefHeightProperty().bind(Bindings.max(600, mainRoot.heightProperty().subtract(20)));
-        new Thread(() -> getInstance(this)).start();
         Platform.runLater(()->managementButton.fire());
-    }
-
-    public static synchronized MainScene getInstance(MainScene mainScene) {
-        if(mainController==null){
-            mainController = mainScene;
-        }
-        return mainScene;
     }
 
     @FXML
@@ -65,7 +55,8 @@ public class MainScene{
 
     @FXML
     public void handleExecutionHistoryButton(ActionEvent actionEvent){
-
+        loadSubScene("HistoryScene.fxml", HistoryController.class);
+        currentController = HistoryController.getInstance();
     }
 
     private void loadSubScene(String fileName, Class<?> loaderClass)

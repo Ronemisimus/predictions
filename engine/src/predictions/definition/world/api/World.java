@@ -37,4 +37,6 @@ public interface World {
     int getGridHeight();
 
     void setTerminations(boolean userTermination, Integer ticksLimit, Integer secondsLimit);
+
+    World clone();
 }

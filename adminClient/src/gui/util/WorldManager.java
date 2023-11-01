@@ -4,7 +4,6 @@ import gui.scene.management.worldNameItem.WorldNameItem;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class WorldManager {
     private static final WorldManager instance = new WorldManager();
@@ -13,12 +12,6 @@ public class WorldManager {
 
     private WorldManager() {
         worlds = new ArrayList<>();
-    }
-
-    public synchronized List<String> getWorldNames() {
-        return worlds.stream()
-                .map(WorldNameItem::getName)
-                .collect(Collectors.toList());
     }
 
     public synchronized void addWorld(String worldName, String filePath) {

@@ -65,7 +65,6 @@ public class InteractiveRun {
         pauseButton.setOnAction(e->new Thread(() -> ServerApi.getInstance().pauseSimulation(identifier)).start());
         resumeButton.setOnAction(e->new Thread(()->ServerApi.getInstance().resumeSimulation(identifier)).start());
         rerunButton.setOnAction(e->new Thread(()->ServerApi.getInstance().reRunSimulation(identifier)).start());
-        //noinspection DataFlowIssue
         copyEnvironmentButton.setOnAction(e->new Thread(()-> MainScene.getInstance(null).copyEnvironment(identifier)).start());
         this.stateGetter = Executors.newScheduledThreadPool(1);
         task = null;

@@ -1,6 +1,7 @@
 package gui.history.display;
 
 import dto.subdto.show.world.EntityDto;
+import gui.util.ServerApi;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -52,23 +53,23 @@ public class EntityCountDisplay {
     }
 
     private void getAmounts() {
-//        List<EntityDto> entities = EngineApi.getInstance().getCurrentEntityAmounts(identifier);
-//        List<HistogramLine> data = entities.stream()
-//                .map(entity -> new HistogramLine(
-//                        entity.getName(),
-//                        entity.getAmount()))
-//                .collect(Collectors.toList());
-//
-//        List<HistogramLine> changedData = entityChartData.stream()
-//                .filter(line -> !data.contains(line))
-//                .collect(Collectors.toList());
-//        List<HistogramLine> newData = data.stream()
-//                .filter(line -> !entityChartData.contains(line))
-//                .collect(Collectors.toList());
-//        Platform.runLater(() -> {
-//            entityChartData.removeAll(changedData);
-//            entityChartData.addAll(newData);
-//        });
+        List<EntityDto> entities = ServerApi.getInstance().getCurrentEntityAmounts(identifier);
+        List<HistogramLine> data = entities.stream()
+                .map(entity -> new HistogramLine(
+                        entity.getName(),
+                        entity.getAmount()))
+                .collect(Collectors.toList());
+
+        List<HistogramLine> changedData = entityChartData.stream()
+                .filter(line -> !data.contains(line))
+                .collect(Collectors.toList());
+        List<HistogramLine> newData = data.stream()
+                .filter(line -> !entityChartData.contains(line))
+                .collect(Collectors.toList());
+        Platform.runLater(() -> {
+            entityChartData.removeAll(changedData);
+            entityChartData.addAll(newData);
+        });
     }
 
     public void hide() {

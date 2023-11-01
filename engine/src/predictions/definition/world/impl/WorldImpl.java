@@ -155,9 +155,23 @@ public class WorldImpl implements World {
 
     @Override
     public void setTerminations(boolean userTermination, Integer ticksLimit, Integer secondsLimit) {
+        this.terminations.clear();
         if (userTermination) this.terminations.add(new UserTermination());
         if (ticksLimit != null) this.terminations.add(new TicksTermination(ticksLimit));
         if (secondsLimit != null) this.terminations.add(new TimeTermination(Duration.ofSeconds(secondsLimit)));
+    }
+
+    @Override
+    public World clone() {
+        return new WorldImpl(
+            name,
+            envVariablesManager,
+            entityDefinitions,
+            rules,
+            gridWidth,
+            gridHeight,
+            sleepTime
+        );
     }
 
     @Override

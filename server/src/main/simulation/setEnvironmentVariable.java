@@ -2,7 +2,6 @@ package main.simulation;
 
 import dto.EnvDto;
 import dto.subdto.show.world.PropertyDto;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +15,7 @@ import java.io.IOException;
 @WebServlet(name = "setEnvironmentVariable", urlPatterns = {"/setEnvironmentVariable"})
 public class setEnvironmentVariable extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession session = req.getSession(false);
         if (session == null) {
             resp.setStatus(401);

@@ -1,6 +1,5 @@
 package main.simulation;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +12,7 @@ import java.io.IOException;
 @WebServlet(name = "runSimulation", urlPatterns = {"/runSimulation"})
 public class runSimulation extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession session = req.getSession(false);
         if (session == null) {
             // send unauthorized message with correct status code

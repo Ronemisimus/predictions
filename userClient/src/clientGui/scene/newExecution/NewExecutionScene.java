@@ -95,14 +95,12 @@ public class NewExecutionScene implements SceneController {
 
     private void handleClearButtonClick(ActionEvent event) {
         if (requestSelected.getValue() != null) ServerApi.getInstance().clearSimulation(requestSelected.getValue().getRequestId());
-        //noinspection DataFlowIssue
         MainScene.getInstance(null).fireNewExecutionButton();
     }
 
     private void handleStartButtonClick(ActionEvent event) {
         try {
             ServerApi.getInstance().runSimulation();
-            //noinspection DataFlowIssue
             MainScene.getInstance(null).fireResultsButton();
         }catch (Exception ignored){}
     }

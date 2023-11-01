@@ -52,7 +52,7 @@ public class WorldInstanceImpl implements WorldInstance{
     private Duration duration;
 
     public WorldInstanceImpl(World world, ClientDataContainerImpl clientDataContainer) {
-        this.world = world;
+        this.world = world.clone();
         this.clientDataContainer = new ClientDataContainerImpl(clientDataContainer);
         this.activeEnvironment = world.getEnvVariablesManager().createActiveEnvironment();
         List<String> entities = new ArrayList<>();

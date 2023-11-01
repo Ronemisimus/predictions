@@ -3,7 +3,6 @@ package main.history;
 import com.google.gson.Gson;
 
 import dto.subdto.show.interactive.RunProgressDto;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +16,7 @@ import java.io.IOException;
 @WebServlet(name="getRunProgress", urlPatterns={"/getRunProgress", "/admin/getRunProgress"})
 public class getRunProgress extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession session = req.getSession(false);
         if (session == null) {
             // send unauthorized message with correct status code

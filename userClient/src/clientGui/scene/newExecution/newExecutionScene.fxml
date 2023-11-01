@@ -4,35 +4,39 @@
 <?import javafx.scene.layout.*?>
 
 
-<AnchorPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clientGui.scene.newExecution.NewExecutionScene">
-   <children>
-      <TitledPane collapsible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-          <graphic>
-              <AnchorPane>
-                  <HBox alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                      <Label text="choose approved and open request:" />
-                      <ComboBox fx:id="requestSelected" promptText="select Request Id" />
-                  </HBox>
-              </AnchorPane>
-          </graphic>
-          <AnchorPane prefHeight="400.0" prefWidth="600.0">
-              <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
-                  <bottom>
-                      <ButtonBar BorderPane.alignment="CENTER">
-                          <buttons>
-                              <Button fx:id="clearButton" mnemonicParsing="false" text="Clear" />
-                              <Button fx:id="startButton" mnemonicParsing="false" text="Start" />
-                          </buttons>
-                      </ButtonBar>
-                  </bottom>
-                  <center>
-                      <SplitPane dividerPositions="0.5" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
-                          <BorderPane fx:id="leftPane" prefHeight="200.0" prefWidth="200.0" />
-                          <BorderPane fx:id="centerPane" prefHeight="200.0" prefWidth="200.0" />
-                      </SplitPane>
-                  </center>
-              </BorderPane>
-          </AnchorPane>
-      </TitledPane>
-   </children>
+<AnchorPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="clientGui.scene.newExecution.NewExecutionScene">
+    <TitledPane collapsible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <graphic>
+            <AnchorPane>
+                <HBox alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                      AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <Label text="choose approved and open request:"/>
+                    <ComboBox fx:id="requestSelected" promptText="select Request Id"/>
+                </HBox>
+            </AnchorPane>
+        </graphic>
+        <AnchorPane prefHeight="400.0" prefWidth="600.0">
+            <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                        AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/17.0.2-ea"
+                        xmlns:fx="http://javafx.com/fxml/1">
+                <bottom>
+                    <ButtonBar BorderPane.alignment="CENTER">
+                        <buttons>
+                            <Button fx:id="clearButton" mnemonicParsing="false" text="Clear"/>
+                            <Button fx:id="startButton" mnemonicParsing="false" text="Start"/>
+                        </buttons>
+                    </ButtonBar>
+                </bottom>
+                <center>
+                    <SplitPane dividerPositions="0.5" prefHeight="200.0" prefWidth="160.0"
+                               BorderPane.alignment="CENTER">
+                        <BorderPane fx:id="leftPane" prefHeight="200.0" prefWidth="200.0"/>
+                        <BorderPane fx:id="centerPane" prefHeight="200.0" prefWidth="200.0"/>
+                    </SplitPane>
+                </center>
+            </BorderPane>
+        </AnchorPane>
+    </TitledPane>
 </AnchorPane>

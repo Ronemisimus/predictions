@@ -1,12 +1,12 @@
 package dto.subdto.requests;
 
 public class RequestEntryDto {
-    String username;
-    String worldName;
-    Integer runAllocation;
-    Integer tickLimit;
-    Integer secondsLimit;
-    boolean userTermination;
+    private final String username;
+    private final String worldName;
+    private final Integer runAllocation;
+    private final Integer tickLimit;
+    private final Integer secondsLimit;
+    private final boolean userTermination;
 
     public RequestEntryDto(String username, String worldName, Integer runAllocation, Integer tickLimit, Integer secondsLimit, boolean userTermination) {
         this.username = username;

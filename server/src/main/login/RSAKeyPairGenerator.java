@@ -19,8 +19,8 @@ public class RSAKeyPairGenerator {
             saveKeyToFile(keyPair.getPublic(), PUBLIC_KEY);
 
             // Load keys from files
-            PrivateKey privateKey = loadPrivateKeyFromFile(PRIVATE_KEY);
-            PublicKey publicKey = loadPublicKeyFromFile(PUBLIC_KEY);
+            PrivateKey privateKey = loadPrivateKeyFromFile();
+            PublicKey publicKey = loadPublicKeyFromFile();
 
             // Verify encryption and decryption
             String originalMessage = "Hello, RSA!";
@@ -30,7 +30,7 @@ public class RSAKeyPairGenerator {
             System.out.println("Original Message: " + originalMessage);
             System.out.println("Decrypted Message: " + decryptedMessage);
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
         }
     }
 
@@ -50,9 +50,10 @@ public class RSAKeyPairGenerator {
     }
 
     // Load a private key from a file
-    private static PrivateKey loadPrivateKeyFromFile(String fileName) throws Exception {
-        FileInputStream fis = new FileInputStream(fileName);
+    private static PrivateKey loadPrivateKeyFromFile() throws Exception {
+        FileInputStream fis = new FileInputStream(RSAKeyPairGenerator.PRIVATE_KEY);
         byte[] privateKeyBytes = new byte[fis.available()];
+        //noinspection ResultOfMethodCallIgnored
         fis.read(privateKeyBytes);
         fis.close();
 
@@ -62,9 +63,10 @@ public class RSAKeyPairGenerator {
     }
 
     // Load a public key from a file
-    private static PublicKey loadPublicKeyFromFile(String fileName) throws Exception {
-        FileInputStream fis = new FileInputStream(fileName);
+    private static PublicKey loadPublicKeyFromFile() throws Exception {
+        FileInputStream fis = new FileInputStream(RSAKeyPairGenerator.PUBLIC_KEY);
         byte[] publicKeyBytes = new byte[fis.available()];
+        //noinspection ResultOfMethodCallIgnored
         fis.read(publicKeyBytes);
         fis.close();
 

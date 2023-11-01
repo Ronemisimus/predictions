@@ -3,17 +3,17 @@ package dto.subdto.requests;
 import java.util.Objects;
 
 public class RequestDetailsDto {
-    int requestId;
-    String worldName;
-    String username;
-    int runAllocation;
-    Integer tickLimit;
-    Integer secondsLimit;
-    boolean userTermination;
-    String status;
-    int runsUsed;
-    int runsCompleted;
-    int runsCurrentlyRunning;
+    private final int requestId;
+    private final String worldName;
+    private final String username;
+    private final int runAllocation;
+    private final Integer tickLimit;
+    private final Integer secondsLimit;
+    private final boolean userTermination;
+    private final String status;
+    private final int runsUsed;
+    private final int runsCompleted;
+    private final int runsCurrentlyRunning;
 
     public RequestDetailsDto(Builder builder) {
         this.requestId = builder.requestId;

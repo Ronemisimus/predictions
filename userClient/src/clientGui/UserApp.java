@@ -32,6 +32,7 @@ public class UserApp extends Application {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(MainScene.class.getResource("MainScene.fxml"));
             primaryStage.setScene(new Scene(loader.load()));
+            primaryStage.setOnCloseRequest(e -> System.exit(0));
             primaryStage.show();
         }
     }

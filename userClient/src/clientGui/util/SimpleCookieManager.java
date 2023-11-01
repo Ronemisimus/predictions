@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 public class SimpleCookieManager implements CookieJar {
 
     private final static String CACHE_MANAGER_PREFIX = "    [Cookie Manager] ---> ";
-    Map<String, Map<String, Cookie>> cookies = new HashMap<>();
+    private final Map<String, Map<String, Cookie>> cookies = new HashMap<>();
     private final Consumer<String> logData = System.out::println;
 
     @NotNull

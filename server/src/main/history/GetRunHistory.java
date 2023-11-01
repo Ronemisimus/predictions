@@ -2,7 +2,6 @@ package main.history;
 
 import com.google.gson.Gson;
 import dto.RunHistoryDto;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +15,7 @@ import java.io.IOException;
 @WebServlet(name = "GetRunHistory", urlPatterns = {"/getRunHistory", "/admin/getRunHistory"})
 public class GetRunHistory extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession session = req.getSession(false);
         if (session == null) {
             // send unauthorized message with correct status code

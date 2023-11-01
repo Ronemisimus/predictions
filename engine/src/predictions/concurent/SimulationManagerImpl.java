@@ -25,7 +25,6 @@ public class SimulationManagerImpl implements SimulationManager{
 
     private final Map<Integer, SimulationState> simulationStates;
 
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final Map<Integer, Future<Void>> worldFutures;
 
     private SimulationManagerImpl(){

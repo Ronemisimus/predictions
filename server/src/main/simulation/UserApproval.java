@@ -8,6 +8,7 @@ import main.login.UserManager;
 import java.io.IOException;
 
 public class UserApproval {
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean approveUser(String username, HttpSession session, HttpServletRequest req, HttpServletResponse resp) throws IOException {
         if (username == null){
             resp.setStatus(401);

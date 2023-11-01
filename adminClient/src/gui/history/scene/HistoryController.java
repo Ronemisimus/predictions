@@ -6,6 +6,8 @@ import gui.history.display.ChartAble;
 import gui.history.display.EntityChartLabel;
 import gui.history.display.PropertyChartLabel;
 import gui.history.display.RunDisplayed;
+import gui.scene.SceneController;
+import gui.util.ServerApi;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -26,14 +28,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class HistoryController {
+public class HistoryController implements SceneController {
     @FXML
     private ListView<RunDisplayed> HistoryList;
     @FXML
     private ListView<Parent> EndedRuns;
     @FXML
     private VBox chart;
-    @SuppressWarnings("unused")
     @FXML
     private VBox currentRunEntityCount; // TODO: fill with running simulation data
     @FXML
@@ -41,9 +42,17 @@ public class HistoryController {
 
     private final ObservableList<RunDisplayed> runs = FXCollections.observableArrayList();
 
-    private final ScheduledExecutorService historyGetter = Executors.newScheduledThreadPool(1);
+    private ScheduledExecutorService historyGetter;
+
+    private static HistoryController instance = null;
+
+    public static SceneController getInstance() {
+        return instance;
+    }
+
     @FXML
     private void initialize() {
+        instance = this;
         HistoryList.getSelectionModel().selectedItemProperty().addListener(this::handleRunSelection);
         EndedRuns.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue instanceof ChartAble) {
@@ -57,21 +66,16 @@ public class HistoryController {
 
         HistoryList.setItems(runs);
 
-//        historyGetter.scheduleAtFixedRate(() -> {
-//            List<RunDisplayed> history = EngineApi.getInstance().getRunHistory();
-//
-//            List<RunDisplayed> replacedItems = runs.stream().filter(e -> !history.contains(e)).collect(Collectors.toList());
-//            List<RunDisplayed> addedItems = history.stream().filter(e -> !runs.contains(e)).collect(Collectors.toList());
-//
-//            Platform.runLater(() -> updateUI(replacedItems,addedItems));
-//        },0, 1000, TimeUnit.MILLISECONDS);
-//
-//        MainController.getInstance(null).getCenterStage().centerProperty().addListener((observable, oldValue, newValue) -> {
-//            if (oldValue != null && newValue == null)
-//            {
-//                historyGetter.shutdownNow();
-//            }
-//        });
+        historyGetter = Executors.newScheduledThreadPool(1);
+
+        historyGetter.scheduleAtFixedRate(() -> {
+            List<RunDisplayed> history = ServerApi.getInstance().getRunHistory();
+
+            List<RunDisplayed> replacedItems = runs.stream().filter(e -> !history.contains(e)).collect(Collectors.toList());
+            List<RunDisplayed> addedItems = history.stream().filter(e -> !runs.contains(e)).collect(Collectors.toList());
+
+            Platform.runLater(() -> updateUI(replacedItems,addedItems));
+        },0, 1000, TimeUnit.MILLISECONDS);
     }
 
     private void updateUI(List<RunDisplayed> replacedItems, List<RunDisplayed> addedItems) {
@@ -127,46 +131,49 @@ public class HistoryController {
             EndedRuns.getItems().add(new Label("loading..."));
         });
 
-//        Map<String, Map<Integer, Integer>> counts = EngineApi.getInstance()
-//                .getSingleRunHistoryEntityAmount(run.getRunIdentifier());
-//        List<EntityChartLabel> entityLabels = counts.keySet().stream()
-//                .map(entity -> new EntityChartLabel(entity, counts, chart))
-//                .collect(Collectors.toList());
+        Map<String, Map<Integer, Integer>> counts = ServerApi.getInstance().getSingleRunHistoryEntityAmount(run.getRunIdentifier());
+        List<EntityChartLabel> entityLabels = counts.keySet().stream()
+                .map(entity -> new EntityChartLabel(entity, counts, chart))
+                .collect(Collectors.toList());
 
-//        List<Parent>  entitiesAdded = entityLabels.stream()
-//                .filter(e -> !run.getEntityChartLabels().contains(e))
-//                .collect(Collectors.toList());
-//        //noinspection SuspiciousMethodCalls
-//        List<Parent> entitiesRemoved = run.getEntityChartLabels().stream()
-//                .filter(e -> !entityLabels.contains(e))
-//                .collect(Collectors.toList());
-//
-//        Map<String, Map<String, PropertyData>> histograms = EngineApi.getInstance()
-//                .getSingleRunHistoryPropertyData(run.getRunIdentifier());
-//        List<PropertyChartLabel> propertyLabels = histograms.keySet().stream()
-//                .map(entity ->
-//                        histograms.get(entity).keySet()
-//                                .stream().map(property ->
-//                                        new PropertyChartLabel(entity, property, histograms.get(entity).get(property))
-//                                ).collect(Collectors.toList()))
-//                .flatMap(List::stream)
-//                .collect(Collectors.toList());
+        List<Parent>  entitiesAdded = entityLabels.stream()
+                .filter(e -> !run.getEntityChartLabels().contains(e))
+                .collect(Collectors.toList());
+        //noinspection SuspiciousMethodCalls
+        List<Parent> entitiesRemoved = run.getEntityChartLabels().stream()
+                .filter(e -> !entityLabels.contains(e))
+                .collect(Collectors.toList());
 
-//        List<Parent> propertiesAdded = propertyLabels.stream()
-//                .filter(e -> !run.getEntityChartLabels().contains(e))
-//                .collect(Collectors.toList());
-//        //noinspection SuspiciousMethodCalls
-//        List<Parent> propertiesRemoved = run.getEntityChartLabels().stream()
-//                .filter(e -> !propertyLabels.contains(e))
-//                .collect(Collectors.toList());
-//
-//        run.removeEntityChartLabels(entitiesRemoved);
-//        run.addEntityChartLabels(entitiesAdded);
-//        run.addEntityChartLabels(propertiesAdded);
-//        run.removeEntityChartLabels(propertiesRemoved);
-//
-//        Platform.runLater(() -> EndedRuns.setItems(run.getEntityChartLabels()));
+        Map<String, Map<String, PropertyData>> histograms = ServerApi.getInstance()
+                .getSingleRunHistoryPropertyData(run.getRunIdentifier());
+        List<PropertyChartLabel> propertyLabels = histograms.keySet().stream()
+                .map(entity ->
+                        histograms.get(entity).keySet()
+                                .stream().map(property ->
+                                        new PropertyChartLabel(entity, property, histograms.get(entity).get(property))
+                                ).collect(Collectors.toList()))
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+
+        List<Parent> propertiesAdded = propertyLabels.stream()
+                .filter(e -> !run.getEntityChartLabels().contains(e))
+                .collect(Collectors.toList());
+        //noinspection SuspiciousMethodCalls
+        List<Parent> propertiesRemoved = run.getEntityChartLabels().stream()
+                .filter(e -> !propertyLabels.contains(e))
+                .collect(Collectors.toList());
+
+        run.removeEntityChartLabels(entitiesRemoved);
+        run.addEntityChartLabels(entitiesAdded);
+        run.addEntityChartLabels(propertiesAdded);
+        run.removeEntityChartLabels(propertiesRemoved);
+
+        Platform.runLater(() -> EndedRuns.setItems(run.getEntityChartLabels()));
     }
 
+    @Override
+    public void destroy() {
+        historyGetter.shutdownNow();
+    }
 }
 
