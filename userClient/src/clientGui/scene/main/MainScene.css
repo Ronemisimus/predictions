@@ -1,0 +1,297 @@
+/* Styling for JavaFX Button */
+Button {
+    -fx-background-color: #3498db; /* Background color */
+    -fx-background-radius: 5; /* Rounded corners */
+    -fx-text-fill: #fff; /* Text color */
+    -fx-font-size: 16px; /* Font size */
+    -fx-font-weight: bold; /* Font weight */
+    -fx-padding: 10px; /* Padding (top and bottom, left and right) */
+    -fx-border-color: #2980b9; /* Border color */
+    -fx-border-width: 2px; /* Border width */
+    -fx-effect: dropshadow(three-pass-box, #000, 10, 0, 0, 0); /* Drop shadow */
+    -fx-cursor: hand; /* Cursor style on hover */
+    -fx-background-insets: 0 0 1 0, 0, 1, 2; /* Inner and outer shadow */
+}
+
+/* Styling for Button when hovered */
+Button:hover {
+    -fx-background-color: #2980b9; /* Change background color on hover */
+    -fx-border-color: #2471a3; /* Change border color on hover */
+}
+
+/* Styling for Button when pressed */
+Button:pressed {
+    -fx-background-color: #2078af; /* Change background color when pressed */
+    -fx-border-color: #1a6a9c; /* Change border color when pressed */
+}
+
+/* Styling for Button when disabled */
+Button:disabled {
+    -fx-opacity: 0.5; /* Reduce opacity when disabled */
+    -fx-background-color: #ccc; /* Change background color when disabled */
+    -fx-border-color: #aaa; /* Change border color when disabled */
+    -fx-text-fill: #888; /* Change text color when disabled */
+}
+
+/* Styling for JavaFX BorderPane */
+BorderPane {
+    -fx-background-color: #f2f2f2; /* Background color */
+}
+
+/* Styling for the top region of the BorderPane (e.g., a title bar) */
+BorderPane .top {
+    -fx-background-color: #3498db; /* Background color */
+    -fx-padding: 10px 0px 10px 0px; /* Padding */
+}
+
+/* Styling for the center region of the BorderPane (e.g., main content) */
+BorderPane .center {
+    -fx-background-color: #ffffff; /* Background color */
+}
+
+/* Styling for JavaFX GridPane */
+GridPane {
+    -fx-background-color: #f2f2f2; /* Background color */
+    -fx-hgap: 10; /* Horizontal gap between cells */
+    -fx-vgap: 10; /* Vertical gap between cells */
+    -fx-padding: 10px; /* Padding around the entire grid */
+}
+
+/* Styling for the cells within the GridPane */
+GridPane .grid-cell {
+    -fx-background-color: #ffffff; /* Cell background color */
+    -fx-padding: 10px; /* Cell padding */
+    -fx-alignment: center; /* Cell content alignment */
+}
+
+/* Styling for odd rows of cells */
+GridPane .grid-cell:odd {
+    -fx-background-color: #f9f9f9; /* Background color for odd rows */
+}
+
+GridPane .grid-cell {
+    -fx-padding: 10%;
+}
+
+/* Styling for even rows of cells */
+GridPane .grid-cell:even {
+    -fx-background-color: #f2f2f2; /* Background color for even rows */
+}
+
+/* Styling for JavaFX ComboBox */
+ComboBox {
+    -fx-background-color: #ffffff; /* Background color */
+    -fx-border-color: #3498db; /* Border color */
+    -fx-border-width: 2px; /* Border width */
+    -fx-font-size: 14px; /* Font size */
+    -fx-padding: 5px; /* Padding */
+    -fx-pref-width: 200px; /* Preferred width */
+    -fx-pref-height: 30px; /* Preferred height */
+    -fx-background-radius: 5; /* Rounded corners */
+    -fx-focus-color: transparent; /* Remove focus border */
+}
+
+/* Styling for the ComboBox dropdown button */
+ComboBox .arrow-button {
+    -fx-background-color: #3498db; /* Background color of the dropdown button */
+    -fx-background-radius: 0 5 5 0; /* Rounded corners for the left side */
+    -fx-shape: "M 4 0 L 8 4 L 12 0 Z"; /* Custom dropdown arrow icon */
+    -fx-text-fill: #fff; /* Arrow color */
+    -fx-padding: 5px; /* Padding for the arrow button */
+}
+
+/* Styling for the ComboBox dropdown list */
+ComboBox .list-cell {
+    -fx-background-color: #ffffff; /* Background color of dropdown list items */
+    -fx-font-size: 14px; /* Font size of dropdown list items */
+}
+
+/* Styling for the ComboBox when it is focused */
+ComboBox:focused {
+    -fx-border-color: #2980b9; /* Border color when focused */
+}
+
+/* Styling for JavaFX TreeView */
+TreeView {
+    -fx-background-color: transparent; /* Background color */
+}
+
+/* Styling for the TreeView's cells (tree items) */
+TreeView .tree-cell {
+    -fx-background-color: transparent; /* Background color for tree items */
+    -fx-font-size: 14px; /* Font size */
+    -fx-padding: 5px; /* Padding around tree items */
+    -fx-alignment: center-left; /* Text alignment */
+    -fx-background-radius: 0; /* No rounded corners */
+}
+
+/* Styling for the TreeView's selected cells (tree items) */
+TreeView .tree-cell:selected {
+    -fx-background-color: #3498db; /* Background color for selected tree items */
+    -fx-text-fill: #fff; /* Text color for selected items */
+}
+
+/* Styling for the TreeView's branch (parent) items */
+TreeView .tree-item:expanded {
+    -fx-background-color: #ecf0f1; /* Background color for expanded branches */
+}
+
+/* Styling for the TreeView's branch (parent) items when collapsed */
+TreeView .tree-item:collapsed {
+    -fx-background-color: #ffffff; /* Background color for collapsed branches */
+}
+
+/* Styling for the TreeView's branch (parent) items when focused */
+TreeView .tree-cell:filled:focused {
+    -fx-background-color: #f2f2f2; /* Background color when focused */
+}
+
+/* Styling for JavaFX Label */
+Label {
+    -fx-font-size: 16px; /* Font size */
+    -fx-font-weight: bold; /* Font weight */
+    -fx-text-fill: #3498db; /* Text color */
+    -fx-background-color: transparent; /* Background color */
+    -fx-padding: 5px; /* Padding */
+    -fx-alignment: center; /* Text alignment */
+    -fx-border-color: #3498db; /* Border color */
+    -fx-border-width: 2px; /* Border width */
+    -fx-background-radius: 5; /* Rounded corners */
+}
+
+/* Styling for Label when it is focused */
+Label:focused {
+    -fx-border-color: #2980b9; /* Border color when focused */
+}
+
+/* Styling for Label when it is disabled */
+Label:disabled {
+    -fx-opacity: 0.5; /* Reduce opacity when disabled */
+    -fx-text-fill: #888; /* Change text color when disabled */
+}
+
+/* Styling for JavaFX HBox */
+HBox {
+    -fx-background-color: transparent; /* Background color */
+    -fx-spacing: 10px; /* Spacing between child nodes */
+    -fx-padding: 10px; /* Padding around the entire HBox */
+}
+
+/* Styling for child nodes within the HBox */
+HBox > * {
+    -fx-background-color: #3498db; /* Background color of child nodes */
+    -fx-text-fill: #fff; /* Text color */
+    -fx-font-size: 16px; /* Font size */
+    -fx-padding: 10px; /* Padding around child nodes */
+    -fx-background-radius: 5; /* Rounded corners */
+}
+
+/* Styling for the child nodes when hovered */
+HBox > *:hover {
+    -fx-background-color: #2980b9; /* Background color when hovered */
+}
+
+/* Styling for JavaFX TableView */
+TableView {
+    -fx-background-color: #fff; /* Background color */
+}
+
+/* Styling for the TableView's column headers */
+TableView .column-header-background {
+    -fx-background-color: #3498db; /* Background color for column headers */
+    -fx-text-fill: #fff; /* Text color for column headers */
+    -fx-font-size: 16px; /* Font size for column headers */
+}
+
+/* Styling for the TableView's column header text */
+TableView .column-header {
+    -fx-padding: 10px; /* Padding for column header text */
+}
+
+/* Styling for the TableView's table cells */
+TableView .table-cell {
+    -fx-background-color: transparent; /* Background color for table cells */
+    -fx-text-fill: #333; /* Text color for table cells */
+    -fx-font-size: 14px; /* Font size for table cells */
+    -fx-alignment: center; /* Text alignment in table cells */
+    -fx-padding: 10px; /* Padding for table cells */
+    -fx-border-color: #ccc; /* Border color for table cells */
+    -fx-border-width: 1px; /* Border width for table cells */
+}
+
+/* Styling for the TableView's table cells when selected */
+TableView .table-cell:selected {
+    -fx-background-color: #3498db; /* Background color for selected table cells */
+    -fx-text-fill: #fff; /* Text color for selected table cells */
+}
+
+/* Styling for the TableView's table cells when hovered */
+TableView .table-cell:hover {
+    -fx-background-color: #f2f2f2; /* Background color for table cells when hovered */
+}
+
+/* Styling for the TableView's row stripes (alternate row colors) */
+TableView .table-row-cell:odd {
+    -fx-background-color: #f9f9f9; /* Background color for odd rows */
+}
+
+/* Styling for the TableView's row stripes (alternate row colors) */
+TableView .table-row-cell:even {
+    -fx-background-color: #ffffff; /* Background color for even rows */
+}
+
+/* Styling for JavaFX TextField */
+TextField {
+    -fx-font-size: 14px; /* Font size */
+    -fx-padding: 5px; /* Padding */
+    -fx-text-fill: #333; /* Text color */
+    -fx-background-color: #fff; /* Background color */
+    -fx-background-insets: 0; /* Remove background insets */
+    -fx-background-radius: 5; /* Rounded corners */
+    -fx-border-color: #3498db; /* Border color */
+    -fx-border-width: 2px; /* Border width */
+}
+
+/* Styling for TextField when focused */
+TextField:focused {
+    -fx-border-color: #2980b9; /* Border color when focused */
+}
+
+/* Styling for TextField when disabled */
+TextField:disabled {
+    -fx-opacity: 0.5; /* Reduce opacity when disabled */
+    -fx-text-fill: #888; /* Change text color when disabled */
+}
+
+/* Styling for JavaFX CheckBox */
+CheckBox {
+    -fx-font-size: 14px; /* Font size */
+    -fx-text-fill: #333; /* Text color */
+}
+
+/* Styling for the CheckBox indicator (the check mark) */
+CheckBox .box {
+    -fx-background-color: #fff; /* Background color for the indicator */
+    -fx-border-color: #3498db; /* Border color for the indicator */
+    -fx-shape: "M 0 0 L 5 5 L 10 0 L 9 1 L 5 4 L 1 1 Z"; /* Custom check mark shape */
+    -fx-padding: 2px; /* Padding around the indicator */
+    -fx-background-radius: 0; /* No rounded corners for the indicator */
+}
+
+/* Styling for CheckBox when selected */
+CheckBox:selected .box {
+    -fx-background-color: #3498db; /* Background color for the indicator when selected */
+    -fx-border-color: #2980b9; /* Border color for the indicator when selected */
+}
+
+/* Styling for CheckBox when focused */
+CheckBox:focused {
+    -fx-border-color: #2980b9; /* Border color when focused */
+}
+
+/* Styling for CheckBox when disabled */
+CheckBox:disabled {
+    -fx-opacity: 0.5; /* Reduce opacity when disabled */
+    -fx-text-fill: #888; /* Change text color when disabled */
+}
+
